@@ -70,7 +70,7 @@ window.dashboard = (function () {
         this.interviewID = timeslot.interviewID;
         this.userID = timeslot.userID;
         this.status = timeslot.status;
-        var inst = timeslot.schedule.starttime;
+        var inst = timeslot.schedule.startTime;
         inst.hour = +inst.hour;
 
         if (inst.period.toLowerCase() == 'pm' && inst.hour != 12) {
@@ -95,9 +95,9 @@ window.dashboard = (function () {
     }
 
     function ADRIBlock() {
-        this.starttime = new timePeriod();
-        this.endtime = new timePeriod();
-        this.lunchstart = new timePeriod();
+        this.startTime = new timePeriod();
+        this.endTime = new timePeriod();
+        this.lunchTime = new timePeriod();
     }
 
     function BlockDay(d) {
@@ -433,14 +433,51 @@ window.dashboard = (function () {
                     dashboard.ui.dashboard.route[user.role](user);
                 },
                 route: {
-                    'Recruiter': function (user) {
-                        
+                    'Recruiter': function (user) {                       
                         var db = dashboard.ui.dashboard;
                     
                         db.setup();
-                        //$('.dynamicContent').fadeIn('fast');                       
+                        $('.dynamicContent').fadeIn('fast');                       
 
                         db.getInterviews(function (data) {
+                            data = [{
+                                CANDIDATE_EMAIL: "bryce.roche@gmail.com",
+                                CANDIDATE_ID: "ADRI0002",
+                                CANDIDATE_PHONE: "",
+                                C_FNAME: "Bruce",
+                                C_LNAME: "Roushe",
+                                FULL_NAME: "Bruce Roushe",
+                                INTERVIEW_REFERENCE_ID: "ADRI0002-522765-R5534",
+                                POSITION_ID: "R5534",
+                                POSITION_NAME: "Customer Service - Personal Banker - Penicuik - 9 Month Fixed Term Contract - Part Time",
+                                ROW_ID: 37,
+                                USER_EMAIL: "support@dashboard-sys.com",
+                                USER_FNAME: "Adri-sys",
+                                USER_ID: "10020802",
+                                USER_LNAME: "Support",
+                                USER_PHONE: "",
+                                TIME_SLOT: "9:45am",
+                                USER_ROLE: "Interviewer"
+                            },
+                            {
+                                CANDIDATE_EMAIL: "bryce.roche@gmail.com",
+                                CANDIDATE_ID: "ADRI0002",
+                                CANDIDATE_PHONE: "",
+                                C_FNAME: "Bruce",
+                                C_LNAME: "Roushe",
+                                FULL_NAME: "Bruce Roushe",
+                                INTERVIEW_REFERENCE_ID: "ADRI0002-522765-R5534",
+                                POSITION_ID: "R5534",
+                                POSITION_NAME: "Customer Service - Personal Banker - Penicuik - 9 Month Fixed Term Contract - Part Time",
+                                ROW_ID: 590,
+                                USER_EMAIL: "support@dashboard-sys.com",
+                                USER_FNAME: "Adri-sys",
+                                USER_ID: "10020802",
+                                USER_LNAME: "Support",
+                                USER_PHONE: "",
+                                TIME_SLOT: "2:30pm",
+                                USER_ROLE: "Interviewer"
+                            }];
                             db.drawInterviews(data);
                         });
                     },
@@ -619,6 +656,7 @@ window.dashboard = (function () {
                     });
                 },
                 getUnscheduledInterviews: function (onComplete) {
+               
                     var elid = "dynamic-content-loader";
                     dashboard.ui.loader(true, elid);
                     var posFilter = $('#unsch-position-filter').val() || 'All';
@@ -743,7 +781,7 @@ window.dashboard = (function () {
                     dashboard.ui.loader(false, "dynamic-content-loader");
                 },
                 drawUnscheduledInterviews: function (data) {
-                  
+                    console.log(data);
                     var toggle = function () {
                         dashboard.ui.dashboard.filter.scheduled();
                     };
@@ -835,49 +873,28 @@ window.dashboard = (function () {
                     
                     for (var i = 0; i < lim; i++) {
                         var rowID = 'rowNum' + i;
-                        fullName = data[i]['c_fname'] + ' ' + data[i]['c_lname'];
-
-                        if (data[i]['c_fname'] !== null) {
+                        fullName = data[i]['C_FNAME'] + ' ' + data[i]['C_LNAME'];
+                        if (data[i]['C_FNAME'] !== null) {
                             canName = fullName;
                         }
                         else {
                             canName = 'TBD';
                         }
 
-                        if (data[i]['startdate'] !== undefined) {
-                            sdate = new Date(data[i]['startdate']);
-                            sdate = new Date(sdate.getTime() + (sdate.getTimezoneOffset() * 60000));
-                            month = sdate.getMonth();
-                            month = month + 1;
-                            day = sdate.getDate();
-                            min = sdate.getMinutes();
-                            hrs = sdate.getHours();
-
-                            tslot = sdate.getFullYear();
-                            tslot = tslot + '-' + month;
-                            tslot = tslot + '-' + day;
-                            if (sdate.getHours() > 12) {
-                                tslot = tslot + ', ' + hrs;
-                                tslot = tslot + ':' + min;
-                                tslot = tslot + 'pm';
-                            }
-                            else {
-                                tslot = tslot + ', ' + hrs;
-                                tslot = tslot + ':' + min;
-                                tslot = tslot + 'am';
-                            }
+                        if (data[i]['TIME_SLOT'] !== undefined || data[i]['TIME_SLOT'] !== null) {
+                            tslot = data[i]['TIME_SLOT'];
                         }
                         else {
                             tslot = 'TBD';
                         }
 
-                        phone = data[i]['c_phone'] || 'None';
+                        phone = data[i]['CANDIDATE_PHONE'] || 'None';
 
                         if (phone === null) {
                             phone = '';
                         } 
                         dtlBar = '<li class="roboto"><a onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');">' + canName + 
-                                 '<p class="roboto">' + data[i]['rolename'] + '</p></a></li>';
+                            '<p class="roboto">' + data[i]['USER_ROLE'] + '</p></a></li>';
                         $tab.append('<li data-role="list-divider" onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" >' + tslot + dtlBar + '</li>');                       
                     }
                     
@@ -1613,7 +1630,7 @@ window.dashboard = (function () {
                 dateNode: function (nodeID, date) {
                     var field = dashboard.ui.template.field;
                     var index = $('.ti-schedule-node').length;
-                    var startSelector = field.timeNodes('starttime', index);
+                    var startSelector = field.timeNodes('startTime', index);
                     var markup = '<div id="datetime-node-' + nodeID + '" class="ti-schedule-node pBG">' +
                         dashboard.ui.template.date(date) +
                         field.wrap('Start Time', startSelector) + '<br />' +
@@ -1663,10 +1680,11 @@ window.dashboard = (function () {
                 setSubData: function (updates, field, subField, val) {
                     dashboard.ui.form.data[updates][field][subField] = val;
                 },
-                setBlockHour: function (category, index, field, value) {
+                setBlockHour: function (category, index, value) {
                     var val = value.split(',');
                     var time = val[0];
                     var period = val[1];
+
                     var lim = dashboard.ui.form.data.availability[index].length;
                     for (var i = 0; i < lim; i++) {
                         dashboard.ui.form.data.availability[index][i].schedule[category]['period'] = period;
@@ -1675,6 +1693,8 @@ window.dashboard = (function () {
                     for (var i = 0; i < lim; i++) {
                         dashboard.ui.form.data.availability[index][i].schedule[category]['hour'] = time;
                     }
+                    //console.log(category, index, value);
+                    //console.log(dashboard.ui.form.data.availability[index]);
                 },
                 setBlockMinute: function (category, index, field, value) {
                     var lim = dashboard.ui.form.data.availability[index].length;
@@ -2133,9 +2153,9 @@ window.dashboard = (function () {
                         field.dayToggle('F', 'friday', 0) +
                         field.dayToggle('S', 'saturday', 0);
 
-                    var startSelector = field.timeNodes('starttime', 0);
-                    var endSelector = field.timeNodes('endtime', 0);
-                    var lunchSelector = field.timeNodes('lunchstart', 0);
+                    var startSelector = field.timeNodes('startTime', 0);
+                    var endSelector = field.timeNodes('endTime', 0);
+                    var lunchSelector = field.timeNodes('lunchTime', 0);
 
                     var form =      '<div class="form-header centered ttlTxt" data-theme="c" data-role="header">Persistent Availability<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.close();">&times;</button></div>' +
                                     '<div class="ui-content" id="block-schedule-container">' +
@@ -2190,9 +2210,9 @@ window.dashboard = (function () {
                         field.dayToggle('Fr', 'friday', index) +
                         field.dayToggle('Sa', 'saturday', index);
 
-                    var startSelector = field.timeNodes('starttime', index);
-                    var endSelector = field.timeNodes('endtime', index);
-                    var lunchSelector = field.timeNodes('lunchstart', index);
+                    var startSelector = field.timeNodes('startTime', index);
+                    var endSelector = field.timeNodes('endTime', index);
+                    var lunchSelector = field.timeNodes('lunchTime', index);
                     var block = '<div class="block-repeater">' +
                         field.wrapDay('Days Available', wdGroup) +
                         '<div class="repeaterFieldSpanned">' +
@@ -2224,9 +2244,9 @@ window.dashboard = (function () {
                             'saturday': 'Sa'
                         };
                         var pMap = [
-                            'endtime',
-                            'lunchstart',
-                            'starttime'
+                            'endTime',
+                            'lunchTime',
+                            'startTime'
                         ];
 
                         function setTimeNode(t, tInstance, field, id) {
@@ -2242,11 +2262,11 @@ window.dashboard = (function () {
                                 'per': p
                             };
 
-                            if (field === 'lunchstart') {
+                            if (field === 'lunchTime') {
 
                             }
                             else {
-                                if (field === 'starttime') {
+                                if (field === 'startTime') {
                                     args.per = p + ' -';
                                     var hWrap = temp.timeNodeSmall(field, t, '#radio-hours-' + t + '-' + field, h, args);
 
@@ -2290,9 +2310,9 @@ window.dashboard = (function () {
                                 $('#' + dayID).append(fWrap);
                             }
                             var sched = avail[e][0].schedule;
-                            setTimeNode(e, sched.starttime, 'starttime', timeID);
-                            setTimeNode(e, sched.endtime, 'endtime', timeID);
-                            setTimeNode(e, sched.lunchstart, 'lunchstart', timeID);
+                            setTimeNode(e, sched.startTime, 'startTime', timeID);
+                            setTimeNode(e, sched.endTime, 'endTime', timeID);
+                            setTimeNode(e, sched.lunchTime, 'lunchTime', timeID);
 
                         }
                     }
@@ -2326,17 +2346,17 @@ window.dashboard = (function () {
                     });
                 },
                 set: function (data) {
-                    var pa = data[0];
-                    //var uInfo = data.userInfo[0][0];
+                    var pa = data.persistentAvailability[0];
+                    var uInfo = data.userInfo[0][0];
                     dashboard.ui.form.data = {
-                        userID: btoa(pa.personid),
+                        userID: btoa(uInfo.USER_ID),
                         interviewID: constants.interview.id,
                         clientID: constants.interview.client,
                         interview: {},
                         positions: {},
                         uiID: constants.interview.ui,
                         info: {
-                            id: btoa(pa.personid),
+                            id: btoa(pa[0].USER_ID),
                             fName: '',
                             lName: '',
                             email: '',
@@ -2397,35 +2417,30 @@ window.dashboard = (function () {
                         var p;
                         var tm;
 
-                        var theHour = tInstance.split(':');
+                        var theHour = tInstance.split('\:');
                         var $hr = 'radio-hours-' + t + '-' + field;
                         var $min = 'radio-minutes-' + t + '-' + field;
                         var el = document.getElementById($hr);
                         var elhr = document.getElementById($min);
-                        theHour = theHour[0];
-                   
-                        if (theHour > 11) {
-                            tm = timeConvert(tInstance);
-                            h = tm.hour;
-                            m = tm.minute;
+                        tm = timeConvert(tInstance);
+                        h = tm.hour;
+                        m = tm.minute;
+                        
+                        if (theHour[0] > 11) {
                             //MARK
+                            dashboard.ui.form.setBlockHour(field, t, h + ',PM');
+                            dashboard.ui.form.setBlockMinute(field, t, 'minutes', m);
+
                             $('[name=' + $hr + ']').val(h + ',PM');
                             $('[name=' + $min + ']').val(m);
-                         
-                            dashboard.ui.form.setBlockHour(field, t, 'hour', h + ',PM');
-                            dashboard.ui.form.setBlockMinute(field, t, 'period', m);
                         }
                         else {
-                            tm = timeConvert(tInstance);
-                            h = tm.hour;
-                            m = tm.minute;
                             //MARK
+                            dashboard.ui.form.setBlockHour(field, t, h + ',AM');
+                            dashboard.ui.form.setBlockMinute(field, t, 'minutes', m);
                             $('[name=' + $hr + ']').val(h + ',AM');
                             $('[name=' + $min + ']').val(m);
-                            dashboard.ui.form.setBlockHour(field, t, 'hour', h + ',PM');
-                            dashboard.ui.form.setBlockMinute(field, t, 'period', m);
                         }
-
                     }
 
                     var tLim = pa.length;
@@ -2434,24 +2449,23 @@ window.dashboard = (function () {
                     var cIndex = 0;
 
                     for (var n = 0; n < tLim; n++) {
-                        dateKey = pa[n].starttime + '-' + pa[n].endtime + '-' + pa[n].lunchstart;
+                        dateKey = pa[n].AVAILABLE_START + '-' + pa[n].AVAILABLE_END + '-' + pa[n].LUNCH_START;
                         if (typeof tMap[dateKey] === 'undefined') {
-                            
+
                             if (n !== 0) {
                                 dashboard.user.info.addBlockRepeater();
                             }
                             cIndex = dashboard.ui.form.data.availability.length;
-                            console.log(dashboard.ui.form.data.availability);
                             tMap[dateKey] = cIndex;
-                            $('#day-toggle-' + cIndex + '-' + pa[n].weekday.toLowerCase()).click();
+                            $('#day-toggle-' + cIndex + '-' + pa[n].AVAILABLE_DAY.toLowerCase()).click();
 
-                            setTimeNode(cIndex, pa[n].starttime, 'starttime');
-                            setTimeNode(cIndex, pa[n].endtime, 'endtime');
-                            setTimeNode(cIndex, pa[n].lunchstart, 'lunchstart');
+                            setTimeNode(cIndex, pa[n].AVAILABLE_START, 'startTime');
+                            setTimeNode(cIndex, pa[n].AVAILABLE_END, 'endTime');
+                            setTimeNode(cIndex, pa[n].LUNCH_START, 'lunchTime');
                         }
                         else {
                             cIndex = tMap[dateKey];
-                            $('#day-toggle-' + cIndex + '-' + pa[n].weekday.toLowerCase()).click();
+                            $('#day-toggle-' + cIndex + '-' + pa[n].AVAILABLE_DAY.toLowerCase()).click();
                         }
                     }
                     

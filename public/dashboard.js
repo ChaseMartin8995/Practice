@@ -1115,7 +1115,6 @@ window.dashboard = (function () {
                         }
 
                         if (data[i]['TIME_SLOT'] !== undefined || data[i]['TIME_SLOT'] !== null) {
-
                             tslot = data[i]['TIME_SLOT'];
                         }
                         else {
@@ -3406,9 +3405,9 @@ window.dashboard = (function () {
                         }
                     });
                 },
-                set: function (data) {
-                    console.log(data);
+                set: function (data) {                    
                     var pa = data.persistentAvailability[0];
+                    console.log(pa);
                     var uInfo = data.userInfo[0][0];
                     dashboard.ui.form.data = {
                         userID: btoa(uInfo.USER_ID),
@@ -3608,7 +3607,7 @@ window.dashboard = (function () {
                             managers: {}
                         },
                         info: {
-                            id: btoa(pa.personid),
+                            id: btoa(pa[0].USER_ID),
                             fName: '',
                             lName: '',
                             email: '',
@@ -3676,10 +3675,7 @@ window.dashboard = (function () {
                         tm = timeConvert(tInstance);
                         h = tm.hour;
                         m = tm.minute;
-
-                        if (h === 1) {
-
-                        }
+                        
                         console.log(h);
                         if (theHour[0] > 11) {
                             //MARK
