@@ -1,3 +1,9 @@
+var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
+AWS.config.region = 'us-east-1'; // Region
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    // Provide your Pool Id here
+    IdentityPoolId: 'us-east-1:b049e1f9-7053-48ec-9b1c-431f2edb615c',
+});
 
 String.prototype.toPhone = function () {
     return this.replace(/(\d\d\d)(\d\d\d)(\d\d\d\d)/, '$1-$2-$3');
@@ -5,8 +11,9 @@ String.prototype.toPhone = function () {
 
 window.constants = {
     interview: {// Mark
-        id: 'QURSSTAwMDItNTIyNzY1LVI1NTM0',
-        user: 'MTAwMjA4MDI=',
+        id: '',
+        user: '92990',
+        personcode: '',
         client: 'UkJTREVNTzIwMTcwODE4',
         ui: 'aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS93d3cucmVjcnVpdGluZy5hZHJpLXN5cy5jb20v'
     },
@@ -30,13 +37,10 @@ window.constants = {
         optout: appconfig.api.base + '/' + appconfig.api.stage + '/optOut',
         uploadFile: appconfig.api.base + '/' + appconfig.api.stage + '/uploadFile',
         removeReq: appconfig.api.base + '/' + appconfig.api.stage + '/removeReq'
-    },
-    messages: {
-
     }
 };
 
-window.dashboard = (function () {
+window.dashboard = (function () {   
 
     function ADRITime(d, h, m, p, s) {
         this.interviewID = constants.interview.id;
@@ -92,15 +96,15 @@ window.dashboard = (function () {
     }
 
     function timePeriod(h, m, p) {
-        this.hour = h || '7';
+        this.hour = h || '1';
         this.minutes = m || '00';
         this.period = p || 'AM';
     }
 
     function ADRIBlock() {
-        this.startTime = new timePeriod();
-        this.endTime = new timePeriod();
-        this.lunchTime = new timePeriod();
+        this.starttime = new timePeriod();
+        this.endtime = new timePeriod();
+        this.lunchstart = new timePeriod();
     }
 
     function BlockDay(d) {
@@ -129,316 +133,130 @@ window.dashboard = (function () {
         tcolors: ['#6764E6', '#348CD5', '#6416C6', '#1172C2', '#07589C'],
         id: '',
         init: function () {
-            dashboard.ui.loader(true, "dynamic-content-loader");
             dashboard.util.getURLParams();
             dashboard.ui.zone();
             dashboard.ui.nav.setup();
-            dashboard.ui.dashboard.open();
-        },
+            dashboard.ui.dashboard.open(); 
+           
+            $(document).on("pagechange", function (event) {
+                var screen = $.mobile.getScreenHeight();
+                var header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight();
+                var footer = $(".ui-footer").hasClass("ui-footer-fixed") ? $(".ui-footer").outerHeight() - 1 : $(".ui-footer").outerHeight();
+                var contentCurrent = $(".ui-content").outerHeight() - $(".ui-content").height();
+                var content = screen - header - footer - contentCurrent;
+
+                $(".ui-content").height(content);
+            });
+            $(document).ready(function () {              
+                $(document).on("swiperight", "#dashboard-ras-content", function (e) {
+                    // We check if there is no open panel on the page because otherwise
+                    // a swipe to close the left panel would also open the right panel (and v.v.).
+                    // We do this by checking the data that the framework stores on the page element (panel: open).
+                    if ($.mobile.activePage.jqmData("panel") !== "open") {
+                        if (e.type === "swiperight") {
+                            $("#contentRibbon").panel("open");
+                        }
+                    }
+                });
+                $('#toggleMenu').on('click', function () {
+                    $("#contentRibbon").panel("open");
+                });
+            });
+
+        }, 
         error: {
             noParams: function () {
                 $('#dashboard-ras-content').html('Sorry, but we couldn\'t find your information. Please try clicking your invitation link again.');
             }
         },
         ui: {
-            selectedDate: '',
-            labels: {
-                data: {
-                    ths: '',
-                    id: '',
-                    height: '',
-                    width: '',
-                    mheight: '',
-                    mwidth: '',
-                    delay: 500
-                },
-                initLabels: function () {
-                    $(document).ready(function () {
-
-                        //$(document).tooltip();
-                    });
-                }
-            },
+            selectedDate: '',        
             settings: {
                 setupReq: function () {
-                    dashboard.ui.selected('dashboard-sub-icon4', 'control-sub-label-act');
                     var $Content = $('.ui-content-body');
-                    var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
-                        '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Positions Overview</div></div>' +
-                        '</div>' +
-                        '<div id="db-scheduling" class="dashboard-scheduling">' +
-                        '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                        '<div id="interviews-table"></div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div id="modal-form" class="modal-form"></div>' +
-                        '<div id="smallModal" class="modal-small"></div>' +
-                        '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                        '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
-                        '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
-                        '<div id="error-modal" class="modal">' +
-                        '<div id="availError" class="modal-content">' +
-                        '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
-                        '</div>' +
-                        '</div>';
+                    var iCard =  '<div id="db-weekly-view" class="header-main-wrap block" data-role="header">' +
+                                    '<h1>Requistions and Links</h1>' +
+                                 '</div>' +
+                                 '<div id="db-scheduling" class="dashboard-scheduling">' +
+                                    '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
+                                       '<div id="position-pool"></div>' +
+                                    '</div>' +
+                                 '</div>' +
+                                 '<div id="modal-form" class="modal-form"></div>' +
+                                 '<div id="smallModal" class="modal-small"></div>' +
+                                 '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
+                                 '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
+                                 '<div id="error-modal" class="modal">' +
+                                    '<div id="availError" class="modal-content">' +
+                                       '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
+                                    '</div>' +
+                                 '</div>';
                     $Content.html(iCard);
-                },
-                setupCandidates: function () {
-                    var $Content = $('.ui-content-body');
-                    var $header = $('db-weekly-view');
-                    var iCard = '<div id="db-weekly-view" class="dashMain-title">' +
-                        '<div class="dashboard-header-block"><div class="dashboard-header-text"></div></div>' +
-                        '</div>' +
-                        '<div id="db-scheduling" class="dashboard-scheduling">' +
-                        '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                        '<div id="interviews"><div id="interviews-table" class="ui-table spanned"></div></div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div id="modal-form" class="modal-form"></div>' +
-                        '<div id="smallModal" class="modal-small"></div>' +
-                        '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                        '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
-                        '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
-                        '<div id="error-modal" class="modal">' +
-                        '<div id="availError" class="modal-content">' +
-                        '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
-                        '</div>' +
-                        '</div>';
-                    $Content.html(iCard);
-                    dashboard.ui.dashboard.getUnscheduledInterviews();
                 },
                 addPositions: function () {
                     dashboard.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
                     var db = dashboard.ui.dashboard;
 
                     var $Content = $('.ui-content-body');
-                    var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
-                        '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Add Position</div></div>' +
-                        '</div>' +
-                        '<div id="db-scheduling" class="dashboard-scheduling">' +
-                        '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                        '<div id="position-pool"></div>' +
-                        '</div>' +
-                        '</div>';
+                    var iCard =  '<div id="db-weekly-view" class="header-main-wrap block" data-role="header">' +
+                                    '<h1 style="margin:0 auto;padding:0;width:95%;">Add Position</h1>' +
+                                 '</div>' +
+                                 '<form><ul style="margin:0 auto;padding:0;width:95%;" id="db-scheduling" data-role="listview" data-inset="true">' +
+                                 '</ul></form>';
                     $Content.html(iCard);
                     dashboard.ui.dashboard.addPosition();
-                    var $options = $('#scheduled-interviews-container');
+                    var $options = $('#db-scheduling');
                     var control = '<div class="spacer"></div><div class="spacer"></div>' +
-                        //'<button onclick="dashboard.ui.dashboard.addPosition();" class="button thin hlBG negTxt"><span>ADD POSITION</span></button>' +
-                        '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitPosition(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
-                    //TEMP '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitPosition(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
+                                  //'<button onclick="dashboard.ui.dashboard.addPosition();" class="button thin hlBG negTxt"><span>ADD POSITION</span></button>' +
+                                  '<fieldset class="ui-grid-a">' +
+                                    '<div class="ui-block-b"><button type="submit" onclick="dashboard.ui.submitPosition(dashboard.ui.dashboard.refreshPool)" class="centered ui-btn ui-corner-all ui-btn-a">Submit</button></div>' +
+                                  '</fieldset>';
 
                     $options.append(control);
                 },
                 openReqs: function () {
+                    var elid = "dynamic-content-loader";
                     var db = dashboard.ui.dashboard;
-                    dashboard.ui.loader(true, "dynamic-content-loader");
+                    dashboard.ui.loader(true, elid);
                     dashboard.ui.settings.setupReq();
                     db.getPositions(function (data) {
                         db.drawPositionPool(data);
                     });
-                },
-                addCandidates: function () {
-                    dashboard.ui.loader(true, "dynamic-content-loader");
-                    dashboard.ui.selected('dashboard-sub-icon7', 'control-sub-label-act');
-                    var db = dashboard.ui.dashboard;
-                    db.getPositions('', function () {
-
-                        var $Content = $('.ui-content-body');
-
-                        var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
-                            '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Add Candidate</div></div>' +
-                            '</div>' +
-                            '<div id="db-scheduling" class="dashboard-scheduling">' +
-                            '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                            '<div id="position-pool"></div>' +
-                            '</div>' +
-                            '</div>';
-                        $Content.html(iCard);
-                        dashboard.ui.addCandidateForm();
-                        var $options = $('#scheduled-interviews-container');
-                        var control = '<div class="spacer"></div><div class="spacer"></div>' +
-                            '<button onclick="dashboard.ui.addCandidateForm();" class="button thin hlBG negTxt"><span>ADD CANDIDATE</span></button>' +
-                            '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitCandidates(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
-
-                        $options.append(control);
-                        dashboard.ui.loader(false, "dynamic-content-loader");
-                    });
-
-                },
-                addManagers: function () {
-                    dashboard.ui.selected('dashboard-sub-icon3', 'control-sub-label-act');
-                    var db = dashboard.ui.dashboard;
-                    var $Content = $('.ui-content-body');
-
-                    var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
-                        '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Add Manager</div></div>' +
-                        '</div>' +
-                        '<div id="db-scheduling" class="dashboard-scheduling">' +
-                        '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                        '<div id="position-pool"></div>' +
-                        '</div>' +
-                        '</div>';
-                    $Content.html(iCard);
-                    dashboard.ui.addManagerForm();
-                    var $options = $('#scheduled-interviews-container');
-                    var control = '<div class="spacer"></div><div class="spacer"></div>' +
-                        '<button onclick="dashboard.ui.addManagerForm();" class="button thin hlBG negTxt"><span>ADD MANAGER</span></button>' +
-                        '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitPosition(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
-
-                    $options.append(control);
-                },
-                addRecruiters: function () {
-                    dashboard.ui.selected('dashboard-sub-icon2', 'control-sub-label-act');
-                    var db = dashboard.ui.dashboard;
-                    var $Content = $('.ui-content-body');
-
-                    var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
-                        '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Add Recruiter</div></div>' +
-                        '</div>' +
-                        '<div id="db-scheduling" class="dashboard-scheduling">' +
-                        '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                        '<div id="position-pool"></div>' +
-                        '</div>' +
-                        '</div>';
-                    $Content.html(iCard);
-                    dashboard.ui.addRecruiterForm();
-                    var $options = $('#scheduled-interviews-container');
-                    var control = '<div class="spacer"></div><div class="spacer"></div>' +
-                        '<button onclick="dashboard.ui.addRecruiterForm();" class="button thin hlBG negTxt"><span>ADD RECRUITER</span></button>' +
-                        '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitRecruiters(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
-
-                    $options.append(control);
-                },
-                notifyCandidates: function (data) {
-                    var dInfo = data.dataMain;
-                    console.log('Top data', data);
-                    data = data.results[0];
-                    var $tab = $('.ui-content-body');
-                    $tab.html('');
-
-                    var header = '<div id="db-weekly-view" class="centered dashMain-title">' +
-                        '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Select notification.</div></div>' +
-                        '</div>';
-                    $tab.html(header);
-
-                    var lim = data.length;
-
-                    var dtlBar = '';
-                    var canName = '';
-                    var phone = '';
-                    var fullName = '';
-                    var rowColors = dashboard.colors;
-                    console.log('email data', data);
-                    for (var i = 0; i < lim; i++) {
-
-                        var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
-                        var rowID = 'emailNum' + i;
-                        // random_number template
-                        dtlBar = '<li title="Select the message you wish to send." class="block email-subject-text">' + data[i].subject + '</li>' +
-                            '<li title="Select the message you wish to send." class="block email-body-text">' + data[i].clean_msg + '</li>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><ul onclick="dashboard.ui.settings.checkMsgType(\'' + data[i].clean_msg + '\',\'' + data[i].subject + '\',' + data[i].templateid + ', ' + dInfo.random_number + ');" id="' + rowID + '" class="email-row-wrap">' + dtlBar + '</ul>');
-                        console.log($('#' + rowID));
-                        $('#' + rowID).css('border-left', '3px solid ' + getRandomColor);
-                        $('#' + rowID).hover(function () {
-                            $(this).css('border-left-width', '6px');
-                        }, function () {
-                            $(this).css('border-left-width', '3px');
-                        });
-                    }
-
-                    $('.selAll').on('click', function () {
-                        $(this).select();
-                    });
-
-                    dashboard.ui.loader(false, "dynamic-content-loader");
-                },
-                checkMsgType: function (msg, subject, tempid, batchid) {
-
-                    var choices = {
-                        email: false,
-                        sns: false,
-                        msg: msg,
-                        subject: subject,
-                        tempid: tempid,
-                        batchid: batchid
-                    };
-                    var chkbox = '<div style="margin-top: 10%; width:100%; text-align: center;"><p style="display: inline-block; font-size:18pt" class="ui-cell-pad">' +
-                        '<input style="display: block;" type="checkbox" id="chkEmail" ></>' +
-                        '<label for="chkEmail">SEND EMAIL</label>' +
-                        '</p>' +
-                        '<p style="display: inline-block; font-size:18pt" class="ui-cell-pad">' +
-                        '<input style="display: block;" type="checkbox" id="chkSNS" ></>' +
-                        '<label for="chkSNS">SEND SMS</label>' +
-                        '</p></div>' +
-                        '<div style="width:100%; text-align: center;"><div style="float:none; margin-top: 8px; margin-right: 15px;" class="modal-controls"><div id="cancel" class="cancelButton"></div></div>' +
-                        '<div style="margin-top: 8px; float:none;" class="modal-controls"><div id="confirm" class="submitButton"></div></div></div>';
-
-                    dashboard.ui.modal.large.open(chkbox);
-
-                    $('input[id=chkEmail]').change(
-                        function () {
-                            if (this.checked) {
-                                choices.email = true;
-                            }
-                            else {
-                                choices.email = false;
-                            }
-                        });
-                    $('input[id=chkSNS]').change(
-                        function () {
-                            if (this.checked) {
-                                choices.sns = true;
-                            }
-                            else {
-                                choices.sns = false;
-                            }
-                        });
-
-                    dashboard.util.btns.confirmationBtns('confirm', 'cancel', dashboard.ui.settings.sendEmail, choices, dashboard.util.uploaderNew.open);
-                },
-                sendEmail: function (args) {
-                    var message = args.msg;
-                    var subject = args.subject;
-                    console.log('args', args);
-                    $('.ui-content-body').html('');
-                    dashboard.ui.modal.error.open('Message Sent!');
-
-                    if (args.email === true) {
-                        console.log('firing email');
-                        var message = {
-                            templateid: args.tempid,
-                            batchid: args.batchid
-                        };
-
-                    }
-                    if (args.sns === true) {
-                        console.log('firing SMS');
-                        var message = {
-                            templateid: args.tempid,
-                            batchid: args.batchid
-                        };
-
-                    }
-                    dashboard.ui.settings.setupCandidates();
-                },
+                }
             },
             zone: function () {
                 //Mark: Removed splash class/id and added the control-ribbon element. Also changed it to update the dashboard-ras-content id instead of the core-content id.
                 var elid = "dynamic-content-loader";
-                var zones = '<div id="dashboard-ras-content" class="content-area mainScroller">' +
-                    '<div class="ui-zone-tabular">' +
-                    '<div class="ui-zone-row">' +
-                    '<div id="left-nav" class="control-ribbon"></div>' +
-                    '<div id="dynamic-content-area" class="ui-content-slide"></div>' +
-                    '<div id=' + elid + ' class="loaderContainer"></div>' +
-                    '</div>' +
-                    '</div>' +
-                    //'<div id="core-content" class="dynamicContent" style="display: block;"></div>' +
-                    '</div>';
-
-
-                $('body').html(zones);
+                var getUnscheduled = function (data) {
+                    dashboard.ui.dashboard.drawUnscheduledInterviews(data);
+                };
+                var wkDate = new Date();
+                var zones = '<div tabindex="0" data-theme="c" data-role="page" data-url="dashboard-ras-content" id="dashboard-ras-content" data-cache="false">' +
+                                '<div id="db-weekly-view" style="border:none;" class="header-main-wrap" data-role="header">' +   
+                                    '<div id="db-weekly-view-grid" class="ui-grid-b">' +
+                                        '<div class="ui-block-a" style="width:10%; height:50px;">' + 
+                                            '<div class="button-wrap">' +
+                                                '<button id="toggleMenu" style="height:24px; padding-top:2.3em;" class="ui-btn ui-btn-icon-left ui-icon-bars"></button>' + 
+                                            '</div>' + 
+                                        '</div>' + 
+                                        '<div class="ui-block-b" style="height:50px;">' +
+                                            '<label for="view-select" class="ui-hidden-accessible">Select</label>' +
+                                            '<select data-iconpos="left" id="view-select" name="view-select" data-shadow="false">' +
+                                                '<option>Today\'s Calls</option>' +
+                                                '<option onclick="dashboard.ui.dashboard.getUnscheduledInterviews(' + getUnscheduled + ');" value="2">Unscheduled Calls</option>' +
+                                            '</select>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' + 
+                                '<div style="padding:0;" data-role="content" id="dynamic-content-area"></div>' +
+                                '<div id=' + elid + ' class="loaderContainer"></div>' +
+                                '<div data-role="footer" data-tap-toggle="false" data-position="fixed" id="nav-main" class="control-ribbon"></div>' +
+                                '<div id="contentRibbon" data-role="panel" data-display="overlay" class="ui-content-ribbon" >' +
+                                    '<div id="availabilityView" class="timeContainerSmall"></div>' +
+                                '</div>' +
+                            '</div>';
+                $('body').html(zones);  
+                dashboard.ui.loader(true, elid);
             },
             selected: function (id, cl) {
                 cl = cl || '';
@@ -454,11 +272,10 @@ window.dashboard = (function () {
                 },
                 setup: function () {
                     var nav = '';
-                    var menu = [ //<i class="material-icons">&#xE8B6;</i>
-                        { adr: '', txt: '', type: 'lLogo', icon: '' },
-                        { adr: 'dashboard.init();', txt: 'Dashboard', type: 'dashBtn', icon: '&#xE7FB;' },
-                        { adr: 'dashboard.ui.nav.actionsSetup();', txt: 'Actions', type: 'dashBtn', icon: '&#xE3C9;' },
+                    var menu = [
+                        { adr: 'dashboard.ui.dashboard.open();', txt: 'Dashboard', type: 'dashBtn', icon: '&#xE7FB;' },
                         { adr: 'dashboard.ui.modal.open();', txt: 'Edit Availability', type: 'dashBtn', icon: '&#xE8F9;' },
+                        { adr: 'dashboard.ui.nav.actionsSetup();', txt: 'Actions', type: 'dashBtn', icon: '&#xE3C9;' },
                         { adr: 'dashboard.ui.nav.reportsSetup();', txt: 'Reports', type: 'dashBtn', icon: '&#xE8F9;' },
                         { adr: 'dashboard.ui.nav.searchSetup();', txt: 'Search', type: 'dashBtn', icon: '&#xE8B6;' }
                     ];
@@ -468,41 +285,18 @@ window.dashboard = (function () {
                         nav = nav + dashboard.ui.nav.template[menu[i].type](menu[i].txt, menu[i].adr, menu[i].icon);
                     }
                     $('#rpts-widget').attr('onclick', 'dashboard.ui.nav.open(\'' + atob(constants.interview.ui) + 'reports.html?cliid=' + constants.interview.client + '\');');
-                    $('#left-nav').html(nav);
-                    dashboard.ui.labels.data.height = document.documentElement.clientHeight;
-                    dashboard.ui.labels.data.width = document.documentElement.clientWidth;
-                    $('#dashboard-icon1').toggleClass('control-wrap-act');
-                    dashboard.ui.nav.template.idcount.main = 0;
-                    dashboard.ui.nav.template.idcount.sub = 0;
+                    $('#nav-main').html(nav);
                 },
                 actionsSetup: function () {
                     dashboard.ui.nav.reset();
                     var nav = '';
                     var menu = [
-                        { txt: 'Recruiters', type: 'subHeader' },
-                        { adr: 'dashboard.ui.actions.positions.getAssociatedRecruiters();', txt: 'Overview', type: 'dashSubBtn' },
-                        { adr: 'dashboard.ui.settings.addRecruiters();', txt: 'Add Recruiters', type: 'dashSubBtn' },
-                        { type: 'subSpacer' },
-                        { txt: 'Hiring Managers', type: 'subHeader' },
-                        { adr: 'dashboard.ui.nav.searchSetup();', txt: 'Add Hiring Managers', type: 'dashSubBtn' },
-                        { type: 'subSpacer' },
-                        { txt: 'Positions', type: 'subHeader' },
-                        { adr: 'dashboard.ui.settings.openReqs();', txt: 'Overview', type: 'dashSubBtn' },
+                        { txt: 'Positions', type: 'subHeader'},
                         { adr: 'dashboard.ui.settings.addPositions();', txt: 'Add Positions', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.settings.openReqs();', txt: 'Edit Requisitions', type: 'dashSubBtn' },
                         { type: 'subSpacer' },
                         { txt: 'Candidates', type: 'subHeader' },
-                        { adr: 'dashboard.ui.settings.setupCandidates();', txt: 'Overview', type: 'dashSubBtn' },
-                        { adr: 'dashboard.ui.settings.addCandidates();', txt: 'Add Candidates', type: 'dashSubBtn' },
                         { adr: 'dashboard.util.uploaderNew.open();', txt: 'Upload Candidates', type: 'dashSubBtn' },
-                        { type: 'subSpacer' },
-                        { txt: 'Template Library', type: 'subHeader' },
-                        { adr: 'dashboard.ui.nav.searchSetup();', txt: 'Add New Messages', type: 'dashSubBtn' },
-                        { adr: 'dashboard.ui.actions.messages.getCandidateMsgs();', txt: 'Candidate Messages', type: 'dashSubBtn' },
-                        { adr: 'dashboard.ui.actions.messages.getRecruiterMsgs();', txt: 'Recruiter Messages', type: 'dashSubBtn' },
-                        { adr: 'dashboard.ui.actions.messages.getManagerMsgs();', txt: 'Manager Messages', type: 'dashSubBtn' },
-                        { type: 'subSpacer' },
-                        { txt: 'Settings', type: 'subHeader' },
-                        { adr: 'dashboard.ui.nav.searchSetup();', txt: 'Roles and Access', type: 'dashSubBtn' },
                     ];
 
                     var lim = menu.length;
@@ -510,8 +304,8 @@ window.dashboard = (function () {
                         nav = nav + dashboard.ui.nav.template[menu[i].type](menu[i].txt, menu[i].adr, menu[i].icon);
                     }
                     $('#contentRibbon').html(nav);
-                    dashboard.ui.actions.positions.getAssociatedRecruiters();
-                    dashboard.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
+                    dashboard.ui.settings.addPositions();
+                    $("#contentRibbon").trigger("updatelayout");
                 },
                 reportsSetup: function () {
                     dashboard.ui.nav.reset();
@@ -544,11 +338,11 @@ window.dashboard = (function () {
                         var cl = 'control-wrap-act';
                         var clk = 'dashboard.ui.selected(\'' + theid + '\', \'' + cl + '\');';
                         return '<div onclick="' + adr + clk + '" id="' + theid + '" class="control-wrap">' +
-                            '<div class="control-button">' +
-                            '<i class="material-icons">' + icon + '</i>' +
-                            '</div>' +
-                            '<div class="control-label">' + txt + '</div>' +
-                            '</div>';
+                                    '<div class="control-button light">' +
+                                        '<i class="material-icons">' + icon + '</i>' +
+                                    '</div>' +
+                                    '<div class="control-label">' + txt + '</div>' +
+                               '</div>';
                     },
                     dashSubBtn: function (txt, adr, icon) {
                         dashboard.ui.nav.template.idcount.sub++;
@@ -557,8 +351,8 @@ window.dashboard = (function () {
                         var cl = 'control-sub-label-act';
                         var clk = 'dashboard.ui.selected(\'' + theid + '\', \'' + cl + '\');';
                         return '<div onclick="' + adr + clk + '" class="control-sub-wrap">' +
-                            '<div id="' + theid + '" class="control-sub-label"><span>' + txt + '</span></div>' +
-                            '</div>';
+                                    '<div id="' + theid + '" class="control-sub-label"><span>' + txt + '</span></div>' +
+                               '</div>';
                     },
                     subHeader: function (txt) {
                         return '<div class="subHeader">' + txt + '</div>';
@@ -584,9 +378,7 @@ window.dashboard = (function () {
                     win.focus();
                 }
             },
-            initialize: function () {
-                dashboard.user.validate(dashboard.ui.checkUser);
-                /*
+            initialize: function () {//INCORRECT
                 dashboard.interview.getUsers(function (data) {
                     dashboard.interview.loadToUI(data);
                     dashboard.interview.addUserNodes(data);
@@ -594,13 +386,8 @@ window.dashboard = (function () {
                         dashboard.ui.availability.drawUserTimes(data);
                     });
                 });
-                */
             },
             checkUser: function (user) {
-                user = {
-                    role: 'Recruiter',
-                    name: 'Support'
-                };
                 var welcome = 'Welcome, ' + user.firstName + ' ' + user.lastName + '!';
                 $('#welcome-box').html(welcome);
                 dashboard.ui.route[user.role](user);
@@ -654,66 +441,21 @@ window.dashboard = (function () {
                 },
                 route: {
                     'Recruiter': function (user) {
-
+                        
                         var db = dashboard.ui.dashboard;
-
+                    
                         db.setup();
-                        $('.dynamicContent').fadeIn('fast');
-
-                        db.getPositions(function (data) {
-                            db.setPositionFilters(data);
-                        });
+                        //$('.dynamicContent').fadeIn('fast');                       
 
                         db.getInterviews(function (data) {
-                            data = [{
-                                CANDIDATE_EMAIL: "bryce.roche@gmail.com",
-                                CANDIDATE_ID: "ADRI0002",
-                                CANDIDATE_PHONE: "",
-                                C_FNAME: "Bruce",
-                                C_LNAME: "Roushe",
-                                FULL_NAME: "Bruce Roushe",
-                                INTERVIEW_REFERENCE_ID: "ADRI0002-522765-R5534",
-                                POSITION_ID: "R5534",
-                                POSITION_NAME: "Customer Service - Personal Banker - Penicuik - 9 Month Fixed Term Contract - Part Time",
-                                ROW_ID: 37,
-                                USER_EMAIL: "support@dashboard-sys.com",
-                                USER_FNAME: "Adri-sys",
-                                USER_ID: "10020802",
-                                USER_LNAME: "Support",
-                                USER_PHONE: "",
-                                TIME_SLOT: "9:45am",
-                                USER_ROLE: "Interviewer"
-                            },
-                            {
-                                CANDIDATE_EMAIL: "bryce.roche@gmail.com",
-                                CANDIDATE_ID: "ADRI0002",
-                                CANDIDATE_PHONE: "",
-                                C_FNAME: "Bruce",
-                                C_LNAME: "Roushe",
-                                FULL_NAME: "Bruce Roushe",
-                                INTERVIEW_REFERENCE_ID: "ADRI0002-522765-R5534",
-                                POSITION_ID: "R5534",
-                                POSITION_NAME: "Customer Service - Personal Banker - Penicuik - 9 Month Fixed Term Contract - Part Time",
-                                ROW_ID: 590,
-                                USER_EMAIL: "support@dashboard-sys.com",
-                                USER_FNAME: "Adri-sys",
-                                USER_ID: "10020802",
-                                USER_LNAME: "Support",
-                                USER_PHONE: "",
-                                TIME_SLOT: "2:30pm",
-                                USER_ROLE: "Interviewer"
-                            }];
                             db.drawInterviews(data);
                         });
-                        var elid = "dynamic-content-loader";
-                        dashboard.ui.loader(false, elid);
                     },
                     'Candidate': function (user) {
 
                     },
                     'Interviewer': function (user) {
                         var db = dashboard.ui.dashboard;
-
                         db.setup();
                         //$('.dynamicContent').fadeIn('fast');
 
@@ -721,8 +463,12 @@ window.dashboard = (function () {
                             db.setPositionFilters(data);
                         });
 
-                        db.getInterviews(function (data) { //MARK DELETE
+                        db.getInterviews(function (data) {
                             db.drawInterviews(data);
+                        });
+
+                        db.getUnscheduledInterviews(function (data) {
+                            db.drawUnscheduledInterviews(data);
                         });
                     },
                     'INVALID': function () {
@@ -765,39 +511,23 @@ window.dashboard = (function () {
                     Changes had to be made to .load for the new calendar on the left-hand side of dashboard.
                     Unscheduled-interviews-container has been removed from this view. Moved the day range display to 
 					the frameWeeklyView function in order for it to display further up.*/
-                    $('#page-title').html('Scheduling Dashboard');
-                    var $el = $('#dynamic-content-area');
-                    var wkDate = new Date();
-                    var getUnscheduled = function (data) {
-                        dashboard.ui.dashboard.drawUnscheduledInterviews(data);
-                    };
-
-                    var dash = '<div id="contentRibbon" class="ui-content-ribbon subScroller">' +
-                        '<div id="availabilityView" class="timeContainerSmall"></div>' +
-                        '</div>' +
-                        '<div id="modal-form" class="modal-form"></div>' +
-                        '<div id="smallModal" class="modal-small"></div>' +
-                        '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                        '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
-                        '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
-                        '<div id="error-modal" class="modal">' +
-                        '<div id="availError" class="modal-content">' +
-                        '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="ui-content-body">' +
-                        '<div id="db-weekly-view" class="dashMain-title">' +
-                        '<button id="toggleScheduled" class="mediumClear" title="Check your unscheduled prospects" onclick="dashboard.ui.dashboard.getUnscheduledInterviews(' + getUnscheduled + ');"></button>' +
-                        '<div class="lineSpacer"></div>' +
-                        dashboard.util.controls.calendarSmall.drawWeeklyView(wkDate) +
-                        '<button onclick="dashboard.util.getURLParams();" title="Refresh" class="refresh-button">&#xE5D5;</button>' +
-                        '</div>' +
-                        '<div id="db-scheduling" class="dashboard-scheduling">' +
-                        '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                        '<div id="interviews"></div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>';
+	                var $el = $('#dynamic-content-area');
+                    				
+                    var dash =  '<div id="smallModal" class="modal-small"></div>' +
+                                '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
+                                '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
+                                '<div id="error-modal" class="modal">' +
+                                    '<div id="availError" class="modal-content">' +
+                                        '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div id="content-body" class="ui-content-body">' +                        
+                                    '<div id="db-scheduling" class="dashboard-scheduling">' +
+                                        '<div id="scheduled-interviews-container" >' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div id="modal-form" class="modal-form"></div>' ;
                     $el.html(dash);
                     dashboard.ui.time.loadNew('contentRibbon');
                 },
@@ -836,42 +566,48 @@ window.dashboard = (function () {
                     }
                 },
                 getInterviewsForDate: function (date, id) {
+                    var range = dashboard.ui.dashboard.range;
+                    var oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+                    var today = new Date();
+                    date = new Date(date);
+                    //$('#sch-selected-date').html(date);
+                    if (range.begin !== '' && range.end !== '') {
+                        range.begin = '';
+                        range.end = '';
+                    }
+
+                    if (range.begin === '') {
+                        range.begin = date;
+                        range.end = date;
+                    }
+                    else {
+                        range.end = date;
+                    }
+                    console.log(range.begin, range.end);
+                    var start = Math.round(Math.abs((today.getTime() - range.begin.getTime()) / (oneDay)));
+                    var diffDays = Math.round(Math.abs((range.begin.getTime() - range.end.getTime()) / (oneDay)));
                     var db = dashboard.ui.dashboard;
+                    console.log(start, diffDays);
                     dashboard.ui.selectedDate = date;
-                    $('#sch-selected-date').html(dis);
-                    db.getInterviewsDate(date, function (data) {
-                        db.drawInterviewsForDate(data);
-                    });
+                    $('#sch-selected-date').html('Interviews for Specified Date');
+                    db.getInterviews(function (data) {
+                        db.drawInterviews(data);
+                    }, start, diffDays);
                 },
-                getInterviews: function (onComplete) {
-                    var posFilter = $('#sch-position-filter').val() || 'All';
-                    $.ajax({
-                        type: "GET",
-                        contentType: 'application/json',
-                        dataType: "json",
-                        url: constants.urls.getUserTimeSlots + "?uid=" + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client + '&pfl=' + btoa(posFilter),
-                        success: function (data) {
-                            onComplete(data[0]);
-                        },
-                        error: function (xhr, ajaxOptions, error) {
-                            console.log(xhr);
-                        }
+                getInterviews: function (onComplete, start, end) {
+                    start = start || 0;
+                    end = end || start;
+
+                    var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
+                    var today = new Date();
+                    var sDate = dashboard.util.date.fmt({ date: today, format: 'yyyy-MM-dd' });
+                    var intInfo = [constants.interview.user, start, end];
+                    socket.on('connect', function (data) {
+                        socket.emit('getInterviews', intInfo);
                     });
 
-                },
-                getPositions: function (onComplete) {
-
-                    $.ajax({
-                        type: "GET",
-                        contentType: 'application/json',
-                        dataType: "json",
-                        url: constants.urls.getPositions + '?uid=' + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client,
-                        success: function (data) {
-                            onComplete(data[0]);
-                        },
-                        error: function (xhr, ajaxOptions, error) {
-                            console.log(xhr);
-                        }
+                    socket.on('recieveGet', function (data) {
+                        onComplete(data[0]);
                     });
                 },
                 getScheduledInterviews: function (onComplete) {
@@ -889,7 +625,7 @@ window.dashboard = (function () {
                         }
                     });
                 },
-                getUnscheduledInterviews: function () {
+                getUnscheduledInterviews: function (onComplete) {
                     var elid = "dynamic-content-loader";
                     dashboard.ui.loader(true, elid);
                     var posFilter = $('#unsch-position-filter').val() || 'All';
@@ -899,7 +635,38 @@ window.dashboard = (function () {
                         dataType: "json",
                         url: constants.urls.getUnscheduledInterviews + '?uid=' + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client + '&pfl=' + btoa(posFilter),
                         success: function (data) {
-                            dashboard.ui.dashboard.drawUnscheduledInterviews(data[0]);
+                            onComplete(data[0]);
+                        },
+                        error: function (xhr, ajaxOptions, error) {
+                            console.log(xhr);
+                        }
+                    });
+                },
+                getInterviewsDate: function (date, onComplete) {
+
+                    var posFilter = $('#sch-position-filter').val() || 'All';
+
+                    $.ajax({
+                        type: "GET",
+                        contentType: 'application/json',
+                        dataType: "json",
+                        url: constants.urls.getInterviewsDate + "?uid=" + constants.interview.user + "&adate=" + btoa(date) + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client + '&pfl=' + btoa(posFilter),
+                        success: function (data) {
+                            onComplete(data[0]);
+                        },
+                        error: function (xhr, ajaxOptions, error) {
+                            console.log(xhr);
+                        }
+                    });
+                },
+                getPositions: function (onComplete) {
+                    $.ajax({
+                        type: "GET",
+                        contentType: 'application/json',
+                        dataType: "json",
+                        url: constants.urls.getPositions + '?uid=' + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client,
+                        success: function (data) {
+                            onComplete(data[0]);
                         },
                         error: function (xhr, ajaxOptions, error) {
                             console.log(xhr);
@@ -925,13 +692,13 @@ window.dashboard = (function () {
                 drawInterviewsForDate: function (data) { //MARK: modified to be very similar to drawSInterviews. Change is mainly to make the header perform differently when selecting a specific date. 
 
                     var lim = data.length;
-                    var $schArea = $('#interviews');
-                    $schArea.html('<div id="interviews-table" class="ui-table spanned"></div>');
+                    var $schArea = $('#scheduled-interviews-container');
+                    $schArea.html('<ul data-theme="a" data-inset="true" data-role="listview" id="interviews-table"></ul>');
 
                     var $tab = $('#interviews-table');
 
                     var row = '<div class="ui-row-header">' +
-                        '<div class="ui-cell-med roboto ui-cell-pad left ">Call Time <span class="block">(Click for more details)</span></div>' +
+                        '<div class="ui-cell-med roboto ui-cell-pad left ">Call Time</div>' +
                         '<div class="ui-cell-med roboto left">Prospect</div>' +
                         '<div class="ui-cell-med roboto left">Position</div>' +
                         '<div class="ui-cell-sm roboto ui-cell-pad left">Req</div>' +
@@ -969,240 +736,197 @@ window.dashboard = (function () {
                         phone = data[i]['CANDIDATE_PHONE'] || '';
 
                         if (phone === null) {
-                            phone = '';
+                            phone = ''; 
                         }
-                        else {
-                            phone = phone.replace('/^1/', '');
-                        }
-                        console.log('phone', phone);
-                        dtlBar = '<div class="ui-cell-med roboto ui-cell-pad small"> ' + tslot + '</div>' +
-                            '<div class="ui-cell-med roboto small"> ' + canName + '</div>' +
-                            '<div class="ui-cell-med roboto small"> ' + data[i]['POSITION_NAME'] + '</div>' +
-                            '<div class="ui-cell-sm ui-cell-pad roboto small"> ' + data[i]['POSITION_ID'] + '</div>' +
-                            '<div class="ui-cell-sm roboto small"> ' + phone.toPhone() + '</div>' +
-                            '<div class="ui-cell-med roboto small"> ' + data[i]['CANDIDATE_EMAIL'] + '</div>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><div onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
-
-                        $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
+                        dtlBar = '<li class="roboto"><a onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');">' + canName +
+                            '<p class="roboto">' + data[i]['POSITION_NAME'] + '</p></a></li>';
+                        $tab.append('<li data-role="list-divider" onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" >' + tslot + dtlBar + '</li>');
                     }
 
                     $('.selAll').on('click', function () {
                         $(this).select();
-                    });
-                    var elid = "dynamic-content-loader";
-                    dashboard.ui.loader(false, elid);
-                },
-                drawUnscheduledInterviews: function (data) {
-
-                    //$('#toggleScheduled').text('Unscheduled Prospects');
-                    $('#toggleScheduled').html('<div title="Check your unscheduled prospects">Unscheduled Prospects</div>');
-                    $('#toggleScheduled').removeAttr('onclick');
-                    $('#toggleScheduled').attr('onclick', 'dashboard.ui.dashboard.getUnscheduledInterviews()');
-                    $('.dashboard-header-text').html('Candidate Overview');
-                    var lim = data.length;
-                    var $schArea = $('#interviews');
-                    $schArea.html('<div id="interviews-table" class="ui-table spanned"></div>');
-                    var $tab = $('#interviews-table');
-
-                    var row = '<div class="ui-row-header">' +
-                        '<div class="ui-cell-med roboto ui-cell-pad left ">Call Time <span class="block">(Click for more details)</span></div>' +
-                        '<div class="ui-cell-med roboto left">Prospect</div>' +
-                        '<div class="ui-cell-med roboto left">Position</div>' +
-                        '<div class="ui-cell-sm roboto ui-cell-pad left">Req</div>' +
-                        '<div class="ui-cell-sm roboto left">Phone</div>' +
-                        '<div class="ui-cell-med roboto left">Email</div>' +
-                        '</div>';
-                    $tab.html(row);
-
-                    var lim = data.length;
-
-                    var dtlBar = '';
-                    var canName = '';
-                    var tslot = '';
-                    var phone = '';
-                    var fullName = '';
-                    var sdate = '';
-                    var rowColors = dashboard.colors;
-                    var month;
-                    var hrs;
-                    var day;
-                    var min;
-
-                    for (var i = 0; i < lim; i++) {
-                        //sdate = data[i]['startdate'].split('T').join(', ');
-
-                        var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
-                        var rowID = 'rowNum' + i;
-                        fullName = data[i]['C_FNAME'] + ' ' + data[i]['C_LNAME'];
-                        if (data[i]['C_FNAME'] !== null) {
-                            canName = fullName;
-                        }
-                        else {
-                            canName = 'TBD';
-                        }
-
-                        if (data[i]['POSITION_ID'] === null) {
-                            data[i]['POSITION_ID'] = 'None';
-                        }
-
-                        tslot = 'TBD';
-
-                        phone = data[i]['CANDIDATE_PHONE'] || 'None';
-
-                        if (phone === null) {
-                            phone = '';
-                        }
-                        else {
-                            phone = phone.replace('/^1/', '');
-                        }
-                        dtlBar = '<div title="Click to view Call Details" class="ui-cell-med roboto ui-cell-pad small">' + tslot + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-med roboto small">' + canName + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-med roboto small">' + data[i]['POSITION_NAME'] + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-sm ui-cell-pad roboto small">' + data[i]['POSITION_ID'] + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-sm roboto small">' + phone + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-med roboto small">' + data[i]['CANDIDATE_EMAIL'] + '</div>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><div onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
-
-                        $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
-                    }
-
-                    $('.selAll').on('click', function () {
-                        $(this).select();
-                    });
-
+                    });                    
+                    $('#interviews-table').listview().listview('refresh');
                     dashboard.ui.loader(false, "dynamic-content-loader");
                 },
-                drawInterviews: function (data, btn) {
-                    btn = btn || '';
-
-                    $('#toggleScheduled').html('<div title="Check your unscheduled prospects">Unscheduled Prospects</div>');
+                drawUnscheduledInterviews: function (data) {
+                  
+                    var toggle = function () {
+                        dashboard.ui.dashboard.filter.scheduled();
+                    };
+                    var htxt = 'Unscheduled Prospects';
+                    $('#toggleScheduled').html('<div>Scheduled Prospects</div>');
+                    $('#sch-selected-date').text(htxt);                                       
                     $('#toggleScheduled').removeAttr('onclick');
-                    $('#toggleScheduled').attr('onclick', 'dashboard.ui.dashboard.getUnscheduledInterviews()');
-                    $('#sch-selected-date').html('Upcoming Scheduled Calls');
+                    $('#toggleScheduled').attr('onclick', 'dashboard.ui.dashboard.getInterviews(' + toggle + ')');
+
                     var lim = data.length;
-                    var $schArea = $('#interviews');
-                    $schArea.html('<div id="interviews-table" class="ui-table spanned"></div>');
+                    var $schArea = $('#scheduled-interviews-container');
+
+                    $schArea.html('<ul data-theme="a" data-inset="true" data-role="listview" id="interviews-table"></ul>');
 
                     var $tab = $('#interviews-table');
-
-                    var row = '<div class="ui-row-header">' +
-                        '<div class="ui-cell-med roboto ui-cell-pad left ">Call Time <span class="block">(Click for more details)</span></div>' +
-                        '<div class="ui-cell-med roboto left">Prospect</div>' +
-                        '<div class="ui-cell-med roboto left">Position</div>' +
-                        '<div class="ui-cell-sm roboto ui-cell-pad left">Req</div>' +
-                        '<div class="ui-cell-sm roboto left">Phone</div>' +
-                        '<div class="ui-cell-med roboto left">Email</div>' +
-                        '</div>';
-                    $tab.append(row);
-
+              
                     var lim = data.length;
 
                     var dtlBar = '';
                     var canName = '';
                     var tslot = '';
                     var phone = '';
-                    var fullName = '';
-                    var sdate = '';
                     var rowColors = dashboard.colors;
-                    var month;
-                    var hrs;
-                    var day;
-                    var min;
-
+                    
                     for (var i = 0; i < lim; i++) {
-                        for (var e in data[i]) {
-                            if (data[i][e] === null || data[i][e] === '') {
-                                data[i][e] = 'None';
-                            }
-                        }
-
                         var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
                         var rowID = 'rowNum' + i;
-                        fullName = data[i]['C_FNAME'] + ' ' + data[i]['C_LNAME'];
-                        if (data[i]['C_FNAME'] !== null) {
-                            canName = fullName;
+
+                        if (data[i]['CANDIDATE_ID'] !== null) {
+                            canName = data[i]['FULL_NAME']
                         }
                         else {
                             canName = 'TBD';
                         }
-
-                        if (data[i]['TIME_SLOT'] !== undefined || data[i]['TIME_SLOT'] !== null) {
-
-                            tslot = data[i]['TIME_SLOT'];
+                       
+                        if (data[i]['TIME_SLOT'] !== null) {
+                            tslot = data[i]['CLEAN_DATE'];
                         }
                         else {
                             tslot = 'TBD';
                         }
+
                         phone = data[i]['CANDIDATE_PHONE'] || '';
+
                         if (phone === null) {
                             phone = '';
-                        }
-                        else {
-                            phone = phone.replace('/^1/', '');
-                        }
-                        dtlBar = '<div title="Click to view Call Details" class="ui-cell-med roboto ui-cell-pad small">' + tslot + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-med roboto small">' + canName + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-med roboto small">' + data[i]['USER_ROLE'] + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-sm ui-cell-pad roboto small">' + data[i]['POSITION_ID'] + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-sm roboto small">' + phone.toPhone() + '</div>' +
-                            '<div title="Click to view Call Details" class="ui-cell-med roboto small">' + data[i]['CANDIDATE_PHONE'] + '</div>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><div onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
-
-                        $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
+                        } 
+                        dtlBar = 'DELETE</a><li onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');"><a> ' + canName + 
+                            '<p> ' + data[i]['POSITION_NAME'] + '</p>' +
+                            '<p> ' + phone.toPhone() + '</p>' +
+                            '<p> ' + data[i]['CANDIDATE_EMAIL'] + '</p></a></li>';
+                        $tab.append('<li data-icon="delete" id="' + rowID + '"><a onclick="dashboard.ui.dashboard.deleteUser(\'' + data[i]['ROW_ID'] + '\',\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');">' + dtlBar + '</li>');
+                        //$tab.append('<li data-role="list-divider" onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" >' + tslot + dtlBar + '</li>');;
                     }
 
                     $('.selAll').on('click', function () {
                         $(this).select();
                     });
+                    $('#interviews-table').listview().listview('refresh');
+                    dashboard.ui.loader(false, "dynamic-content-loader");
+                   
+                },
+                drawInterviews: function (data) {
+                    var toggle = function (data) {
+                        dashboard.ui.dashboard.drawUnscheduledInterviews(data);
+                    };
+                    var htxt = 'All Scheduled Calls';
 
+                    $('#sch-selected-date').text(htxt);
+                    //$('#toggleScheduled').text('Unscheduled Prospects');
+                    $('#toggleScheduled').text('Unscheduled Prospects');
+                    $('#toggleScheduled').removeAttr('onclick');
+                    $('#toggleScheduled').attr('onclick', 'dashboard.ui.dashboard.getUnscheduledInterviews(' + toggle + ')');
+
+                    var lim = data.length;
+                    var $schArea = $('#scheduled-interviews-container');
+                    $schArea.html('<ul data-theme="a" data-inset="true" data-role="listview" id="interviews-table"></ul>');
+
+                    var $tab = $('#interviews-table');                   
+
+                    var lim = data.length;
+                    var fullName = '';
+                    var dtlBar = '';
+                    var canName = '';
+                    var tslot = '';
+                    var phone = '';
+                    var rowColors = dashboard.colors;
+                    
+                    for (var i = 0; i < lim; i++) {
+                        var rowID = 'rowNum' + i;
+                        fullName = data[i]['c_fname'] + ' ' + data[i]['c_lname'];
+
+                        if (data[i]['c_fname'] !== null) {
+                            canName = fullName;
+                        }
+                        else {
+                            canName = 'TBD';
+                        }
+
+                        if (data[i]['startdate'] !== undefined) {
+                            sdate = new Date(data[i]['startdate']);
+                            sdate = new Date(sdate.getTime() + (sdate.getTimezoneOffset() * 60000));
+                            month = sdate.getMonth();
+                            month = month + 1;
+                            day = sdate.getDate();
+                            min = sdate.getMinutes();
+                            hrs = sdate.getHours();
+
+                            tslot = sdate.getFullYear();
+                            tslot = tslot + '-' + month;
+                            tslot = tslot + '-' + day;
+                            if (sdate.getHours() > 12) {
+                                tslot = tslot + ', ' + hrs;
+                                tslot = tslot + ':' + min;
+                                tslot = tslot + 'pm';
+                            }
+                            else {
+                                tslot = tslot + ', ' + hrs;
+                                tslot = tslot + ':' + min;
+                                tslot = tslot + 'am';
+                            }
+                        }
+                        else {
+                            tslot = 'TBD';
+                        }
+
+                        phone = data[i]['c_phone'] || 'None';
+
+                        if (phone === null) {
+                            phone = '';
+                        } 
+                        dtlBar = '<li class="roboto"><a onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');">' + canName + 
+                                 '<p class="roboto">' + data[i]['rolename'] + '</p></a></li>';
+                        $tab.append('<li data-role="list-divider" onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" >' + tslot + dtlBar + '</li>');                       
+                    }
+                    
+                    $('.selAll').on('click', function () {
+                        $(this).select();
+                    });      
+                    $('#interviews-table').listview().listview('refresh');
                     dashboard.ui.loader(false, "dynamic-content-loader");
                 },
                 drawPositionPool: function (data) {
-                    console.log('drawPositionPool ', data);
-                    dashboard.ui.form.data.positionids = [];
                     var lim = data.length;
-                    var $schArea = $('#scheduled-interviews-container');
-
-                    $schArea.html('<div id="interviews-table" class="ui-table spanned"></div>');
-                    var $tab = $('#interviews-table');
-
-                    var row = '<div class="ui-row-header">' +
-                        //'<div class="ui-cell-btn-header roboto left">Delete</div>' +
-                        '<div class="ui-cell-sm roboto ui-cell-pad left ">Req #</div>' +
-                        '<div class="ui-cell-sm roboto left">Req Type</div>' +
-                        '<div class="ui-cell-med roboto left">Req Name</div>' +
-                        '</div>';
-                    $tab.append(row);
+                    var $schArea = $('#position-pool');
+                              
+                    $schArea.html('<ul data-theme="a" data-inset="true" data-role="listview" id="interviews-table"></ul>');
+                    var $tab = $('#interviews-table');                 
 
                     var dtlBar = '';
                     var canName = '';
                     var tslot = '';
                     var phone = '';
                     var rowColors = dashboard.colors;
-
+                
                     for (var i = 0; i < lim; i++) {
-                        dashboard.ui.form.data.positionids.push(data[i]['POSITION_ID']);
                         var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
-                        var rowID = 'positionRow' + i;
-                        dtlBar = //'<div class="ui-cell-btn left" onclick="dashboard.ui.dashboard.confirmRemoveReq(\'' + data[i]['role_code'] + '\');">&#xE5CD;</div>' +
-                            '<div class="ui-cell-sm ui-cell-pad roboto small">' + data[i]['POSITION_ID'] + '</div>' +
-                            '<div class="ui-cell-med roboto small">' + data[i]['POSITION_TYPE'] + '</div>' +
-                            '<div class="ui-cell-med roboto small">' + data[i]['POSITION_NAME'] + '</div>' +
-                            '</div>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><div title="Click to add users to ' + data[i]['POSITION_ID'] + '" id="' + rowID + '" onclick="dashboard.ui.actions.positions.getUsersByPosition(\'' + data[i]['POSITION_ID'] + '\');" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
-                        $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
+                        var rowID = 'rowNum' + i;
+                        var link = window.location.href.split('rctrinfsys')[0] + 'candidate.html?rec=' + btoa(data[i]['POSITION_ID']) + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client;
+                        //$schArea.append('<div onclick="dashboard.ui.dashboard.scheduleInterview(\'' + data[i]['POSITION_ID'] + '\');" class="pool-node mainBG negTxt ckable">' + data[i]['LONG_NAME'] + '</div>');
+                        //row = row + '<div class="ui-row ckable" onclick="dashboard.ui.dashboard.getReqLink(\'' + btoa(data[i]['POSITION_ID']) + '\');">';
+                        dtlBar = '<li>' + data[i]['POSITION_NAME'] + 
+                            '<p>' + data[i]['POSITION_TYPE'] + '</p>' +
+                            '<p><input class="selAll spanned-field" value="' + link + '" readonly /></p>' +
+                            '</li>'; //'<li data-role="list-divider" onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['POSITION_ID'] + '\');" id="' + rowID + '" >' + tslot + dtlBar + '</li>'
+                        $tab.append('<li data-role="list-divider" onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['POSITION_ID'] + '\');" id="' + rowID + '" >' + data[i]['POSITION_ID'] + dtlBar + '</li>');                     
                     }
 
                     $('.selAll').on('click', function () {
                         $(this).select();
                     });
-
-                    var elid = "dynamic-content-loader";
-                    dashboard.ui.loader(false, elid);
+                    
                 },
                 getReqLink: function (reqnum) {
                     var link = window.location.href.split('rctrinfsys')[0] + 'candidate.html?rec=' + reqnum + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client;
-                    var markup = '<div class="repeaterField"><div class="formHeader centered">Requisition Link</div><input id="req-input" class="infoTxt repeaterField" value="' + link + '" readonly /></div>';
+                    var markup = '<div class="repeaterField"><div class="form-header centered">Requisition Link</div><input id="req-input" class="infoTxt repeaterField" value="' + link + '" readonly /></div>';
                     $('#smallModal').html(markup);
                     $('#req-input').on('click', function () {
                         $(this).select();
@@ -1240,7 +964,7 @@ window.dashboard = (function () {
                 },
                 getInterview: function (id) {
                     dashboard.ui.loader(true, "dynamic-content-loader");
-                    constants.interview.id = btoa(id);
+                    constants.interview.id = id;
                     dashboard.ui.initialize();
                 },
                 addPosition: function () {
@@ -1257,8 +981,13 @@ window.dashboard = (function () {
                 },
                 refreshPool: function () {
                     var db = dashboard.ui.dashboard;
-                    dashboard.ui.modal.close();
+                    dashboard.ui.modal.close(); 
                     dashboard.ui.settings.addPositions();
+                    /*
+                    db.getPositions(function (data) {
+                        db.drawPositionPool(data);
+                    });
+                    */
                 },
                 refreshInterviews: function () {
                     dashboard.ui.selectedDate = dashboard.ui.selectedDate || '';
@@ -1269,419 +998,45 @@ window.dashboard = (function () {
                 },
                 reports: {
                     open: function () {
-                        //dashboard.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
+                        dashboard.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
                         var $Content = $('.ui-content-body')
-                        var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
-                            '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Interactions</div></div>' +
-                            '</div>' +
-                            '<div id="db-scheduling" class="dashboard-scheduling">' +
-                            '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                            '<div id="position-pool"></div>' +
-                            '</div>' +
-                            '</div>';
+                        var iCard =  '<div id="db-weekly-view" data-role="header">' +
+                                        '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Interactions</div></div>' +
+                                     '</div>' +
+                                     '<div id="db-scheduling" class="dashboard-scheduling">' +
+                                        '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
+                                           '<div id="position-pool"></div>' +
+                                        '</div>' +
+                                     '</div>';
                         $Content.html(iCard);
                     }
-                }
+                },
             },
-            actions: {
-                data: {
+            slideshow: {
+                initialize: function () {
+                    dashboard.ui.slideshow.populate();
+                    dashboard.ui.slideshow.run();
                 },
-                messages: {
-                    getCandidateMsgs: function (onComplete) {
-                        dashboard.ui.loader(true, "dynamic-content-loader");
-                        //var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
-                        var intInfo = [1, 'candidate'];
-                        console.log(intInfo);
-                        socket.on('connect', function (data) {
-                            socket.emit('getMessages', intInfo);
-                        });
-
-                        socket.on('receiveMessages', function (data) {
-                            socket.disconnect();
-                            console.log('messages ', data[0]);
-                            dashboard.ui.actions.messages.drawMsgs(data[0], intInfo[1]);
-                        });
-                    },
-                    getRecruiterMsgs: function (onComplete) {
-                        dashboard.ui.loader(true, "dynamic-content-loader");
-                        //var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
-                        var intInfo = [1, 'manager'];
-                        console.log(intInfo);
-                        socket.on('connect', function (data) {
-                            socket.emit('getMessages', intInfo);
-                        });
-
-                        socket.on('receiveMessages', function (data) {
-                            socket.disconnect();
-                            console.log('messages ', data[0]);
-                            dashboard.ui.actions.messages.drawMsgs(data[0], 'recruiter');
-                        });
-                    },
-                    getManagerMsgs: function (onComplete) {
-                        dashboard.ui.loader(true, "dynamic-content-loader");
-                        //var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
-                        var intInfo = [1, 'manager'];
-                        console.log(intInfo);
-                        socket.on('connect', function (data) {
-                            socket.emit('getMessages', intInfo);
-                        });
-
-                        socket.on('receiveMessages', function (data) {
-                            socket.disconnect();
-                            console.log('messages ', data[0]);
-                            dashboard.ui.actions.messages.drawMsgs(data[0], intInfo[1]);
-                        });
-                    },
-                    drawMsgs: function (data, msgType) {
-                        var dInfo = data;
-                        console.log('notifyCandidates ', data);
-                        var $tab = $('.ui-content-body');
-                        $tab.html('');
-
-                        var header = '<div id="db-weekly-view" class="centered dashMain-title">' +
-                            '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Messages for ' + msgType + '.</div></div>' +
-                            '</div>';
-                        $tab.html(header);
-
-                        var lim = data.length;
-
-                        var dtlBar = '';
-                        var canName = '';
-                        var phone = '';
-                        var fullName = '';
-                        var rowColors = dashboard.colors;
-                        console.log(constants.interview);
-                        for (var i = 0; i < lim; i++) {
-
-                            var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
-                            var rowID = 'emailNum' + i;
-                            // random_number template
-                            dtlBar = '<li class="block email-subject-text">' + data[i].subject + '</li>' +
-                                '<li class="block email-body-text">' + data[i].clean_msg + '</li>';
-                            $tab.append('<div class="ui-row-spacer-main"></div><ul id="' + rowID + '" class="email-row-wrap">' + dtlBar + '</ul>');
-                            console.log($('#' + rowID));
-                            $('#' + rowID).css('border-left', '3px solid ' + getRandomColor);
-                            $('#' + rowID).css('cursor', 'default');
-                        }
-
-                        $('.selAll').on('click', function () {
-                            $(this).select();
-                        });
-
-                        dashboard.ui.loader(false, "dynamic-content-loader");
+                populate: function () {
+                    var slides = '<div class="ss-slide active-slide"><div class="vCenter slideTxt"><div style="display:inline-block;width:50%;">Need help?</div><div style="display:inline-block;width:50%;">Click the &quot;?&quot; on the bottom right of your screen.</div></div></div>' +
+                        '<div class="ss-slide"><div class="vCenter slideTxt"><div style="display:inline-block;width:50%;height:100%;"><br/>Need to remove a req?<br/><br/></div><div style="display:inline-block;width:50%;">1) Navigate to &quot;My Positions&quot;<br/><br/>2) Click the &quot;X&quot; next to the desired req number.</div></div></div>' +
+                        '<div class="ss-slide"><div class="vCenter slideTxt">Be sure to double-check your spam folder if you feel like you are missing notifications!</div></div>';
+                    $('#main-splash').html(slides);
+                },
+                advance: function () {
+                    var $active = $('#main-splash .active-slide');
+                    var $next = $active.next();
+                    if ($next.length === 0) {
+                        $next = $('#main-splash .ss-slide').first();
                     }
+                    $next.addClass('active-slide');
+                    window.setTimeout(function () {
+                        $active.removeClass('active-slide');
+                    }, 300);
                 },
-                positions: {
-                    getUsersByPosition: function (pid) {
-                        dashboard.ui.loader(true, "dynamic-content-loader");
-                        var txt = 'Select Users to add or remove for ' + pid + '';
-                        var buttons = '<div style="margin-top: 8px; margin-right: 15px;" class="modal-controls"><div id="cancel" class="cancelButton"></div></div>' +
-                            '<div style="margin-top: 8px;" class="modal-controls"><div id="confirm" class="submitButton"></div></div>';
-
-                        dashboard.ui.actions.positions.drawUsers('', pid, txt, buttons);
-
-                    },
-                    getAssociatedRecruiters: function () {
-                        dashboard.ui.loader(true, "dynamic-content-loader");
-                        var txt = 'Recruiter Overview';
-                        //var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
-                        //var intInfo = [constants.interview.user];
-
-                        socket.on('connect', function (data) {
-                            socket.emit('getPositionAssociations', constants.interview.user);
-                        });
-
-                        socket.on('receivePositionAssociations', function (data) {
-                            socket.disconnect();
-                            dashboard.ui.actions.positions.setupAssociations(txt);
-                            dashboard.ui.actions.positions.drawAssociations();
-                        });
-                    },
-                    getAssociatedManagers: {
-
-                    },
-                    getAssociatedCandidates: {
-
-                    },
-                    setupAssociations: function (txt, btns) {
-                        btns = btns || '';
-
-                        var $Content = $('.ui-content-body');
-                        var $header = $('db-weekly-view');
-                        var iCard = '<div id="db-weekly-view" class="dashMain-title">' +
-                            '<div class="dashboard-header-block"><div class="dashboard-header-text">' + txt + '</div></div>' +
-                            btns +
-                            '</div>' +
-                            '<div id="db-scheduling" class="dashboard-scheduling">' +
-                            '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                            '<div id="position-pool"></div>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div id="modal-form" class="modal-form"></div>' +
-                            '<div id="smallModal" class="modal-small"></div>' +
-                            '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                            '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
-                            '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
-                            '<div id="error-modal" class="modal">' +
-                            '<div id="availError" class="modal-content">' +
-                            '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
-                            '</div>' +
-                            '</div>';
-                        $Content.html(iCard);
-                        dashboard.util.btns.confirmationBtns('confirm', 'cancel', dashboard.ui.actions.positions.updatePositions, '', dashboard.ui.settings.openReqs);
-                    },
-                    drawAssociations: function (data) {
-                        data = dashboard.ui.form.data.users.recruiters;
-
-                        var lim = data.length;
-                        var $schArea = $('#position-pool');
-                        $schArea.html('<div id="interviews-table" class="ui-table spanned"></div>');
-                        var $tab = $('#interviews-table');
-                        $tab.html('');
-                        var row = '<div class="ui-row-header">' +
-                            '<div class="ui-cell-sm roboto ui-cell-pad left ">Name</div>' +
-                            '<div class="ui-cell-sm roboto ui-cell-pad left ">Positions</div>' +
-                            '<div class="ui-cell-sm roboto left">Phone</div>' +
-                            '<div class="ui-cell-med roboto left">Email</div>' +
-                            '</div>';
-                        $tab.append(row);
-
-                        var lim = data.length;
-                        var dtlBar = '';
-                        var canName = '';
-                        var tslot = '';
-                        var phone = '';
-                        var fullName = '';
-                        var otherName = '';
-                        var sdate = '';
-                        var rowColors = dashboard.colors;
-                        var month;
-                        var hrs;
-                        var day;
-                        var min;
-                        var next;
-
-                        var newRow;
-                        var names = [];
-                        var uniqueNames = [];
-                        var output = [];
-                        // create new array with fullName
-                        for (var s = 0; s < lim; s++) {
-                            newRow = {
-                                fullName: data[s]['fname'] + ' ' + data[s]['lname'],
-                                pid: data[s]['role_code'],
-                                phone: data[s]['mobilenumber'],
-                                email: data[s]['emailaddress'],
-                                userid: data[s]['userid']
-                            };
-                            fullName = data[s]['fname'] + ' ' + data[s]['lname'];
-                            names.push(newRow);
-                        }
-                        // walk through new array and concat any duplicate position IDs into single row
-                        names.forEach(function (value) {
-                            var existing = output.filter(function (v) {
-                                return v.fullName == value.fullName;
-                            });
-                            if (existing.length) {
-                                var existingIndex = output.indexOf(existing[0]);
-                                output[existingIndex].pid = output[existingIndex].pid.concat(value.pid);
-                            }
-                            else {
-                                if (typeof value.pid == 'string') {
-                                    value.pid = [value.pid];
-                                    output.push(value);
-                                }
-                            }
-                        });
-                        console.log('drawAssociations', output);
-                        dashboard.ui.actions.data.recruiters = output;
-                        data = output;
-                        var dLen = data.length;
-                        for (var i = 0; i < dLen; i++) {
-                            var positionids = '';
-                            var pLen = data[i]['pid'].length;
-                            for (var e = 0; e < pLen; e++) {
-                                data[i]['pid'] = data[i]['pid'] || '';
-                                if (data[i]['pid'] && e < pLen - 1) {
-                                    positionids = positionids + data[i]['pid'][e] + ', ';
-                                }
-                                else {
-                                    positionids = positionids + data[i]['pid'][e];
-                                }
-                            }
-
-                            var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
-                            var rowID = 'rowNum' + i;
-                            phone = data[i]['phone'];
-                            if (data[i]['fullName'] !== null) {
-                                //do nothing
-                            }
-                            else {
-                                fullName = 'TBD';
-                            }
-
-                            if (phone === null) {
-                                phone = '';
-                            }
-                            else {
-                                phone = phone.replace('/^1/', '');
-                            }
-                            dtlBar = '<div class="ui-cell-med ui-cell-pad roboto small">' + data[i]['fullName'] + '</div>' +
-                                '<div class="ui-cell-sm roboto small">' + positionids + '</div>' +
-                                '<div class="ui-cell-sm roboto small">' + phone + '</div>' +
-                                '<div class="ui-cell-med roboto small">' + data[i]['email'] + '</div>';
-                            $tab.append('<div class="ui-row-spacer-main"></div><div id="' + rowID + '" class="ui-main-row-view tableBG">' + dtlBar + '</div>');
-
-                            $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
-                        }
-
-                        $('.selAll').on('click', function () {
-                            $(this).select();
-                        });
-
-                        dashboard.ui.loader(false, "dynamic-content-loader");
-                    },
-                    setupPositionAssociations: function (txt, btns) {
-                        btns = btns || '';
-
-                        var $Content = $('.ui-content-body');
-                        var $header = $('db-weekly-view');
-                        var iCard = '<div id="db-weekly-view" class="dashMain-title">' +
-                            '<div class="dashboard-header-block"><div class="dashboard-header-text">' + txt + '</div></div>' +
-                            btns +
-                            '</div>' +
-                            '<div id="db-scheduling" class="dashboard-scheduling">' +
-                            '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
-                            '<div id="position-pool"></div>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div id="modal-form" class="modal-form"></div>' +
-                            '<div id="smallModal" class="modal-small"></div>' +
-                            '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                            '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
-                            '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
-                            '<div id="error-modal" class="modal">' +
-                            '<div id="availError" class="modal-content">' +
-                            '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
-                            '</div>' +
-                            '</div>';
-                        $Content.html(iCard);
-                        dashboard.util.btns.confirmationBtns('confirm', 'cancel', dashboard.ui.actions.positions.updatePositions, '', dashboard.ui.settings.openReqs);
-                    },
-                    drawUsers: function (data, pid, txt, buttons) {
-                        dashboard.ui.actions.positions.setupPositionAssociations(txt, buttons);
-                        data = dashboard.ui.actions.data.recruiters;
-                        console.log(data);
-                        var lim = data.length;
-                        var $schArea = $('#position-pool');
-
-                        $schArea.html('<div id="interviews-table" class="ui-table spanned"></div>');
-                        var $tab = $('#interviews-table');
-                        $tab.html('');
-                        var row = '<div class="ui-row-header">' +
-                            '<div class="ui-cell-sm roboto ui-cell-pad left">Select <span class="block">(Select to add)</span></div>' +
-                            '<div class="ui-cell-sm roboto ui-cell-pad left ">Name</div>' +
-                            '<div class="ui-cell-sm roboto left">Phone</div>' +
-                            '<div class="ui-cell-med roboto left">Email</div>' +
-                            '</div>';
-                        $tab.append(row);
-
-                        var lim = data.length;
-
-                        var dtlBar = '';
-                        var canName = '';
-                        var tslot = '';
-                        var phone = '';
-                        var fullName = '';
-                        var sdate = '';
-                        var rowColors = dashboard.colors;
-                        var month;
-                        var hrs;
-                        var day;
-                        var min;
-                        var chkbox;
-
-                        for (var i = 0; i < lim; i++) {
-                            for (var e in data[i]) {
-                                if (data[i][e] === null || data[i][e] === '') {
-                                    data[i][e] = 'None';
-                                }
-                            }
-
-                            var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
-                            var rowID = 'rowNum' + i;
-                            phone = data[i]['phone'];
-                            fullName = data[i]['fullName'];
-                            if (fullName !== null) {
-                                //do nothing
-                            }
-                            else {
-                                fullName = 'TBD';
-                            }
-
-
-                            var userid = data[i]['userid'];
-
-                            for (var e in data[i]['pid']) {
-                                if (pid === data[i]['pid'][e]) {
-                                    chkbox = '<p class="ui-cell-pad">' +
-                                        '<input checked onclick="dashboard.ui.actions.positions.setData(' + pid + ', ' + data[i]['userid'] + ');" type="checkbox" id="chkBox' + rowID + '" ></>' +
-                                        '<label for="chkBox' + rowID + '"></label>' +
-                                        '</p>';
-                                    break;
-                                }
-                                else {
-                                    chkbox = '<p class="ui-cell-pad">' +
-                                        '<input onclick="dashboard.ui.actions.positions.setData(\'' + pid + '\',' + data[i]['userid'] + ');" type="checkbox" id="chkBox' + rowID + '" ></>' +
-                                        '<label for="chkBox' + rowID + '"></label>' +
-                                        '</p>';
-                                }
-                            }
-                            /*
-                            chkbox = '<p class="ui-cell-pad">' +
-                                '<input onclick="dashboard.ui.actions.positions.setData(' + pid + ', ' + data[i]['userid'] + ');" type="checkbox" id="chkBox' + rowID + '" ></>' +
-                                '<label for="chkBox' + rowID + '"></label>' +
-                                '</p>';
-                            */
-                            dtlBar = '' + chkbox + '<div class="ui-cell-med ui-cell-pad roboto small">' + fullName + '</div>' +
-                                '<div class="ui-cell-sm roboto small">' + phone + '</div>' +
-                                '<div class="ui-cell-med roboto small">' + data[i]['email'] + '</div>';
-                            $tab.append('<div class="ui-row-spacer-main"></div><div title="Use the checkboxes to add or remove from ' + pid + '" id="' + rowID + '" class="ui-main-row-view tableBG">' + dtlBar + '</div>');
-                            $()
-                            $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
-                        }
-
-                        $('.selAll').on('click', function () {
-                            $(this).select();
-                        });
-
-
-                        dashboard.ui.loader(false, "dynamic-content-loader");
-                    },
-                    setData: function (posid, userid) {
-                        var rec = dashboard.ui.actions.data.recruiters;
-
-                        for (var e = 0; e < rec.length; e++) {
-                            if (rec[e].userid === userid) {
-                                console.log('true0', rec[e].userid, userid);
-                                var iLen = dashboard.ui.actions.data.recruiters[e].pid.length;
-                                for (var i = 0; i < iLen; i++) {
-                                    if (dashboard.ui.actions.data.recruiters[e].pid[i] === posid) {
-                                        console.log(dashboard.ui.actions.data.recruiters[e].pid[i]);
-                                        //dashboard.ui.actions.data.recruiters[e].pid[i] = '';
-                                    }
-                                    else {
-                                        console.log('false', dashboard.ui.actions.data.recruiters[e]);
-                                        dashboard.ui.actions.data.recruiters[e].pid.push(posid);
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    updatePositions: function (user) {
-                        dashboard.ui.settings.openReqs();
-                    }
-                },
+                run: function () {
+                    setInterval(dashboard.ui.slideshow.advance, 8000);
+                }
             },
             modal: {
                 open: function () {
@@ -1714,26 +1069,6 @@ window.dashboard = (function () {
                         });
                     }
                 },
-                large: {
-                    open: function (t) {
-                        t = t || '';
-                        $('#small-modal-bg-overlay').stop();
-                        $('#largeModal').stop();
-                        $('#small-modal-bg-overlay').fadeIn(400, function () {
-                            $('#largeModal').fadeIn(400);
-                        });
-                        if (t !== '') {
-                            $('#largeModal').html(t);
-                        }
-                    },
-                    close: function () {
-                        $('#small-modal-bg-overlay').stop();
-                        $('#largeModal').stop();
-                        $('#largeModal').fadeOut(400, function () {
-                            $('#small-modal-bg-overlay').fadeOut(400);
-                        });
-                    }
-                },
                 error: {//Mark: Added different modal markup for errors and important notifications. 
                     open: function (t) {
                         $('#small-modal-bg-overlay').stop();
@@ -1741,8 +1076,7 @@ window.dashboard = (function () {
                         $('#small-modal-bg-overlay').fadeIn(400, function () {
                             $('#error-modal').fadeIn(400);
                         });
-                        $('#availError').html(t);
-                        $('#availError').append('<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>');
+                        $('#availError').append(t);
                     },
                     close: function () {
                         $('#small-modal-bg-overlay').stop();
@@ -1754,96 +1088,53 @@ window.dashboard = (function () {
                 }
             },
             addPositionForm: function () {
-                var currentLength = dashboard.ui.form.data.positions.length;
-
-                var nodes = currentLength + $('.smallFormFields').length;
-                var $schArea = $('#position-pool');
+                var $schArea = $('#db-scheduling');
                 var field = dashboard.ui.template.field;
-                dashboard.ui.form.data.positions[nodes] = {
-                    rolename: "",
-                    role_code: "",
-                    role_type: "",
-                    count: nodes
-                }; //label, updates, field, setType, value, index  //label, updates, field, choices, setType, index
-                var posFields = field.input('Position ID', 'positions', 'role_code', '', '', nodes) + '<br/>' +
-                    field.input('Position Name', 'positions', 'rolename', '', '', nodes) + '<br/>' +
-                    field.selectNew('Position Type', 'positions', 'role_type', ['Vacancy', 'Evergreen'], '', nodes); //TO-DO: un-hardcode this
-
-                posFields = '<div class="smallForm"><div class="smallFormFields"><div class="formHeader">New Position</div>' + posFields + '</div></div>';
+                var posFields = field.input('Position ID', 'positions', 'id') +
+                                field.input('Position Name', 'positions', 'name') +
+                                field.selectNew('Position Type', 'positions', 'type', ['Vacancy', 'Evergreen']); //TO-DO: un-hardcode this
+                
                 $schArea.append(posFields);
+                $("input").textinput();
+                //dropdownsLarge();
             },
-            addRecruiterForm: function () {
-                var currentLength = dashboard.ui.form.data.users.recruiters.length;
-
-                var nodes = currentLength + $('.largeFormFields').length;
-                var $schArea = $('#position-pool');
-                var field = dashboard.ui.template.field;
-                dashboard.ui.form.data.users.recruiters[nodes] = {
-                    userid: nodes + 1000,
-                    fname: '',
-                    lname: '',
-                    emailaddress: '',
-                    mobilenumber: '',
-                    role_code: ''
+            scheduleInterviewForm: function (positionID) {
+                dashboard.ui.form.resetData();
+                dashboard.ui.form.data.positions[0] = {
+                    id: positionID
                 };
-                var posFields = field.input('Email Address', 'recruiters', 'emailaddress', 'User', '', nodes) +
-                    field.inputSmall('First Name', 'recruiters', 'fname', 'User', '', nodes) +
-                    field.inputSmall('Last Name', 'recruiters', 'lname', 'User', '', nodes) +
-                    field.inputSmall('Phone Number', 'recruiters', 'mobilenumber', 'User', '', nodes);
-
-                posFields = '<div class="smallForm"><div class="largeFormFields"><div class="formHeader">New Recruiter</div>' + posFields + '</div></div>';
-                $schArea.append(posFields);
-            },
-            addManagerForm: function () {
-                var nodes = $('.largeFormFields').length;
-                console.log(nodes);
-                var $schArea = $('#position-pool');
+                var $modal = $('#modal-form');
                 var field = dashboard.ui.template.field;
-                dashboard.ui.form.data.users.managers[nodes] = {};
-                var posFields = field.input('Email Address', 'managers', 'email', 'User', '', nodes) +
-                    field.inputSmall('First Name', 'managers', 'fname', 'User', '', nodes) +
-                    field.inputSmall('Last Name', 'managers', 'lname', 'User', '', nodes) +
-                    field.inputSmall('Phone Number', 'managers', 'phone', 'User', '', nodes);
+                var intFields = '<div id="new-event-form" class="form-event">' +
+                    '<div class="formHeader">Enter ' + appconfig.alias.interview + ' Information</div>' +
+                    field.input(appconfig.alias.interview + ' Title', 'interview', 'title') +
+                    '<div style="display:none;">' + field.input(appconfig.alias.interview + ' ID', 'interview', 'id') + '</div>' +
+                    //field.input(appconfig.alias.interview + ' Address', 'interview', 'address') +                             //hard-coded
+                    //field.input(appconfig.alias.interview + ' City', 'interview', 'city') +                                   //hard-coded
+                    //field.input(appconfig.alias.interview + ' State', 'interview', 'state') +                            //hard-coded
+                    //field.input(appconfig.alias.interview + ' Zip', 'interview', 'zip') +                                //hard-coded
+                    field.input('Phone/ Conference Number', 'interview', 'conferenceNumber') +
+                    field.input('Conference ID', 'interview', 'conferenceID') +
+                    field.input('Conference Code', 'interview', 'conferenceCode') +
+                    '<hr/>' +
+                    field.userRepeater(appconfig.alias.candidate, 'users', 'candidates') +
+                    '<hr/>' +
+                    field.userRepeater(appconfig.alias.recruiter, 'users', 'recruiters') +
+                    '<hr/>' +
+                    field.userRepeater(appconfig.alias.interviewer, 'users', 'interviewers') +
+                    '</div>';
 
-                posFields = '<div class="smallForm"><div class="largeFormFields"><div class="formHeader">New Manager</div>' + posFields + '</div></div>';
-                $schArea.append(posFields);
-            },
-            addCandidateForm: function () {
-                var currentLength = dashboard.ui.form.data.users.candidates.length;
+                intFields = intFields +
+                    '<hr />' +
+                    '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.form.submit(dashboard.ui.dashboard.refreshInterviews)">SUBMIT</button>';
+                $modal.html(intFields);
 
-                var nodes = currentLength + $('.largeFormFields').length;
-                var $schArea = $('#position-pool');
-                var field = dashboard.ui.template.field;
-                dashboard.ui.form.data.users.candidates[nodes] = {
-                    c_email: '',
-                    c_fname: '',
-                    c_lname: '',
-                    c_phone: '',
-                    role_code: '',
-                    rolename: ''
-                };
-                var posFields = field.input('Email Address', 'candidates', 'c_email', 'User', '', nodes) +
-                    field.inputSmall('First Name', 'candidates', 'c_fname', 'User', '', nodes) +
-                    field.inputSmall('Last Name', 'candidates', 'c_lname', 'User', '', nodes) +
-                    field.inputSmall('Phone Number', 'candidates', 'c_phone', 'User', '', nodes) +
-                    field.input('Role Name', 'candidates', 'rolename', 'User', '', nodes) +
-                    field.selectNew('Position ID', 'candidates', 'role_code', dashboard.ui.form.data.positionids, 'User', nodes);
+                var dNow = new Date();
+                var iid = dNow.getTime() + '-' + atob(constants.interview.user);
+                $('#field-id').val(iid);
+                $('#field-id').change();
 
-                posFields = '<div class="smallForm"><div class="largeFormFields"><div class="formHeader">New Candidate</div>' + posFields + '</div></div>';
-                $schArea.append(posFields);
-            },
-            submitCandidates: function (onComplete) {
-                var jData = dashboard.ui.form.data.users.candidates;
-                console.log(jData);
-                dashboard.ui.settings.setupCandidates();
-                dashboard.ui.selected('dashboard-sub-icon6', 'control-sub-label-act');
-            },
-            submitRecruiters: function (onComplete) {
-                var jData = dashboard.ui.form.data.users.recruiters;
-                console.log(jData);
-                dashboard.ui.actions.positions.getAssociatedRecruiters();
-                dashboard.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
-
+                dashboard.ui.modal.open();
             },
             submitPosition: function (onComplete) {
 
@@ -1904,6 +1195,19 @@ window.dashboard = (function () {
                 dashboard.data[id][field] = value;
             },
             time: {
+                load: function (elmt) {
+                    dashboard.ui.form.data = {
+                        userID: constants.interview.user,
+                        interviewID: constants.interview.id,
+                        clientID: constants.interview.client,
+                        uiID: constants.interview.ui,
+                        availability: []
+                    };
+                    var today = new Date();
+                    var cctr = '<div id="dashboard-ras-calendar-control" class="dashboard-ras-calendar-control"></div>'; //maybe add to css
+                    $('#' + elmt).html(cctr);
+                    dashboard.util.controls.calendar.draw('dashboard-ras-calendar-control', today.getMonth(), today.getFullYear());
+                },
                 loadNew: function (elmt) { //Mark: loadNew added instead of load. The calendar function needed to be modified. Changed style as well. Chain needs to be modified so that availabilityView id doesn't have to be here.
                     $('#' + elmt).html('');
                     dashboard.ui.form.data = {
@@ -1913,10 +1217,12 @@ window.dashboard = (function () {
                         uiID: constants.interview.ui,
                         availability: []
                     };
+                    
                     var today = new Date();
-                    var cctr = '<div id="ribbon-header" class="dashHeader centered roboto">ADRI</div><div id="dashboard-ras-calendar-control"></div>' +
+                    var cctr = '<div id="dashboard-ras-calendar-control" class="dashboard-ras-calendar-control"></div>' +
                         '<div id="availabilityView" class="timeContainerSmall"></div>';
                     $('#' + elmt).html(cctr);
+                    $("#contentRibbon").trigger("updatelayout");
                     dashboard.util.controls.calendarSmall.draw('dashboard-ras-calendar-control', today.getMonth(), today.getFullYear());
                     dashboard.user.info.launchEditForm();
                 },
@@ -1948,8 +1254,19 @@ window.dashboard = (function () {
                     dashboard.ui.availability.get();
                 },
                 get: function (onComplete) {
-                    var svc = '';
-                    onComplete('');
+                    var svc = constants.urls.getTimeSlots + '?iref=' + constants.interview.id + '&uid=' + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client;
+                    $.ajax({
+                        type: "GET",
+                        contentType: 'application/json',
+                        dataType: "json",
+                        url: svc,
+                        success: function (data) {
+                            onComplete(data[0]);
+                        },
+                        error: function (xhr, ajaxOptions, error) {
+                            console.log(xhr);
+                        }
+                    });
                 },
                 drawNodes: function (data) {
                     var lim = data.length;
@@ -1973,7 +1290,7 @@ window.dashboard = (function () {
                     var lim = data.length;
                     var $user = '';
                     var map = {};
-
+                    console.log(data);
                     $('.user-date-node-struct').html('');
 
                     for (var i = 0; i < lim; i++) {
@@ -1998,11 +1315,11 @@ window.dashboard = (function () {
             template: {
                 field: {
                     wrap: function (label, field) {
-                        var markup = '<div class="repeaterField centered">' +
-                            '<span class="fheader block">' + label + '</span>' +
-
-                            field +
-                            '</div>';
+                        var markup = '<div class="ui-field-contain">' +
+                                        '<label style="margin-left:.446em;" class="fheader">' + label + '</label>' +
+                            
+                                        field +
+                                     '</div>';
                         return markup;
                     },
                     wrapDay: function (label, field) { //MARK
@@ -2013,7 +1330,7 @@ window.dashboard = (function () {
                             '</div>';
                         return markup;
                     },
-                    wrapSmall: function (field, id) {//Mark: 
+                    wrapSmall: function (field, id) {//Mark: Created due to markup change. label parameter is not needed as result. 
                         var markup = '<div class="time-block-repeater" >' +
                             '<div class="repeaterFieldSmall left">' +
                             field +
@@ -2021,7 +1338,7 @@ window.dashboard = (function () {
                             '</div>';
                         return markup;
                     },
-                    timeWrap: function (field, id) {//Mark:  
+                    timeWrap: function (field, id) {//Mark: Created due to markup change. label parameter is not needed as result. 
                         var markup = '<div class="time-block-repeater" >' +
                             '<div class="repeaterFieldSmall left">' +
                             field +
@@ -2045,11 +1362,11 @@ window.dashboard = (function () {
                         return markup;
                     },
                     dayToggle: function (icon, updates, index) {//MARK: altered dayToggle to work with new markup. 
-                        var markup = '<div title="Choose the days you are available!" class="day-toggler" id="day-toggle-' + index + '-' + updates + '" data-state="off" data-value="no" onclick="dashboard.ui.form.setToggler($(this)); dashboard.ui.form.instantiateDay(\'' + updates + '\',\'' + index + '\');"><div>' + icon + '</div></div>';
+                        var markup = '<div class="day-toggler" id="day-toggle-' + index + '-' + updates + '" data-state="off" data-value="no" onclick="dashboard.ui.form.setToggler($(this)); dashboard.ui.form.instantiateDay(\'' + updates + '\',\'' + index + '\');"><div>' + icon + '</div></div>';
                         return markup;
                     },
                     dayToggleSmall: function (icon, updates, index) { //MARK: added smaller dayToggle
-                        var markup = '<div class="field-viewer" id="day-toggle-' + index + '-' + updates + '"><div>' + icon + '</div></div>';
+                        var markup = '<div class="field-viewer" id="day-toggle-' + index + '-' + updates + '" data-state="off" data-value="no" dashboard.ui.form.instantiateDay(\'' + updates + '\',\'' + index + '\');"><div>' + icon + '</div></div>';
                         return markup;
                     },
                     selectNew: function (label, updates, field, choices) {
@@ -2063,8 +1380,8 @@ window.dashboard = (function () {
                         //'<select onchange="dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select>' +
                         var markup = '<div class="field-wrapper">' +
                             '<span>' + label + '</span>' +
-                            '<div class="containerFull"><select class="" onchange="dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select></div>'
-                        '</div>';
+                            '<div class="containerFull"><select style="max-width:200px;" class="dropdown" onchange="dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select></div>'
+                            '</div>';
                         return markup;
                     },
                     select: function (label, updates, field, choices) {
@@ -2078,37 +1395,25 @@ window.dashboard = (function () {
 
                         var markup = '<div class="field-wrapper">' +
                             '<span>' + label + '</span>' +
-                            '<select onchange="dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select>' +
+                            '<select style="max-width:200px;" class="dropdown" onchange="dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select>' +
                             '</div>';
                         return markup;
                     },
-                    input: function (label, updates, field, setType, value, index) {
-                        console.log(label, updates, field, setType, value, index);
+                    input: function (label, updates, field, value) {
                         value = value || '';
-                        setType = setType || '';
-                        var markup = '<div class="field-wrapper">' +
-                            '<span>' + label + '</span>' +                  //updates, index, field, val
-                            '<input id="field-' + field + '" onchange="dashboard.ui.form.set' + setType + 'Data(\'' + updates + '\',\'' + index + '\',\'' + field + '\',$(this).val());">' + value + '</input>' +
-                            '</div>';
-
-                        return markup;
-                    },
-                    inputSmall: function (label, updates, field, setType, value, index) {
-                        value = value || '';
-                        setType = setType || '';
-                        var markup = '<div class="field-wrapper-small">' +
-                            '<span>' + label + '</span>' +
-                            '<input id="field-' + field + '" onchange="dashboard.ui.form.set' + setType + 'Data(\'' + updates + '\',\'' + index + '\',\'' + field + '\',$(this).val());">' + value + '</input>' +
-                            '</div>';
+                        var markup = '<li class="ui-field-contain">' +
+                            '<label for="' + field + '">' + label + '</label>' +
+                            '<input data-clear-btn="true" type="text" name="' + field + '" id="field-' + field + '" onchange="dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + value + '</input>' +
+                            '</li>';
                         return markup;
                     },
                     number: function (label, updates, field, step, value, min) {
                         min = min || 0;
                         value = value || '';
                         step = step || '1';
-                        var markup = '<div class="field-wrapper">' +
-                            '<span>' + label + '</span>' +
-                            '<input type="number" min="' + min + '" id="field-' + field + '" step="' + step + '" value="' + value + '" onchange="dashboard.util.checkNumValue($(this),' + min + ',' + step + ');dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());"></input>' +
+                        var markup = '<div data-role="fieldcontain" class="field-wrapper ui-field-contain ui-body ui-br">' +
+                            '<span style="display:block;">' + label + '</span>' +
+                            '<input class="ui-input ui-input-text ui-body-c ui-corner-all ui-shadow-inset" type="number" min="' + min + '" id="field-' + field + '" step="' + step + '" value="' + value + '" onchange="dashboard.util.checkNumValue($(this),' + min + ',' + step + ');dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());"></input>' +
                             '</div>';
                         return markup;
                     },
@@ -2121,7 +1426,7 @@ window.dashboard = (function () {
                     },
                     userRepeater: function (label, updates, field) {
                         var rid = label.split(/[^A-Za-z0-9]/).join('');
-                        var markup = '<div title="Add a range of time. You can use this for more control of your schedule." id="user-repeater-' + rid + '"></div><button class="button thin hlBG negTxt ckable" onclick="dashboard.ui.form.addUser(\'user-repeater-' + rid + '\',\'' + label + '\',\'' + updates + '\',\'' + field + '\')"><span>Add ' + label + '</span></button>';
+                        var markup = '<div><div id="user-repeater-' + rid + '"></div><button class="button thin hlBG negTxt ckable" onclick="dashboard.ui.form.addUser(\'user-repeater-' + rid + '\',\'' + label + '\',\'' + updates + '\',\'' + field + '\')"><span>Add ' + label + '</span></button></div>';
                         return markup;
                     },
                     user: function (role, updates, fld) {
@@ -2147,36 +1452,66 @@ window.dashboard = (function () {
                         var minutes = timeData.minutes;
                         var period = timeData.period;
                         var hrs = hours.length;
+                        var mins = minutes.length;    
+
+                        var hmkup = '';
+                        for (var h = 0; h < hrs; h++) {
+                            hmkup = hmkup + '<option value="' + hours[h] + '">' + hours[h][0] + '</option>';
+                        }
+                        var id = 'selector-hours' + index + '-' + category;
+                        dashboard.id = id;
+                        markup = '<div id="selector-hours-' + index + '-' + category + '" class="container"><select onchange="dashboard.ui.form.setBlockHour(\'' + category + '\',\'' + index + '\',\'hour\',$(this).val()); dashboard.ui.form.setBlockHour(\'' + category + '\',\'' + index + '\',\'period\',$(this).val());" class="dropdown" name="radio-hours-' + index + '-' + category + '" id="radio-hours-' + index + '-' + category + '" >' + hmkup + '</select></div>';
+
+                        var mmkup = '';
+                        for (var m = 0; m < mins; m++) {
+                            mkup = mkup + '<option value="' + minutes[m] + '">' + minutes[m] + '</option>';
+                        }
+
+                        markup = markup + '<div class="container"><select onchange="dashboard.ui.form.setBlockMinute(\'' + category + '\',\'' + index + '\',\'minutes\',\'' + minutes[0] + '\'); dashboard.ui.form.setBlockMinute(\'' + category + '\',\'' + index + '\',\'period\',\'' + minutes[1] + '\');" class="dropdown" name="radio-minutes-' + index + '-' + category + '" id="radio-minutes-' + index + '-' + category + '" >' + mkup + '</select></div>';
+
+                        return markup;
+                    },
+                    timeNodesOld: function (category, index) {
+                        var zone;
+                        var markup = '';;
+                        var timeData = dashboard.util.time.propagateWorkhoursArray();
+                        var hours = timeData.hours;
+                        var minutes = timeData.minutes;
+                        var period = timeData.period;
+                        var hrs = hours.length;
                         var mins = minutes.length;
 
                         var hmkup = '';
-                        for (var i = 0; i < hrs; i++) {
-                            hmkup = hmkup + '<option value="' + hours[i] + '">' + hours[i][0] + '</option>';
+                        for (var h = 0; h < hrs; h++) {
+                            hmkup = hmkup + dashboard.ui.template.field.workHourNode(category, index, 'radio-hours-' + index + '-' + category, hours[h]);
                         }
 
-                        var id = 'selector-hours' + index + '-' + category;
-                        dashboard.id = id;                                                                                                                                             ////onclick="dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'hour\',\'' + value[0] + '\'); dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'period\',\'' + value[1] + '\');"          
-                        markup = '<div title="Use these fields to choose a time range for your availability" id="selector-hours-' + index + '-' + category + '" class="container"><select onchange="dashboard.ui.form.setBlockHour(\'' + category + '\',\'' + index + '\',$(this).val());" class="dropdown" name="radio-hours-' + index + '-' + category + '" id="radio-hours-' + index + '-' + category + '" >' + hmkup + '</select></div>';
+                        markup = '<div class="mobile-hscroll"><div id="radio-hours-' + index + '-' + category + '" class="timenodes"><div class="secHTxt">Hour</div><div>' + hmkup + '</div></div><div class="ampmGradient timenode-bar"></div></div>';
 
-                        for (var e = 0; e < mins; e++) {
-                            mkup = mkup + '<option value="' + minutes[e] + '">' + minutes[e] + '</option>';
+                        var mmkup = '';
+                        for (var m = 0; m < mins; m++) {
+                            mmkup = mmkup + dashboard.ui.template.field.timeNode(category, index, 'radio-minutes-' + index + '-' + category, minutes[m], minutes[m]);
                         }
 
-                        markup = markup + '<div title="Use these fields to choose a time range for your availability" class="container"><select onchange="dashboard.ui.form.setBlockMinute(\'' + category + '\',\'' + index + '\',\'minutes\',$(this).val());" class="dropdown" name="radio-minutes-' + index + '-' + category + '" id="radio-minutes-' + index + '-' + category + '" >' + mkup + '</select></div>';
+                        markup = markup + '<div class="mobile-hscroll"><div id="radio-minutes-' + index + '-' + category + '" class="timenodes"><div class="secHTxt">Minute</div>' + mmkup + '</div></div>';
 
+                        return markup;
+                    },
+                    workHourNodeOld: function (category, index, zone, value) {
+                        var markup = '<div id="' + zone + '-' + index + '-' + value.join('') + '" class="field-toggler ckable radio" data-value="' + value[0] + '" onclick="dashboard.ui.form.setRadio(\'' + zone + '\',$(this)); dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'hour\',\'' + value[0] + '\'); dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'period\',\'' + value[1] + '\');"><div>' + value[0] + '</div></div>';
                         return markup;
                     },
                     workHourNode: function (category, index, zone, value) {
-                        var markup = '<option id="' + zone + '-' + index + '-' + value.join('') + '" class="option" data-value="' + value[0] + '">' + value[0] + '</option>';
+                        var markup = '<option value="' + value[0] + '" id="' + zone + '-' + index + '-' + value.join('') + '" class="option" data-value="' + value[0] + '" onclick="dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'hour\',\'' + value[0] + '\'); dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'period\',\'' + value[1] + '\');">' + value[0] + '</option>';                       
                         return markup;
                     },
                     timeNode: function (category, index, zone, value, icon) {
-                        var markup = '<option id="' + zone + '-' + index + '-' + value + '" onclick="dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'minutes\',\'' + value + '\');">' + icon + '</option>';
+                        var markup = '<option value="' + value[0] + '" id="' + zone + '-' + index + '-' + value + '" onclick="dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'minutes\',\'' + value + '\');">' + icon + '</option>';
                         return markup;
                     },
-                    timeNodeSmall: function (category, index, zone, value, args) {//Mark: added "small" function as the timeNode function is still needed for the editing form.           
+                    timeNodeSmall: function (category, index, zone, value, args) {//Mark: added "small" function as the timeNode function is still needed for the editing form. 
                         var icon = args['hr'] + ':' + args['min'] + args['per'];
-                        var markup = '<div class="time-section"><div class="field-viewer" id="' + zone + '-' + index + '-' + value + '" >' + icon + '</div></div>';
+                        var markup = '<div class="time-section"><div class="field-viewer" id="' + zone + '-' + index + '-' + value + '" >' + icon +'</div></div>';
                         return markup;
                     }
                 },
@@ -2213,33 +1548,31 @@ window.dashboard = (function () {
                     return markup;
                 },
                 userNode: function (data) {
-
                     var fields = [
                         'INTERVIEW_REFERENCE_ID',
-                        'USER_FNAME',
-                        'USER_ID',
-                        'USER_LNAME',
-                        'USER_ROLE',
-                        'USER_PHONE',
-                        'USER_EMAIL',
+                        'fullname',
+                        'personcode',
+                        'last_name',
+                        'user_role',
+                        'mobilenumber',
+                        'emailaddress',
                         'ROW_ID'
                     ];
+                    var fullName = data['fname'] + ' ' + data['lname'];
 
-                    var fullName = data['USER_FNAME'] + ' ' + data['USER_LNAME'];
+                    var nodeID = data['personcode'];
 
-                    var nodeID = data['USER_ID'];
-
-                    if (data['USER_PHONE'] === null) {
-                        data['USER_PHONE'] = '';
+                    if (data['mobilenumber'] === null) {
+                        data['mobilenumber'] = '';
                     }
 
                     var uid = constants.interview.user; //<i class="material-icons">&#xE5CD;</i> onclick="dashboard.interview.deleteUser(\'' + data['ROW_ID'] + '\');"
-                    var delUser = '';//'<div title="Delete this user from this call." class="remove-widget">&#xE5CD;</div>';
+                    var delUser = '<div title="Delete this user from this call." class="remove-widget">&#xE5CD;</div>';
                     if (uid === data.personcode || appconfig.page.interviewdetail.controls.deleteuser === false) {
                         delUser = '';
                     }
 
-                    var role = data['USER_ROLE'] || '';
+                    var role = data['user_role'] || '';
                     if (role === null) {
                         role = '';
                     }
@@ -2249,9 +1582,9 @@ window.dashboard = (function () {
                     role = role.split('Recruiter').join(appconfig.alias.recruiter);
                     var etxt = '<p>Email sent!</p>';
                     var mtxt = '<p>Text sent!</p>';
-                    var calwidget = '<div title="Offer a specific time." class="add-widget" onclick="dashboard.timeslot.addControls(\'modal-form\',\'' + data['USER_ID'] + '\',\'' + fullName + '\',\'' + data['USER_ROLE'] + '\');">&#xE878;</div>';
-                    var emlwidget = '<div title="Email this user a new link." class="add-widget" onclick="dashboard.util.emailUser(\'' + 6 + '\', \'' + data['USER_ID'] + '\');dashboard.ui.modal.error.open(\'' + etxt + '\');">&#xE0BE;</div>';
-                    var smswidget = '<div title="Send a mobile text to this user." class="add-widget" onclick="dashboard.util.smsUser(\'' + data['USER_ID'] + '\');dashboard.ui.modal.error.open(\'' + mtxt + '\');">&#xE0D8;</div>';
+                    var calwidget = '<div class="control-wrap" onclick="dashboard.timeslot.addControls(\'modal-form\',\'' + data['personcode'] + '\',\'' + fullName + '\',\'' + data['user_role'] + '\');">&#xE878;</div>';
+                    var emlwidget = '<div class="control-wrap" onclick="dashboard.util.emailUser(\'' + data + '\');dashboard.ui.modal.error.open(\'' + etxt + '\');"><div class="material-icons control-button darker">&#xE0BE;</div></div>';
+                    var smswidget = '<div class="control-wrap" onclick="dashboard.util.smsUser(\'' + data + '\');dashboard.ui.modal.error.open(\'' + mtxt + '\');"><div class="material-icons control-button darker">&#xE0D8;</div></div>';
 
                     if (appconfig.page.interviewdetail.controls.calendar !== true) {
                         calwidget = '';
@@ -2264,23 +1597,20 @@ window.dashboard = (function () {
                     if (appconfig.page.interviewdetail.controls.sms !== true) {
                         smswidget = '';
                     }
-
-                    var markup = '<div id="user-node-' + nodeID + '" class="ui-user-node">' +
-                        delUser +
-                        '<div class="ui-user-node-info">' +
-                        '<div class="ui-user-node-header">' + fullName + '</div>' +
-                        '<hr />' +
-                        '<div class="ui-user-node-body">' + role + '</div>' +
-                        '<div class="ui-user-node-body">' + data['USER_PHONE'] + '</div>' +
-                        '<div class="ui-user-node-body">' + data['USER_EMAIL'] + '</div>' +
-                        '<div id="user-availability-' + nodeID + '" class="user-date-node"></div>' +
-                        '<div style="margin-top:10%;" class="spanned centered block">' +
-                        calwidget +
-                        emlwidget +
-                        smswidget +
-                        '</div>' +
-                        '</div>' +
-                        '</div>';
+                    //ui-li-divider ui-bar-a ui-first-child
+                    var markup = '<li data-role="list-divider" id="user-node-' + nodeID + '">' +
+                                        //delUser +
+                                        fullName + 
+                                        '<li class="roboto">' +    
+                                            '<p>' + role + '</p>' +
+                                            '<p>' + data['mobilenumber'] + '</p>' +
+                                            '<p>' + data['emailaddress'] + '</p>' +
+                                            '<p id="user-availability-' + nodeID + '"></p>' +
+                                             calwidget +
+                                             emlwidget +
+                                             smswidget +
+                                        '</li>' +
+                                  '</li>';
                     return markup;
                 },
                 addUserNode: function () {
@@ -2289,7 +1619,7 @@ window.dashboard = (function () {
                 dateNode: function (nodeID, date) {
                     var field = dashboard.ui.template.field;
                     var index = $('.ti-schedule-node').length;
-                    var startSelector = field.timeNodes('startTime', index);
+                    var startSelector = field.timeNodes('starttime', index);
                     var markup = '<div id="datetime-node-' + nodeID + '" class="ti-schedule-node pBG">' +
                         dashboard.ui.template.date(date) +
                         field.wrap('Start Time', startSelector) + '<br />' +
@@ -2312,196 +1642,11 @@ window.dashboard = (function () {
                     userID: constants.interview.user,
                     uiID: constants.interview.ui,
                     interview: {},
-                    positions: [ //TEMP
-                        {
-                            rolename: "Commercial Lawn Specialist",
-                            role_code: "R8464",
-                            role_type: "Job Requisition",
-                            count: 1
-                        },
-                        {
-                            rolename: "Commercial Lawn Specialist",
-                            role_code: "R7540",
-                            role_type: "Job Requisition",
-                            count: 2
-                        },
-                        {
-                            rolename: "Residential Laborer",
-                            role_code: "R7160",
-                            role_type: "Job Requisition",
-                            count: 3
-                        },
-                        {
-                            rolename: "Commercial Lawn Specialist",
-                            role_code: "R7146",
-                            role_type: "Job Requisition",
-                            count: 4
-                        },
-                        {
-                            rolename: "RESIDENTIAL SALES REP",
-                            role_code: "R7150",
-                            role_type: "Job Requisition",
-                            count: 5
-                        },
-                        {
-                            rolename: "RESIDENTIAL SALES REP",
-                            role_code: "R7156",
-                            role_type: "Job Requisition",
-                            count: 6
-                        },
-                        {
-                            rolename: "RESIDENTIAL SALES REP",
-                            role_code: "R7543",
-                            role_type: "Job Requisition",
-                            count: 7
-                        },
-                    ],
-                    positionids: [],
+                    positions: {},
                     users: {
-                        candidates: [
-                            {
-                                c_email: 'support@dashboard-sys.com',
-                                c_fname: 'Jordan',
-                                c_lname: 'Marshall',
-                                c_phone: '12059151006',
-                                rolename: "Commercial Lawn Specialist",
-                                INTERVIEW_REFERENCE_ID: "C00831124-99841928-R7540",
-                                role_code: "R7540"
-                            },
-                            {
-                                c_email: 'support@dashboard-sys.com',
-                                c_fname: 'Peter',
-                                c_lname: 'Parker',
-                                c_phone: '12059151006',
-                                rolename: "Commercial Lawn Specialist",
-                                INTERVIEW_REFERENCE_ID: "C00831124-99841928-R7540",
-                                role_code: "R7540"
-                            },
-                            {
-                                c_email: 'support@dashboard-sys.com',
-                                c_fname: 'Will',
-                                c_lname: 'Smith',
-                                c_phone: '12059151006',
-                                rolename: "Residential Worker",
-                                INTERVIEW_REFERENCE_ID: "C00831124-99841928-R7160",
-                                role_code: "R7160"
-                            },
-                        ],
-                        recruiters: [
-                            {
-                                userid: 1319,
-                                fname: "Billie",
-                                lname: "Hook",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7150"
-                            },
-                            {
-                                userid: 1319,
-                                fname: "Billie",
-                                lname: "Hook",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7160"
-                            },
-                            {
-                                userid: 1319,
-                                fname: "Billie",
-                                lname: "Hook",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7540"
-                            },
-                            {
-                                userid: 92990,
-                                fname: "Mikesha",
-                                lname: "Charles",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7146"
-                            },
-                            {
-                                userid: 92990,
-                                fname: "Mikesha",
-                                lname: "Charles",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7150"
-                            },
-                            {
-                                userid: 92990,
-                                fname: "Mikesha",
-                                lname: "Charles",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7156"
-                            },
-                            {
-                                userid: 92990,
-                                fname: "Mikesha",
-                                lname: "Charles",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7540"
-                            },
-                            {
-                                userid: 92990,
-                                fname: "Mikesha",
-                                lname: "Charles",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7543"
-                            },
-                            {
-                                userid: 92990,
-                                fname: "Mikesha",
-                                lname: "Charles",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R8477"
-                            },
-                            {
-                                userid: 92990,
-                                fname: "Mikesha",
-                                lname: "Charles",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R8632"
-                            },
-                            {
-                                userid: 77767,
-                                fname: "Emily",
-                                lname: "LAROCHE",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7150"
-                            },
-                            {
-                                userid: 12345,
-                                fname: "Clinton",
-                                lname: "White",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7150"
-                            },
-                            {
-                                userid: 12345,
-                                fname: "Clinton",
-                                lname: "White",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R7156"
-                            },
-                            {
-                                userid: 93452,
-                                fname: "Amber",
-                                lname: "Jones",
-                                emailaddress: "support@dashboard-sys.com",
-                                mobilenumber: "12059151006",
-                                role_code: "R8464"
-                            },
-                        ],
-                        managers: {}
+                        candidates: {},
+                        recruiters: {},
+                        interviewers: {}
                     }
                 },
                 resetData: function () {
@@ -2510,221 +1655,24 @@ window.dashboard = (function () {
                         userID: constants.interview.user,
                         uiID: constants.interview.ui,
                         interview: {},
-                        positions: [ //TEMP
-                            {
-                                rolename: "Commercial Lawn Specialist",
-                                role_code: "R8464",
-                                role_type: "Job Requisition",
-                                count: 1
-                            },
-                            {
-                                rolename: "Commercial Lawn Specialist",
-                                role_code: "R7540",
-                                role_type: "Job Requisition",
-                                count: 2
-                            },
-                            {
-                                rolename: "Residential Laborer",
-                                role_code: "R7160",
-                                role_type: "Job Requisition",
-                                count: 3
-                            },
-                            {
-                                rolename: "Commercial Lawn Specialist",
-                                role_code: "R7146",
-                                role_type: "Job Requisition",
-                                count: 4
-                            },
-                            {
-                                rolename: "RESIDENTIAL SALES REP",
-                                role_code: "R7150",
-                                role_type: "Job Requisition",
-                                count: 5
-                            },
-                            {
-                                rolename: "RESIDENTIAL SALES REP",
-                                role_code: "R7156",
-                                role_type: "Job Requisition",
-                                count: 6
-                            },
-                            {
-                                rolename: "RESIDENTIAL SALES REP",
-                                role_code: "R7543",
-                                role_type: "Job Requisition",
-                                count: 7
-                            },
-                        ],
-                        positionids: [],
+                        positions: {},
                         users: {
-                            candidates: [
-                                {
-                                    c_email: 'support@dashboard-sys.com',
-                                    c_fname: 'Jordan',
-                                    c_lname: 'Marshall',
-                                    c_phone: '12059151006',
-                                    rolename: "Commercial Lawn Specialist",
-                                    INTERVIEW_REFERENCE_ID: "C00831124-99841928-R7540",
-                                    role_code: "R7540"
-                                },
-                                {
-                                    c_email: 'support@dashboard-sys.com',
-                                    c_fname: 'Peter',
-                                    c_lname: 'Parker',
-                                    c_phone: '12059151006',
-                                    rolename: "Commercial Lawn Specialist",
-                                    INTERVIEW_REFERENCE_ID: "C00831124-99841928-R7540",
-                                    role_code: "R7540"
-                                },
-                                {
-                                    c_email: 'support@dashboard-sys.com',
-                                    c_fname: 'Will',
-                                    c_lname: 'Smith',
-                                    c_phone: '12059151006',
-                                    rolename: "Residential Worker",
-                                    INTERVIEW_REFERENCE_ID: "C00831124-99841928-R7160",
-                                    role_code: "R7160"
-                                },
-                            ],
-                            recruiters: [
-                                {
-                                    userid: 1319,
-                                    fname: "Billie",
-                                    lname: "Hook",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7150"
-                                },
-                                {
-                                    userid: 1319,
-                                    fname: "Billie",
-                                    lname: "Hook",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7160"
-                                },
-                                {
-                                    userid: 1319,
-                                    fname: "Billie",
-                                    lname: "Hook",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7540"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7146"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7150"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7156"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7540"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7543"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R8477"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R8632"
-                                },
-                                {
-                                    userid: 77767,
-                                    fname: "Emily",
-                                    lname: "LAROCHE",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7150"
-                                },
-                                {
-                                    userid: 12345,
-                                    fname: "Clinton",
-                                    lname: "White",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7150"
-                                },
-                                {
-                                    userid: 12345,
-                                    fname: "Clinton",
-                                    lname: "White",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7156"
-                                },
-                                {
-                                    userid: 93452,
-                                    fname: "Amber",
-                                    lname: "Jones",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R8464"
-                                },
-                            ],
-                            managers: {}
+                            candidates: {},
+                            recruiters: {},
+                            interviewers: {}
                         }
                     };
                 },
-                setData: function (updates, index, field, val) {
-                    dashboard.ui.form.dtemp[updates][field] = val;
-                },
-                setUserData: function (updates, index, field, val) {
-                    dashboard.ui.form.dtemp.users[updates][index][field] = val;
+                setData: function (updates, field, val) {
+                    dashboard.ui.form.data[updates][field] = val;
                 },
                 setSubData: function (updates, field, subField, val) {
                     dashboard.ui.form.data[updates][field][subField] = val;
                 },
-                setBlockTime: function (category, index, field, value) {
-
-                    var lim = dashboard.ui.form.data.availability[index].length;
-                    for (var i = 0; i < lim; i++) {
-                        dashboard.ui.form.data.availability[index][i].schedule[category][field] = value;
-                    }
-                },
-                setBlockHour: function (category, index, value) {
+                setBlockHour: function (category, index, field, value) {
                     var val = value.split(',');
-                    console.log();
                     var time = val[0];
                     var period = val[1];
-
                     var lim = dashboard.ui.form.data.availability[index].length;
                     for (var i = 0; i < lim; i++) {
                         dashboard.ui.form.data.availability[index][i].schedule[category]['period'] = period;
@@ -2733,8 +1681,6 @@ window.dashboard = (function () {
                     for (var i = 0; i < lim; i++) {
                         dashboard.ui.form.data.availability[index][i].schedule[category]['hour'] = time;
                     }
-                    //console.log(category, index, value);
-                    //console.log(dashboard.ui.form.data.availability[index]);
                 },
                 setBlockMinute: function (category, index, field, value) {
                     var lim = dashboard.ui.form.data.availability[index].length;
@@ -2748,8 +1694,7 @@ window.dashboard = (function () {
                     var state = $node.attr('data-state');
 
                     if (state === 'off') {
-                        var lim = dashboard.ui.form.data.availability[index].length - 1;
-
+                        var lim = dashboard.ui.form.data.availability[index].length;
                         var ids = [];
                         for (var i = 0; i < lim; i++) {
                             if (dashboard.ui.form.data.availability[index][i].day === day) {
@@ -2771,6 +1716,9 @@ window.dashboard = (function () {
                             dashboard.ui.form.data.availability[index].push(block);
                         }
                     }
+                },
+                setUserData: function (role, index, field, val) {
+                    dashboard.ui.form.data.users[role][index][field] = val;
                 },
                 addUser: function (el, role, updates, field) {
                     var markup = dashboard.ui.template.field.user(role, updates, field);
@@ -2816,6 +1764,7 @@ window.dashboard = (function () {
                 },
                 submit: function (onComplete) {
 
+                    console.log(JSON.stringify(dashboard.ui.form.data));
 
                     $.ajax({
                         type: "POST",
@@ -2853,31 +1802,12 @@ window.dashboard = (function () {
                     $radio.addClass('cked');
                 }
             },
-            loaderLong: function (isLoading, id) {
-                var element = '<div class="spinnerContainer"><div class="loader"></div><div class="spanned loadertxt">Please allow up to 30 seconds for your data to be uploaded</div></div>';
-                var theEl = $('#' + id);
-
-                if (isLoading === true) {
-                    theEl.css('display', '');
-                    theEl.html(element);
-                    var spinner = $(".loader");
-
-                    setTimeout(function () {
-                        spinner.css('transform', 'rotate(216000deg)');
-                    }, 100);
-
-                }
-
-                else {
-                    dashboard.ui.labels.initLabels();
-                    theEl.css('display', 'none');
-                }
-            },
-            loader: function (isLoading, id) {
+            loader: function (isLoading, id, l) {
                 var element = '<div class="spinnerContainer"><div class="loader"></div></div>';
                 var theEl = $('#' + id);
-
+                
                 if (isLoading === true) {
+                    $('')
                     theEl.css('display', '');
                     theEl.html(element);
                     var spinner = $(".loader");
@@ -2885,11 +1815,10 @@ window.dashboard = (function () {
                     setTimeout(function () {
                         spinner.css('transform', 'rotate(216000deg)');
                     }, 100);
-
                 }
 
-                else {
-                    dashboard.ui.labels.initLabels();
+                else {                                                   
+                    $('#content-body').css('display', 'block');
                     theEl.css('display', 'none');
                 }
             }
@@ -2915,6 +1844,7 @@ window.dashboard = (function () {
                 });
             },
             loadToUI: function (data) {
+                
                 $('#page-title').html(appconfig.alias.interview + ' Details');
                 var $el = $('#contentRibbon');
                 $el.html('');
@@ -2925,44 +1855,39 @@ window.dashboard = (function () {
                 for (var e = 0; e < data.length; e++) {
                     if (data[e].user_role === "Candidate" || data[e].user_role === 'Prospect') {
                         mainNumber = data[e].mobilenumber || 'None';
-                        canName = data[e].fname + ' ' + data[e].lname;
+                        canName = data[e].fullname + ' ' + data[e].last_name;
                     }
                 };
                 var iFields = [
                     //['ID', 'INTERVIEW_REFERENCE_ID'], //hard-coded
-                    ['Title', 'INTERVIEW_TITLE'],
-                    //['Address', 'INTERVIEW_ADDRESS'], //hard-coded
-                    //['City', 'INTERVIEW_CITY'],           //hard-coded
-                    //['State', 'INTERVIEW_STATE'],         //hard-coded
-                    //['Zip', 'INTERVIEW_ZIP'],             //hard-coded
-                    ['Conference Number', 'INTERVIEW_CONFERENCE_NUMBER'],
-                    ['Conference Code', 'INTERVIEW_CONFERENCE_CODE'],
-                    ['Conference ID', 'INTERVIEW_CONFERENCE_ID']
+                    ['Name', canName],
+                    ['Prospect\'s Phone', mainNumber],
                 ];
-                console.log('interview', interview);
+
                 var iCard = '<div id="interview-info-container" class="int-info-container">' +
                     '<div id="dtl-' + interview['INTERVIEW_REFERENCE_ID'] + '" class="interviewInfo">' +
                     '<div id="dtl-txt-' + interview['INTERVIEW_REFERENCE_ID'] + '" class="interviewCardContents ">' +
-                    '<div id="interview-info-header" class="formHeader secHTxt roboto">' + appconfig.alias.interview + ' for ' + interview['POSITION_NAME'] + '</div>' +  //hard-coded
+                    '<div id="interview-info-header" class="formHeader secHTxt roboto">' + appconfig.alias.interview + ' for ' + canName + '</div>' +  //hard-coded
                     '</div>' +
                     '</div>' +
                     '</div>' +
-                    '<div class="interviewNodeArea ">' +
-                    //'<div class="formHeader secHTxt">Users Associated with ' + appconfig.alias.interview + '</div>' +    //hard-coded
+                    '<div class="interviewNodeArea ">' +                    
                     '<div id="dashboard-ras-timeNodes"></div>' +
                     '</div>' +
-                    '<div id="modal-form" class="modal-form"></div>' +
+                    '<div id="modal-form" data-position-to="window" data-role="popup" data-theme="a" class="ui-content ui-corner-all"></div>' +
                     '<div id="smallModal" class="modal-small"></div>' +
-                    '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
                     '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
                     '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>';
 
                 $el.html(iCard);
+                $("#contentRibbon").trigger("updatelayout");
                 var tMarkup = '';
                 for (var i = 0; i < iFields.length; i++) {
+
                     if (interview[iFields[i][1]] === null) {
                         interview[iFields[i][1]] = '';
                     }
+
                     tMarkup = '<div class="icardFldWrap">' +
                         '<div class="secHTxt roboto bold block">' + iFields[i][0] + '</div><div class="secHTxt roboto fixedHgt">' + interview[iFields[i][1]] + '</div>' +
                         '</div>';
@@ -2972,55 +1897,49 @@ window.dashboard = (function () {
                 //$('.dynamicContent').fadeIn('fast');
             },
             getUsers: function (onComplete) {
-                console.log('getUsers');
-                var svc = constants.urls.getUsers + '?iref=' + constants.interview.id + '&uid=' + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client;
-                $.ajax({
-                    type: "GET",
-                    contentType: 'application/json',
-                    dataType: "json",
-                    url: svc,
-                    success: function (data) {
-                        onComplete(data[0]);
-                    },
-                    error: function (xhr, ajaxOptions, error) {
-                        console.log(xhr);
-                    }
+                var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
+                var intInfo = [constants.interview.id];
+                console.log(intInfo);
+                socket.on('connect', function (data) {
+                    socket.emit('getInterviewInfo', intInfo);
+                });
+
+                socket.on('recieveCallInfo', function (data) {
+                    onComplete(data[0]);
                 });
             },
             addUserNodes: function (data) {
                 var lim = data.length;
-                var $Content = $('.ui-content-body');
+                var $Content = $('#interviews-table');
                 $Content.html('');
-                var header = '<div id="db-weekly-view" class="centered dashMain-title">' +
-                    '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Users Associated with ' + appconfig.alias.interview + '</div></div>' +
+                var header = '<div style="margin-left:0; border:none;" id="db-weekly-view" data-role="header">' + 
+                    '<div style="margin-left:2%;" class="formHeader darker">Users Associated with ' + appconfig.alias.interview + '</div >' +    //hard-coded' +
                     '</div>';
                 $Content.html(header);
 
-                var modal = '<div id="error-modal" class="modal">' +
-                    '<div id="availError" class="modal-content">' +
-                    '</div>' +
-                    '</div>';
+                var modal =  '<div id="error-modal" class="modal">' +
+                                '<div id="availError" class="modal-content">' +
+                                   '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
+                                '</div>' +
+                             '</div>';
                 $Content.append(modal);
 
                 var map = {};
 
                 for (var i = 0; i < lim; i++) {
-                    if (!map[data[i]['USER_ID']]) {
-                        map[data[i]['USER_ID']] = data[i];
+                    if (!map[data[i]['personcode']]) {
+                        map[data[i]['personcode']] = data[i];
                     }
                 }
-
+               
                 for (var user in map) {
                     $Content.append(dashboard.ui.template.userNode(map[user]));
                 }
 
-                var rowColors = dashboard.tcolors;
-                var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
-                $('.user-date-node').css('background', getRandomColor);
-
                 if (appconfig.page.interviewdetail.controls.adduser === true) {
                     $Content.append(dashboard.ui.template.addUserNode());
                 }
+                $('#interviews-table').listview().listview('refresh');
                 dashboard.ui.loader(false, "dynamic-content-loader");
             },
             addUserForm: function () {
@@ -3113,6 +2032,7 @@ window.dashboard = (function () {
                 return jsData;
             },
             add: function (jsData) {
+                console.log(JSON.stringify(jsData));
                 $.ajax({
                     type: "POST",
                     contentType: 'application/json',
@@ -3177,7 +2097,7 @@ window.dashboard = (function () {
         user: {
             validate: function (onComplete) {
                 var svc = constants.urls.validateUser + '?iref=' + constants.interview.id + '&uid=' + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client;
-              
+                
                 $.ajax({
                     type: "GET",
                     contentType: 'application/json',
@@ -3200,52 +2120,50 @@ window.dashboard = (function () {
                     var $vc = $('#availabilityView');
                     var $modal = $('#modal-form');
                     var form = dashboard.user.info.form(userID);
-                    var view = dashboard.user.info.view();
+                    var view = dashboard.user.info.view(); 
                     $vc.html(view);
                     $modal.html(form);
-                    dashboard.user.info.load(userID);
+                    dashboard.user.info.load(userID);          
+                    
                 },
                 form: function (userID) {
                     var field = dashboard.ui.template.field;
                     var wdGroup = field.dayToggle('Su', 'sunday', 0) +
-                        field.dayToggle('Mo', 'monday', 0) +
-                        field.dayToggle('Tu', 'tuesday', 0) +
-                        field.dayToggle('We', 'wednesday', 0) +
-                        field.dayToggle('Th', 'thursday', 0) +
-                        field.dayToggle('Fr', 'friday', 0) +
-                        field.dayToggle('Sa', 'saturday', 0);
+                        field.dayToggle('M', 'monday', 0) +
+                        field.dayToggle('T', 'tuesday', 0) +
+                        field.dayToggle('W', 'wednesday', 0) +
+                        field.dayToggle('T', 'thursday', 0) +
+                        field.dayToggle('F', 'friday', 0) +
+                        field.dayToggle('S', 'saturday', 0);
 
-                    var startSelector = field.timeNodes('startTime', 0);
-                    var endSelector = field.timeNodes('endTime', 0);
-                    var lunchSelector = field.timeNodes('lunchTime', 0);
+                    var startSelector = field.timeNodes('starttime', 0);
+                    var endSelector = field.timeNodes('endtime', 0);
+                    var lunchSelector = field.timeNodes('lunchstart', 0);
 
-                    var form = '<div class="formContent">' +
-                        '<div class="dashMain-title centered">' +
-                        '<div class="dashboard-header-block">' +
-                        '<div class="dashboard-header-text">Persistent Availability</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div id="block-schedule-area" class="block-container">' +
-                        '<div id="block-repeater-edit centered" class="block-repeater">' +
-                        field.wrapDay('Days Available', wdGroup) +
-                        '<div class="repeaterFieldSpanned">' +
-                        field.wrap('Start', startSelector) +
-                        field.wrap('End', endSelector) +
-                        field.wrap('Lunch', lunchSelector) +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="block-repeater-add">' +
-                        '<div title="Add an additional range of time to your schedule." class="block-text fheader">&nbsp;Add Another Schedule</div><div class="stdWidget" onclick="dashboard.user.info.addBlockRepeater();">&#xE146;</div>' +
-                        '</div>' +
-                        field.number('Default ' + appconfig.alias.interview + ' Length (Minutes)', 'info', 'defaultInterviewMinutes', 5, 20, 10) +           //hard-coded
-                        field.number(appconfig.alias.interviewer + ' Rank', 'info', 'ranking', 1, 1, 0) +
-                        '<div class="centered spanned"><button type="button" class="bigButton mainBG negTxt ckable" onclick="dashboard.user.info.update(\'' + userID + '\',dashboard.user.info.updated)">Submit</button></div><div class="spacer"></div>' +
-                        '</div>';
+                    var form =      '<div class="form-header centered ttlTxt" data-theme="c" data-role="header">Persistent Availability<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.close();">&times;</button></div>' +
+                                    '<div class="ui-content" id="block-schedule-container">' +
+                                        '<div id="block-schedule-area" class="block-container">' +
+                                            '<div id="block-repeater-edit" class="block-repeater left">' +
+                                                field.wrapDay('Days Available', wdGroup) + 
+                                                '<div class="repeaterFieldSpanned">' +
+                                                    field.wrap('Start', startSelector) + 
+                                                    field.wrap('End', endSelector) + 
+                                                    field.wrap('Lunch', lunchSelector) +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                        '<div class="block-repeater-add">' + 
+                                            '<div class="block-text fheader">&nbsp;Add Another Schedule</div><div class="stdWidget" onclick="dashboard.user.info.addBlockRepeater();">&#xE146;</div>' +
+                                        '</div>' +
+                                        field.number('Default ' + appconfig.alias.interview + ' Length (Minutes)', 'info', 'defaultInterviewMinutes', 5, 20, 10) +           //hard-coded
+                                        field.number(appconfig.alias.interviewer + ' Rank', 'info', 'ranking', 1, 1, 0) +
+                                        '<div class="centered spanned"><button class="bigButton mainBG negTxt ckable" onclick="dashboard.user.info.update(\'' + userID + '\',dashboard.user.info.updated)">Submit</button></div><div class="spacer"></div>' +
+                                    '</div>';
+                                
                     return form;
                 },
                 personalInfo: function (userID) {
-                    var info = '<div class="formHeader secHTxt centered">Identifying Information</div>' +
+                    var info = '<div class="form-header secHTxt centered">Identifying Information</div>' +
                         field.input('First Name', 'info', 'fName') +
                         field.input('Last Name', 'info', 'lName') +
                         field.input('Email Address', 'info', 'email') +
@@ -3258,7 +2176,7 @@ window.dashboard = (function () {
                     var field = dashboard.ui.template.field;
                     var form = '<div class="formContent">' +
                         '<div class="dashHeader">Current Availability</div>' +
-                        '<div title="Edit Availability" id="block-schedule-view" class="block-container" onclick="dashboard.ui.modal.open();">' +
+                        '<div id="block-schedule-view" class="block-container" onclick="dashboard.ui.modal.open();">' +
                         '</div>' +
                         '</div>' +
                         '</div>';
@@ -3275,9 +2193,9 @@ window.dashboard = (function () {
                         field.dayToggle('Fr', 'friday', index) +
                         field.dayToggle('Sa', 'saturday', index);
 
-                    var startSelector = field.timeNodes('startTime', index);
-                    var endSelector = field.timeNodes('endTime', index);
-                    var lunchSelector = field.timeNodes('lunchTime', index);
+                    var startSelector = field.timeNodes('starttime', index);
+                    var endSelector = field.timeNodes('endtime', index);
+                    var lunchSelector = field.timeNodes('lunchstart', index);
                     var block = '<div class="block-repeater">' +
                         field.wrapDay('Days Available', wdGroup) +
                         '<div class="repeaterFieldSpanned">' +
@@ -3289,10 +2207,9 @@ window.dashboard = (function () {
                     $('#block-schedule-area').append(block);
                     //dropdowns();
                 },
-                addBlockView: function () { // MARK: View function created to handle the dashboard preview of availability. (Cleanup.)
+                addBlockView: function () {
                     $('#block-schedule-view').html('');
                     var index = $('.block-repeater').length;
-
                     var field = dashboard.ui.template.field;
                     var fWrap;
                     var avail = dashboard.ui.form.data.availability;
@@ -3310,13 +2227,13 @@ window.dashboard = (function () {
                             'saturday': 'Sa'
                         };
                         var pMap = [
-                            'endTime',
-                            'lunchTime',
-                            'startTime'
+                            'endtime',
+                            'lunchstart',
+                            'starttime'
                         ];
 
-
                         function setTimeNode(t, tInstance, field, id) {
+
                             var temp = dashboard.ui.template.field;
                             var h = tInstance.hour;
                             var m = tInstance.minutes;
@@ -3328,11 +2245,11 @@ window.dashboard = (function () {
                                 'per': p
                             };
 
-                            if (field === 'lunchTime') {
+                            if (field === 'lunchstart') {
 
                             }
                             else {
-                                if (field === 'startTime') {
+                                if (field === 'starttime') {
                                     args.per = p + ' -';
                                     var hWrap = temp.timeNodeSmall(field, t, '#radio-hours-' + t + '-' + field, h, args);
 
@@ -3347,30 +2264,19 @@ window.dashboard = (function () {
                         }
 
                         for (var e = 0; e < aLen; e++) {
+
                             var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
                             var id = 'view' + e;
                             var dayID = 'day' + e;
                             var timeID = 'time' + e;
-
-
-
-                            avail[e][0] = avail[e][0] || '';
-                            if (avail[e][0] !== '') {
-                                var block = '<div id="' + id + '" class="repeater-section">' +
-                                    '<div id="' + dayID + '" class="day-section"></div>' +
-                                    '<div id="' + timeID + '" class="time-section right"></div>' +
-                                    '</div>';
-                                $('#block-schedule-view').append(block);
-                                $('#' + id).css('border-left', '5px solid ' + getRandomColor);
-
-                                var sched = avail[e][0].schedule || '';
-                                setTimeNode(e, sched.startTime, 'startTime', timeID);
-                                setTimeNode(e, sched.endTime, 'endTime', timeID);
-                                setTimeNode(e, sched.lunchTime, 'lunchTime', timeID);
-                            }
+                            var block = '<div id="' + id + '" class="repeater-section">' +
+                                '<div id="' + dayID + '" class="day-section"></div>' +
+                                '<div id="' + timeID + '" class="time-section right"></div>' +
+                                '</div>';
+                            $('#block-schedule-view').append(block);
+                            $('#' + id).css('border-left', '5px solid ' + getRandomColor);
 
                             for (var c = 0; c < avail[e].length; c++) {
-
                                 var data = avail[e][c];
                                 var dLen = data.length;
                                 var day = data.day;
@@ -3386,6 +2292,11 @@ window.dashboard = (function () {
 
                                 $('#' + dayID).append(fWrap);
                             }
+                            var sched = avail[e][0].schedule;
+                            setTimeNode(e, sched.starttime, 'starttime', timeID);
+                            setTimeNode(e, sched.endtime, 'endtime', timeID);
+                            setTimeNode(e, sched.lunchstart, 'lunchstart', timeID);
+
                         }
                     }
                     else {
@@ -3401,223 +2312,29 @@ window.dashboard = (function () {
                     dashboard.user.info.get(userID, function (data) {
                         dashboard.user.info.set(data);
                     });
-                },
+                }, 
                 get: function (userID, onComplete) {
-                    var svc = constants.urls.persistentAvailability + '?uid=' + userID + '&cliid=' + constants.interview.client + '&uiid=' + constants.interview.ui;
-                    $.ajax({
-                        type: "GET",
-                        contentType: 'application/json',
-                        dataType: "json",
-                        url: svc,
-                        success: function (data) {
-                            onComplete(data);
-                        },
-                        error: function (xhr, ajaxOptions, error) {
-                            console.log(xhr);
-                        }
+
+                    userID = constants.interview.user;
+                    var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
+                    socket.on('connect', function (data) {
+                        socket.emit('getAvail', userID);
+                    });
+
+                    socket.on('recieveGet', function (data) {
+                        onComplete(data);
                     });
                 },
                 set: function (data) {
-                    console.log(data);
-                    var pa = data.persistentAvailability[0];
-                    var uInfo = data.userInfo[0][0];
+                    var pa = data[0];
+                    //var uInfo = data.userInfo[0][0];
                     dashboard.ui.form.data = {
-                        userID: btoa(uInfo.USER_ID),
+                        userID: btoa(pa.personid),
                         interviewID: constants.interview.id,
                         clientID: constants.interview.client,
                         interview: {},
+                        positions: {},
                         uiID: constants.interview.ui,
-                        positions: [ //TEMP
-                            {
-                                rolename: "Commercial Lawn Specialist",
-                                role_code: "R8464",
-                                role_type: "Job Requisition",
-                                count: 1
-                            },
-                            {
-                                rolename: "Commercial Lawn Specialist",
-                                role_code: "R7540",
-                                role_type: "Job Requisition",
-                                count: 2
-                            },
-                            {
-                                rolename: "Residential Laborer",
-                                role_code: "R7160",
-                                role_type: "Job Requisition",
-                                count: 3
-                            },
-                            {
-                                rolename: "Commercial Lawn Specialist",
-                                role_code: "R7146",
-                                role_type: "Job Requisition",
-                                count: 4
-                            },
-                            {
-                                rolename: "RESIDENTIAL SALES REP",
-                                role_code: "R7150",
-                                role_type: "Job Requisition",
-                                count: 5
-                            },
-                            {
-                                rolename: "RESIDENTIAL SALES REP",
-                                role_code: "R7156",
-                                role_type: "Job Requisition",
-                                count: 6
-                            },
-                            {
-                                rolename: "RESIDENTIAL SALES REP",
-                                role_code: "R7543",
-                                role_type: "Job Requisition",
-                                count: 7
-                            },
-                        ],
-                        positionids: [],
-                        users: {
-                            candidates: [
-                                {
-                                    c_email: 'support@dashboard-sys.com',
-                                    c_fname: 'Jordan',
-                                    c_lname: 'Marshall',
-                                    c_phone: '12059151006',
-                                    rolename: "Commercial Lawn Specialist",
-                                    INTERVIEW_REFERENCE_ID: "C00831124-99841928-R7540",
-                                    role_code: "R7540"
-                                },
-                                {
-                                    c_email: 'support@dashboard-sys.com',
-                                    c_fname: 'Peter',
-                                    c_lname: 'Parker',
-                                    c_phone: '12059151006',
-                                    rolename: "Commercial Lawn Specialist",
-                                    INTERVIEW_REFERENCE_ID: "C00831124-99841928-R7540",
-                                    role_code: "R7540"
-                                },
-                                {
-                                    c_email: 'support@dashboard-sys.com',
-                                    c_fname: 'Will',
-                                    c_lname: 'Smith',
-                                    c_phone: '12059151006',
-                                    rolename: "Residential Worker",
-                                    INTERVIEW_REFERENCE_ID: "C00831124-99841928-R7160",
-                                    role_code: "R7160"
-                                },
-                            ],
-                            recruiters: [
-                                {
-                                    userid: 1319,
-                                    fname: "Billie",
-                                    lname: "Hook",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7150"
-                                },
-                                {
-                                    userid: 1319,
-                                    fname: "Billie",
-                                    lname: "Hook",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7160"
-                                },
-                                {
-                                    userid: 1319,
-                                    fname: "Billie",
-                                    lname: "Hook",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7540"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7146"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7150"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7156"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7540"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7543"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R8477"
-                                },
-                                {
-                                    userid: 92990,
-                                    fname: "Mikesha",
-                                    lname: "Charles",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R8632"
-                                },
-                                {
-                                    userid: 77767,
-                                    fname: "Emily",
-                                    lname: "LAROCHE",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7150"
-                                },
-                                {
-                                    userid: 12345,
-                                    fname: "Clinton",
-                                    lname: "White",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7150"
-                                },
-                                {
-                                    userid: 12345,
-                                    fname: "Clinton",
-                                    lname: "White",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R7156"
-                                },
-                                {
-                                    userid: 93452,
-                                    fname: "Amber",
-                                    lname: "Jones",
-                                    emailaddress: "support@dashboard-sys.com",
-                                    mobilenumber: "12059151006",
-                                    role_code: "R8464"
-                                },
-                            ],
-                            managers: {}
-                        },
                         info: {
                             id: btoa(pa.personid),
                             fName: '',
@@ -3630,6 +2347,7 @@ window.dashboard = (function () {
                         },
                         availability: []
                     };
+
                     var flds = [
                         ['fName', 'USER_FNAME'],
                         ['lName', 'USER_LNAME'],
@@ -3679,34 +2397,35 @@ window.dashboard = (function () {
                         var p;
                         var tm;
 
-                        var theHour = tInstance.split('\:');
+                        var theHour = tInstance.split(':');
                         var $hr = 'radio-hours-' + t + '-' + field;
                         var $min = 'radio-minutes-' + t + '-' + field;
                         var el = document.getElementById($hr);
                         var elhr = document.getElementById($min);
-                        tm = timeConvert(tInstance);
-                        h = tm.hour;
-                        m = tm.minute;
-
-                        if (h === 1) {
-
-                        }
-                        console.log(h);
-                        if (theHour[0] > 11) {
+                        theHour = theHour[0];
+                   
+                        if (theHour > 11) {
+                            tm = timeConvert(tInstance);
+                            h = tm.hour;
+                            m = tm.minute;
                             //MARK
-                            dashboard.ui.form.setBlockHour(field, t, h + ',PM');
-                            dashboard.ui.form.setBlockMinute(field, t, 'minutes', m);
-
                             $('[name=' + $hr + ']').val(h + ',PM');
                             $('[name=' + $min + ']').val(m);
+                         
+                            dashboard.ui.form.setBlockHour(field, t, 'hour', h + ',PM');
+                            dashboard.ui.form.setBlockMinute(field, t, 'period', m);
                         }
                         else {
+                            tm = timeConvert(tInstance);
+                            h = tm.hour;
+                            m = tm.minute;
                             //MARK
-                            dashboard.ui.form.setBlockHour(field, t, h + ',AM');
-                            dashboard.ui.form.setBlockMinute(field, t, 'minutes', m);
                             $('[name=' + $hr + ']').val(h + ',AM');
                             $('[name=' + $min + ']').val(m);
+                            dashboard.ui.form.setBlockHour(field, t, 'hour', h + ',PM');
+                            dashboard.ui.form.setBlockMinute(field, t, 'period', m);
                         }
+
                     }
 
                     var tLim = pa.length;
@@ -3715,37 +2434,46 @@ window.dashboard = (function () {
                     var cIndex = 0;
 
                     for (var n = 0; n < tLim; n++) {
-                        dateKey = pa[n].AVAILABLE_START + '-' + pa[n].AVAILABLE_END + '-' + pa[n].LUNCH_START;
+                        dateKey = pa[n].starttime + '-' + pa[n].endtime + '-' + pa[n].lunchstart;
                         if (typeof tMap[dateKey] === 'undefined') {
-
+                            
                             if (n !== 0) {
                                 dashboard.user.info.addBlockRepeater();
                             }
                             cIndex = dashboard.ui.form.data.availability.length;
+                            console.log(dashboard.ui.form.data.availability);
                             tMap[dateKey] = cIndex;
-                            $('#day-toggle-' + cIndex + '-' + pa[n].AVAILABLE_DAY.toLowerCase()).click();
+                            $('#day-toggle-' + cIndex + '-' + pa[n].weekday.toLowerCase()).click();
 
-                            setTimeNode(cIndex, pa[n].AVAILABLE_START, 'startTime');
-                            setTimeNode(cIndex, pa[n].AVAILABLE_END, 'endTime');
-                            setTimeNode(cIndex, pa[n].LUNCH_START, 'lunchTime');
+                            setTimeNode(cIndex, pa[n].starttime, 'starttime');
+                            setTimeNode(cIndex, pa[n].endtime, 'endtime');
+                            setTimeNode(cIndex, pa[n].lunchstart, 'lunchstart');
                         }
                         else {
                             cIndex = tMap[dateKey];
-                            $('#day-toggle-' + cIndex + '-' + pa[n].AVAILABLE_DAY.toLowerCase()).click();
+                            $('#day-toggle-' + cIndex + '-' + pa[n].weekday.toLowerCase()).click();
                         }
                     }
+                    
                     dashboard.user.info.addBlockView();
                 },
                 update: function (userID, onComplete) {
+                    var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
+                    dashboard.ui.loader(true, "dynamic-content-loader");
+                    //var jData = dashboard.user.info.setJson();      
+                    var jData = dashboard.ui.form.data;
+                    socket.on('connect', function (data) {
+                        reconnection: false;
+                        socket.emit('setAvail', jData, userID);
+                        onComplete();
+                    });
 
-                    onComplete();
                 },
                 updated: function () { //Mark: added loadNew to refresh dash availability view along with loading animation close. 
-                    var elid = "dynamic-content-loader";
-
+                   
                     dashboard.ui.form.resetData();
                     dashboard.ui.time.loadNew('contentRibbon');
-                    dashboard.ui.loader(false, elid);
+                    dashboard.ui.loader(false, "dynamic-content-loader");
                     dashboard.ui.modal.close();
                 },
                 setJson: function () {
@@ -3813,8 +2541,6 @@ window.dashboard = (function () {
                 });
             },
             getURLParams: function () {
-                //var testurl = 'https://s3-us-west-2.amazonaws.com/www.recruiting.dashboard-sys.com/candidate.html?iref=QURSSTAwMTktNTIyNzY1LVI1NTM0&uid=QURSSTAwMTk=&cliid=UkJTREVNTzIwMTcwODE4&uiid=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS93d3cucmVjcnVpdGluZy5hZHJpLXN5cy5jb20v';
-                //var uParts = testurl.split('?');
                 var uParts = window.location.href.split('?');
                 var pObj = {};
                 if (uParts.length > 1) {
@@ -3833,9 +2559,6 @@ window.dashboard = (function () {
                     constants.interview.user = pObj.uid;
                     constants.interview.ui = ui;
                     constants.interview.client = pObj.cliid;
-                }
-                else {
-                    // Do nothing
                 }
             },
             testFormat: function () {
@@ -3912,7 +2635,7 @@ window.dashboard = (function () {
                     return rows;
                 },
                 body: function (rows) {
-                    return '<div class="spacer"></div><div class="ui-table">' + rows + '</div><div class="spacer"></div>';
+                    return '<div class="spacer"></div><div data-role="listview" class="ui-table">' + rows + '</div><div class="spacer"></div>';
                 }
             },
             date: {
@@ -4281,7 +3004,7 @@ window.dashboard = (function () {
                             var cellid = dashboard.util.date.fmt({ date: date, format: 'MM-dd-yyyy' });
                             var sDate = dashboard.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
                             //dashboard.ui.time.dateNode.add(sDate, 'ui-datenodes');
-                            return '<div id="cal-cell-' + cellid + '" class="cal-cell hover-underline" onclick="dashboard.ui.dashboard.getInterviewsForDate(\'' + sDate + '\', \'cal-cell-' + cellid + '\')">' +
+                            return '<div id="cal-cell-' + cellid + '" class="cal-cell hover-underline" onclick="dashboard.ui.dashboard.getInterviewsForDate(\'' + sDate + '\', \'' + cellid + '\')">' +
                                 '<div nohighlight class="cal-cell-date">' + date.getDate() + '</div>' +
                                 '</div>';
                         },
@@ -4332,7 +3055,7 @@ window.dashboard = (function () {
                             var sDate = dashboard.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
                             var cellDate = dashboard.util.date.fmt({ date: date, format: 'MMM d' });
 
-                            return '<div id="cal-cell-' + cellid + '" class="wvCell pBG ckable" onclick="dashboard.ui.dashboard.getInterviewsForDate(\'' + sDate + '\', \'cal-cell-' + cellid + '\')">' +
+                            return '<div id="cal-cell-' + cellid + '" class="wvCell pBG ckable" onclick="dashboard.ui.dashboard.getInterviewsForDate(\'' + sDate + '\', \'' + cellid + '\')">' +
                                 '<div nohighlight class="wv-cell-date">' + cellDate + '</div>' +
                                 '<div id="cal-cell-nodes-' + cellid + '"></div>' +
                                 '</div>';
@@ -4389,36 +3112,30 @@ window.dashboard = (function () {
 
                         var $el = $('#' + elmt);
                         $el.html(cal.frame(minDate, maxDate, elmt));
-                        $('.cal-cell').click(function () {
-                            $('.cal-cell').removeClass('cal-cell-active');
-                            $(this).addClass('cal-cell-active');
-                        });
                         //$el.html(cal.frame(minDate, maxDate, elmt));
                     },
                     frameWeeklyView: function (wkDate) { //Mark: cycleWeekly View markup changed. template.row is no longer being used. 
-                        var cDay = new Date;
-
+                        var cDay = new Date; 
+                 
                         if (cDay.getDay === wkDate.getDay) {
-                            cDay = 'Today\'s Calls';
+                            cDay = 'All Scheduled Calls';
                         }
-
+                        
                         var tmp = dashboard.util.controls.calendarSmall.template;
                         var header = '';
                         for (var d = 0; d < 7; d++) {
                             header = header + tmp.wvheader(dashboard.util.date.days[d].abbreviation);
                         }
-
                         var row = '';
                         var cell = '';
                         var body = '';
 
+
                         row = '';
                         row = tmp.row(row);
-
-                        body = '<div class="dashboard-header-block">' +
-                            '<span id="sch-selected-date" class="dashboard-header-text"></span>' +
-                            '</div>' +
-                            body;
+                        
+                        body =  '<h1 class="dashboard-header-text" id="sch-selected-date"></h1>' +
+                                body;
                         return body;
                     },
                     drawWeeklyView: function (wkDate) {
@@ -4449,62 +3166,164 @@ window.dashboard = (function () {
                     location.reload();
                 }
             },
-            btns: {
-                confirmationBtns: function (id, id2, confirm, cb, cancel) {
-                    cb = cb || '';
-                    $(function () {
-                        $("#" + id).click(function () {
-                            $("#" + id).addClass("submit-onclic").delay(450).queue(function () {
-                                validateSubmit();
-                            });
-                        });
+            uploader: {
+                files: {},
+                template: function () {
+                    var headers = 'Candidate_ID,Candidate,Candidate_Phone_Number,Candidate_E-Mail,Candidate_Source,Date_Candidate_was_Added_to_Requisition,Requisition_Number,Requisition_Title,Requisition_Type,Requisition_Status,Division,Region,Location,Job_Code,Job_Title,Job_Family,Recruiter_1_Employee_ID,Recruiter_1_Name,Recruiter_1_E-Mail,Recruiter_1_Work_City,Recruiter_1_Work_State,Recruiter_2_Name,Recruiter_2_E-Mail,Recruiter_3_Employee_ID,Recruiter_3_Name,Recruiter_3_E-Mail,Recruiter_4_Employee_ID,Recruiter_4_Name,Recruiter_4_E-Mail,Recruiter_5_Employee_ID,Recruiter_5_Name,Recruiter_5_E-Mail,Linked_Requisition_Number,Linked_Requisition_Title,Linked_Requisition_Type,Linked_Requisition_Status,Linked_Requisition_External_Career_Site_URL\r\n';
+                    var encodedUri = encodeURI(headers);
+                    var link = document.createElement("a");
+                    link.href = window.URL.createObjectURL(new Blob([headers], { type: 'text/csv' }));
+                    link.download = "template.csv";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+                open: function () {
+                    dashboard.util.uploader.files = {};
 
-                        function validateSubmit() {
-                            setTimeout(function () {
-                                $("#" + id).removeClass("submit-onclic");
-                                $("#" + id).addClass("submit-validate");
-                                callbackSubmit();
-                            }, 2250);
+                    var dz = '<div class="file-drop" id="dz-input"><div class="vCenter">Drop files here</div></div>' +
+                        '<div id="progress-bars" class="file-progress"></div>' +
+                        '<div id="upload-msg"></div>' +
+                        '<div><button type="button" class="bigButton mainBG negTxt ckable" onclick="dashboard.util.uploader.upload();" id="upload-button">Upload!</button></div>';
+                    $('#smallModal').html(dz);
+
+                    function handleFileSelect(evt) {
+                        evt.stopPropagation();
+                        evt.preventDefault();
+                        $('#progress-bars').html('');
+                        var files = evt.dataTransfer.files;
+                        var len = files.length;
+                        for (var i = 0; i < len; i++) {
+                            $('#progress-bars').append('<span>' + files[i].name + '</span><div id="progress-bar-' + i + '" class="file-progress"><div id="pct-' + i + '" class="percent">0%</div></div>');
+                            $('#pct-' + i).css('max-width', '0%');
+                            $('#pct-' + i).html('0%');
+                            dashboard.util.uploader.read(files[i], i);
                         }
-                        function callbackSubmit() {
-                            setTimeout(function () {
-                                $("#" + id).removeClass("submit-validate");
-                                dashboard.ui.modal.large.close();
-                                confirm(cb);
-                            }, 400);
+
+                    }
+
+                    function handleDragOver(evt) {
+                        evt.stopPropagation();
+                        evt.preventDefault();
+                        evt.dataTransfer.dropEffect = 'copy';
+                    }
+
+                    // Setup the dnd listeners.
+                    var dropZone = document.getElementById('dz-input');
+                    dropZone.addEventListener('dragover', handleDragOver, false);
+                    dropZone.addEventListener('drop', handleFileSelect, false);
+
+                    dashboard.ui.modal.small.open();
+                },
+                read: function (file, i) {
+                    var reader = new FileReader();
+                    reader.onerror = errorHandler;
+                    reader.onprogress = function (e) {
+                        updateProgress(e, i);
+                    };
+                    reader.onabort = function (e) {
+                        alert('File read cancelled');
+                    };
+
+                    reader.onloadstart = function (e) {
+                        $('#progress-bar-' + i).addClass('loading');
+                    };
+                    reader.onload = function (e) {
+                        $('#pct-' + i).css('max-width', '100%');
+                        $('#pct-' + i).html('Ready to Upload');
+                        setTimeout(function () {
+                            $('#progress-bar-' + i).removeClass('loading');
+                        }, 2000);
+                        dashboard.util.uploader.files[file.name] = {
+                            name: file.name,
+                            data: btoa(e.target.result), //encoded to base 64 for transfer,
+                            index: i
+                        };
+                    }
+                    $('#dz-cancel').click(function () {
+                        dashboard.util.uploader.abort(reader);
+                    });
+
+                    // Read in as text
+                    reader.readAsText(file);
+
+                    function errorHandler(evt) {
+                        switch (evt.target.error.code) {
+                            case evt.target.error.NOT_FOUND_ERR:
+                                alert('File Not Found!');
+                                break;
+                            case evt.target.error.NOT_READABLE_ERR:
+                                alert('File is not readable');
+                                break;
+                            case evt.target.error.ABORT_ERR:
+                                break; // noop
+                            default:
+                                alert('An error occurred reading this file.');
+                        };
+                    }
+
+                    function updateProgress(evt, i) {
+                        if (evt.lengthComputable) {
+                            var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
+                            // Increase the progress bar length.
+                            if (percentLoaded < 100) {
+                                $('#pct-' + i).css('max-width', percentLoaded + '%');
+                                $('#pct-' + i).html(percentLoaded + '%');
+                            }
+                        }
+                    }
+                },
+                abort: function (reader) {
+                    reader.abort();
+                },
+                upload: function () {
+                    //iterate through each member of dashboard.util.uploader.files, call service to check file contents and upload or reject
+                    $('#upload-msg').html('');
+                    for (var f in dashboard.util.uploader.files) {
+                        var file = dashboard.util.uploader.files[f];
+                        dashboard.util.uploader.process(file, dashboard.util.uploader.complete, dashboard.util.uploader.reject);
+                    }
+                },
+                process: function (file, complete, reject) {
+                    var data = {
+                        userID: constants.interview.user,
+                        clientID: constants.interview.client,
+                        uiID: constants.interview.ui,
+                        filename: file.name,
+                        filedata: file.data
+                    };
+
+                    $.ajax({
+                        type: "POST",
+                        contentType: 'application/json',
+                        dataType: "json",
+                        url: constants.urls.uploadFile,
+                        data: JSON.stringify(data),
+                        success: function (response) {
+                            complete(response, file);
+                        },
+                        error: function (xhr, ajaxOptions, error) {
+                            reject(xhr, file);
                         }
                     });
-                    $(function () {
-                        $("#" + id2).click(function () {
-                            $("#" + id2).addClass("cancel-onclic").delay(450).queue(function () {
-                                validateCancel();
-                            });
-                        });
-                        function validateCancel() {
-                            setTimeout(function () {
-                                $("#" + id2).removeClass("cancel-onclic");
-                                $("#" + id2).addClass("cancel-validate");
-                                callbackCancel();
-                            }, 2250);
-                        }
-                        function callbackCancel() {
-                            setTimeout(function () {
-                                $("#" + id2).removeClass("cancel-validate");
-                                dashboard.ui.modal.large.close();
-                                cancel();
-                            }, 400);
-                        }
-                    });
+                },
+                reject: function (response, file) {
+                    $('#pct-' + file.index).css('background-color', '#8a110e');
+                    $('#pct-' + file.index).css('color', 'white');
+                    $('#pct-' + file.index).html('Failed to Upload');
+                },
+                complete: function (response, file) {
+                    if (response.hasOwnProperty('errorMessage')) {
+                        dashboard.util.uploader.reject(response, file);
+                    }
+                    else {
+                        $('#pct-' + file.index).css('background-color', '#6dcc50');
+                        $('#pct-' + file.index).html('Uploaded Successfully! Parties will be notified shortly.');
+                    }
                 }
             },
             uploaderNew: {
                 files: {},
-                data: [],
-                intInfo: {
-                    userID: constants.interview.user,
-                    filename: '',
-                    filedata: ''
-                },
                 template: function () {
                     var headers = 'Candidate_ID,Candidate,Candidate_Phone_Number,Candidate_E-Mail,Candidate_Source,Date_Candidate_was_Added_to_Requisition,Requisition_Number,Requisition_Title,Requisition_Type,Requisition_Status,Division,Region,Location,Job_Code,Job_Title,Job_Family,Recruiter_1_Employee_ID,Recruiter_1_Name,Recruiter_1_E-Mail,Recruiter_1_Work_City,Recruiter_1_Work_State,Recruiter_2_Name,Recruiter_2_E-Mail,Recruiter_3_Employee_ID,Recruiter_3_Name,Recruiter_3_E-Mail,Recruiter_4_Employee_ID,Recruiter_4_Name,Recruiter_4_E-Mail,Recruiter_5_Employee_ID,Recruiter_5_Name,Recruiter_5_E-Mail,Linked_Requisition_Number,Linked_Requisition_Title,Linked_Requisition_Type,Linked_Requisition_Status,Linked_Requisition_External_Career_Site_URL\r\n';
                     var encodedUri = encodeURI(headers);
@@ -4519,12 +3338,8 @@ window.dashboard = (function () {
                     var $Content = $('.ui-content-body');
                     $Content.html('');
                     dashboard.util.uploaderNew.files = {};
-                    dashboard.util.uploaderNew.intInfo = {
-                        userID: constants.interview.user,
-                        filename: '',
-                        filedata: ''
-                    };
-                    var dz = '<div class="file-drop" id="dz-input"><div style="margin-top:100px;" class="vCenter">Drop files here</div></div>' +
+
+                    var dz = '<div class="file-drop" id="dz-input"><div class="vCenter">Drop files here</div></div>' +
                         '<div id="progress-bars" class="file-progress"></div>' +
                         '<div id="upload-msg"></div>' +
                         '<div><button type="button" class="bigButton mainBG negTxt ckable" onclick="dashboard.util.uploaderNew.upload();" id="upload-button">Upload!</button></div>';
@@ -4556,6 +3371,7 @@ window.dashboard = (function () {
                     dropZone.addEventListener('dragover', handleDragOver, false);
                     dropZone.addEventListener('drop', handleFileSelect, false);
 
+                    //dashboard.ui.modal.small.open();
                 },
                 read: function (file, i) {
                     var reader = new FileReader();
@@ -4578,8 +3394,7 @@ window.dashboard = (function () {
                         }, 2000);
                         dashboard.util.uploaderNew.files[file.name] = {
                             name: file.name,
-                            data: e.target.result,
-                            //data: btoa(unescape(encodeURIComponent(e.target.result))), //btoa(e.target.result) MARK This was needed due to error "Failed to execute 'btoa' on 'Window': The string to be encoded contains characters outside of the Latin1 range."
+                            data: btoa(unescape(encodeURIComponent(e.target.result))), //btoa(e.target.result) MARK This was needed due to error "Failed to execute 'btoa' on 'Window': The string to be encoded contains characters outside of the Latin1 range."
                             index: i
                         };
                     }
@@ -4615,30 +3430,19 @@ window.dashboard = (function () {
                             }
                         }
                     }
-
                 },
                 abort: function (reader) {
                     reader.abort();
                 },
                 upload: function () {
-                    var files = dashboard.util.uploaderNew.files;
-                    if ($.isEmptyObject(files) === true) {
-                        dashboard.ui.modal.error.open('There do not seem to be any files uploaded.');
-                    }
-                    else {
-                        dashboard.ui.loaderLong(true, "dynamic-content-loader");
-                        //iterate through each member of dashboard.util.uploader.files, call service to check file contents and upload or reject
-                        $('#upload-msg').html(''); // FIX THIS
-                        for (var f in dashboard.util.uploaderNew.files) {
-                            var file = dashboard.util.uploaderNew.files[f];
-                            var intInfo = dashboard.util.uploaderNew.intInfo;
-                            intInfo.filename = file.name;
-                            intInfo.filedata = file.data;
-                            dashboard.util.uploaderNew.process(file, dashboard.util.uploaderNew.complete, dashboard.util.uploaderNew.reject);
-                        }
+                    //iterate through each member of dashboard.util.uploader.files, call service to check file contents and upload or reject
+                    $('#upload-msg').html('');
+                    for (var f in dashboard.util.uploaderNew.files) {
+                        var file = dashboard.util.uploaderNew.files[f];
+                        dashboard.util.uploaderNew.process(file, dashboard.util.uploaderNew.complete, dashboard.util.uploaderNew.reject);
                     }
                 },
-                process: function (file, onComplete, reject) {
+                process: function (file, complete, reject) {
                     var data = {
                         userID: constants.interview.user,
                         clientID: constants.interview.client,
@@ -4654,18 +3458,27 @@ window.dashboard = (function () {
                         url: constants.urls.uploadFile,
                         data: JSON.stringify(data),
                         success: function (response) {
-                            onComplete(response, file);
+                            complete(response, file);
                         },
                         error: function (xhr, ajaxOptions, error) {
                             reject(xhr, file);
                         }
                     });
-
                 },
                 reject: function (response, file) {
                     $('#pct-' + file.index).css('background-color', '#8a110e');
                     $('#pct-' + file.index).css('color', 'white');
                     $('#pct-' + file.index).html('Failed to Upload');
+                },
+                complete: function (response, file) {
+                    if (response.hasOwnProperty('errorMessage')) {
+                        dashboard.util.uploaderNew.reject(response, file);
+                    }
+                    else {
+                        $('#pct-' + file.index).css('background-color', '#6dcc50');
+                        $('#pct-' + file.index).html('Uploaded Successfully! Parties will be notified shortly.');
+                        // ADD BOT EMAIL
+                    }
                 }
             }
         }
@@ -4676,3 +3489,5 @@ window.dashboard = (function () {
 $(document).ready(function () {
     dashboard.init();
 });
+
+  
