@@ -1,7 +1,7 @@
 ﻿window.appconfig = (function () {
     var appconfig = {
         api: {
-            base: '',
+            base: 'https://4jja3nb0yf.execute-api.us-west-2.amazonaws.com',
             stage: 'prod' 
         },
         clientname: '',

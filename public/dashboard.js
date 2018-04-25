@@ -129,6 +129,7 @@ window.dashboard = (function () {
         tcolors: ['#6764E6', '#348CD5', '#6416C6', '#1172C2', '#07589C'],
         id: '',
         init: function () {
+            console.log('stuff');
             dashboard.ui.loader(true, "dynamic-content-loader");
             dashboard.util.getURLParams();
             dashboard.ui.zone();
@@ -639,11 +640,12 @@ window.dashboard = (function () {
                     begin: '',
                     end: 0
                 },
-                open: function () {
+                open: function () {                    
                     dashboard.user.validate(dashboard.ui.dashboard.checkUser);
                 },
                 checkUser: function (user) {
                     //Mark: Manually entering the user. Need to remove when beginning to test. 
+                    
                     user = {
                         role: 'Recruiter',
                         name: 'Support'
@@ -654,7 +656,7 @@ window.dashboard = (function () {
                 },
                 route: {
                     'Recruiter': function (user) {
-
+                        
                         var db = dashboard.ui.dashboard;
 
                         db.setup();
@@ -711,20 +713,6 @@ window.dashboard = (function () {
                     'Candidate': function (user) {
 
                     },
-                    'Interviewer': function (user) {
-                        var db = dashboard.ui.dashboard;
-
-                        db.setup();
-                        //$('.dynamicContent').fadeIn('fast');
-
-                        db.getPositions(function (data) {
-                            db.setPositionFilters(data);
-                        });
-
-                        db.getInterviews(function (data) { //MARK DELETE
-                            db.drawInterviews(data);
-                        });
-                    },
                     'INVALID': function () {
 
                     }
@@ -771,7 +759,7 @@ window.dashboard = (function () {
                     var getUnscheduled = function (data) {
                         dashboard.ui.dashboard.drawUnscheduledInterviews(data);
                     };
-
+                    
                     var dash = '<div id="contentRibbon" class="ui-content-ribbon subScroller">' +
                         '<div id="availabilityView" class="timeContainerSmall"></div>' +
                         '</div>' +
@@ -2721,11 +2709,12 @@ window.dashboard = (function () {
                 },
                 setBlockHour: function (category, index, value) {
                     var val = value.split(',');
-                    console.log();
+                    
                     var time = val[0];
                     var period = val[1];
 
                     var lim = dashboard.ui.form.data.availability[index].length;
+                    console.log('INDEX', lim);
                     for (var i = 0; i < lim; i++) {
                         dashboard.ui.form.data.availability[index][i].schedule[category]['period'] = period;
                     }
@@ -2748,7 +2737,7 @@ window.dashboard = (function () {
                     var state = $node.attr('data-state');
 
                     if (state === 'off') {
-                        var lim = dashboard.ui.form.data.availability[index].length - 1;
+                        var lim = dashboard.ui.form.data.availability[index].length;
 
                         var ids = [];
                         for (var i = 0; i < lim; i++) {
@@ -2757,7 +2746,7 @@ window.dashboard = (function () {
                             }
                         }
 
-                        for (var n = ids.length - 1; n > -1; n--) {
+                        for (var n = ids.length; n > -1; n--) {
                             dashboard.ui.form.data.availability[index].splice(ids[n], 1);
                         }
                     }

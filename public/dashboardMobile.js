@@ -807,6 +807,7 @@ window.dashboard = (function () {
                    
                 },
                 drawInterviews: function (data) {
+                    console.log(data);
                     var toggle = function (data) {
                         dashboard.ui.dashboard.drawUnscheduledInterviews(data);
                     };
@@ -1890,15 +1891,18 @@ window.dashboard = (function () {
                 //$('.dynamicContent').fadeIn('fast');
             },
             getUsers: function (onComplete) {
-                var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
-                var intInfo = [constants.interview.id];
-                console.log(intInfo);
-                socket.on('connect', function (data) {
-                    socket.emit('getInterviewInfo', intInfo);
-                });
-
-                socket.on('recieveCallInfo', function (data) {
-                    onComplete(data[0]);
+                var svc = constants.urls.getUsers + '?iref=' + constants.interview.id + '&uid=' + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client;
+                $.ajax({
+                    type: "GET",
+                    contentType: 'application/json',
+                    dataType: "json",
+                    url: svc,
+                    success: function (data) {
+                        onComplete(data[0]);
+                    },
+                    error: function (xhr, ajaxOptions, error) {
+                        console.log(xhr);
+                    }
                 });
             },
             addUserNodes: function (data) {
@@ -2454,22 +2458,15 @@ window.dashboard = (function () {
                     dashboard.user.info.addBlockView();
                 },
                 update: function (userID, onComplete) {
-                    var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
-                    dashboard.ui.loader(true, "dynamic-content-loader");
-                    //var jData = dashboard.user.info.setJson();      
-                    var jData = dashboard.ui.form.data;
-                    socket.on('connect', function (data) {
-                        reconnection: false;
-                        socket.emit('setAvail', jData, userID);
-                        onComplete();
-                    });
 
+                    onComplete();
                 },
                 updated: function () { //Mark: added loadNew to refresh dash availability view along with loading animation close. 
-                   
+                    var elid = "dynamic-content-loader";
+
                     dashboard.ui.form.resetData();
                     dashboard.ui.time.loadNew('contentRibbon');
-                    dashboard.ui.loader(false, "dynamic-content-loader");
+                    dashboard.ui.loader(false, elid);
                     dashboard.ui.modal.close();
                 },
                 setJson: function () {
