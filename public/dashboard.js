@@ -36,11 +36,11 @@ window.constants = {
     }
 };
 
-window.adri = (function () {
+window.dashboard = (function () {
 
     function ADRITime(d, h, m, p, s) {
         this.interviewID = constants.interview.id;
-        this.userID = adri.interview.scheduling.userID;
+        this.userID = dashboard.interview.scheduling.userID;
         this.date = d;
         this.hour = h;
         this.minute = m;
@@ -123,21 +123,21 @@ window.adri = (function () {
         return '<option selected="selected" value="' + value + '">' + text + '</option>';
     }
 
-    var adri = {
+    var dashboard = {
         data: {},
         colors: ['#FFD555', '#6764E6', '#FFB955', '#348CD5', '#6416C6', '#1172C2', '#FFF156', '#07589C'],
         tcolors: ['#6764E6', '#348CD5', '#6416C6', '#1172C2', '#07589C'],
         id: '',
         init: function () {
-            adri.ui.loader(true, "dynamic-content-loader");
-            adri.util.getURLParams();
-            adri.ui.zone();
-            adri.ui.nav.setup();
-            adri.ui.dashboard.open();
+            dashboard.ui.loader(true, "dynamic-content-loader");
+            dashboard.util.getURLParams();
+            dashboard.ui.zone();
+            dashboard.ui.nav.setup();
+            dashboard.ui.dashboard.open();
         },
         error: {
             noParams: function () {
-                $('#adri-ras-content').html('Sorry, but we couldn\'t find your information. Please try clicking your invitation link again.');
+                $('#dashboard-ras-content').html('Sorry, but we couldn\'t find your information. Please try clicking your invitation link again.');
             }
         },
         ui: {
@@ -161,7 +161,7 @@ window.adri = (function () {
             },
             settings: {
                 setupReq: function () {
-                    adri.ui.selected('dashboard-sub-icon4', 'control-sub-label-act');
+                    dashboard.ui.selected('dashboard-sub-icon4', 'control-sub-label-act');
                     var $Content = $('.ui-content-body');
                     var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
                         '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Positions Overview</div></div>' +
@@ -174,11 +174,11 @@ window.adri = (function () {
                         '<div id="modal-form" class="modal-form"></div>' +
                         '<div id="smallModal" class="modal-small"></div>' +
                         '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                        '<div id="modal-bg-overlay" class="modal-overlay" onclick="adri.timeslot.removeControls();"></div>' +
-                        '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="adri.ui.modal.small.close();"></div>' +
+                        '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
+                        '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
                         '<div id="error-modal" class="modal">' +
                         '<div id="availError" class="modal-content">' +
-                        '<button id="closeModal" class="close-modal" onclick="adri.ui.modal.error.close();">&times;</button>' +
+                        '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
                         '</div>' +
                         '</div>';
                     $Content.html(iCard);
@@ -197,19 +197,19 @@ window.adri = (function () {
                         '<div id="modal-form" class="modal-form"></div>' +
                         '<div id="smallModal" class="modal-small"></div>' +
                         '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                        '<div id="modal-bg-overlay" class="modal-overlay" onclick="adri.timeslot.removeControls();"></div>' +
-                        '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="adri.ui.modal.small.close();"></div>' +
+                        '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
+                        '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
                         '<div id="error-modal" class="modal">' +
                         '<div id="availError" class="modal-content">' +
-                        '<button id="closeModal" class="close-modal" onclick="adri.ui.modal.error.close();">&times;</button>' +
+                        '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
                         '</div>' +
                         '</div>';
                     $Content.html(iCard);
-                    adri.ui.dashboard.getUnscheduledInterviews();
+                    dashboard.ui.dashboard.getUnscheduledInterviews();
                 },
                 addPositions: function () {
-                    adri.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
-                    var db = adri.ui.dashboard;
+                    dashboard.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
+                    var db = dashboard.ui.dashboard;
 
                     var $Content = $('.ui-content-body');
                     var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
@@ -221,27 +221,27 @@ window.adri = (function () {
                         '</div>' +
                         '</div>';
                     $Content.html(iCard);
-                    adri.ui.dashboard.addPosition();
+                    dashboard.ui.dashboard.addPosition();
                     var $options = $('#scheduled-interviews-container');
                     var control = '<div class="spacer"></div><div class="spacer"></div>' +
-                        //'<button onclick="adri.ui.dashboard.addPosition();" class="button thin hlBG negTxt"><span>ADD POSITION</span></button>' +
-                        '<button class="bigButton mainBG negTxt ckable" onclick="adri.ui.submitPosition(adri.ui.dashboard.refreshPool)">SUBMIT</button>';
-                    //TEMP '<button class="bigButton mainBG negTxt ckable" onclick="adri.ui.submitPosition(adri.ui.dashboard.refreshPool)">SUBMIT</button>';
+                        //'<button onclick="dashboard.ui.dashboard.addPosition();" class="button thin hlBG negTxt"><span>ADD POSITION</span></button>' +
+                        '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitPosition(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
+                    //TEMP '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitPosition(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
 
                     $options.append(control);
                 },
                 openReqs: function () {
-                    var db = adri.ui.dashboard;
-                    adri.ui.loader(true, "dynamic-content-loader");
-                    adri.ui.settings.setupReq();
+                    var db = dashboard.ui.dashboard;
+                    dashboard.ui.loader(true, "dynamic-content-loader");
+                    dashboard.ui.settings.setupReq();
                     db.getPositions(function (data) {
                         db.drawPositionPool(data);
                     });
                 },
                 addCandidates: function () {
-                    adri.ui.loader(true, "dynamic-content-loader");
-                    adri.ui.selected('dashboard-sub-icon7', 'control-sub-label-act');
-                    var db = adri.ui.dashboard;
+                    dashboard.ui.loader(true, "dynamic-content-loader");
+                    dashboard.ui.selected('dashboard-sub-icon7', 'control-sub-label-act');
+                    var db = dashboard.ui.dashboard;
                     db.getPositions('', function () {
 
                         var $Content = $('.ui-content-body');
@@ -255,20 +255,20 @@ window.adri = (function () {
                             '</div>' +
                             '</div>';
                         $Content.html(iCard);
-                        adri.ui.addCandidateForm();
+                        dashboard.ui.addCandidateForm();
                         var $options = $('#scheduled-interviews-container');
                         var control = '<div class="spacer"></div><div class="spacer"></div>' +
-                            '<button onclick="adri.ui.addCandidateForm();" class="button thin hlBG negTxt"><span>ADD CANDIDATE</span></button>' +
-                            '<button class="bigButton mainBG negTxt ckable" onclick="adri.ui.submitCandidates(adri.ui.dashboard.refreshPool)">SUBMIT</button>';
+                            '<button onclick="dashboard.ui.addCandidateForm();" class="button thin hlBG negTxt"><span>ADD CANDIDATE</span></button>' +
+                            '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitCandidates(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
 
                         $options.append(control);
-                        adri.ui.loader(false, "dynamic-content-loader");
+                        dashboard.ui.loader(false, "dynamic-content-loader");
                     });
 
                 },
                 addManagers: function () {
-                    adri.ui.selected('dashboard-sub-icon3', 'control-sub-label-act');
-                    var db = adri.ui.dashboard;
+                    dashboard.ui.selected('dashboard-sub-icon3', 'control-sub-label-act');
+                    var db = dashboard.ui.dashboard;
                     var $Content = $('.ui-content-body');
 
                     var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
@@ -280,17 +280,17 @@ window.adri = (function () {
                         '</div>' +
                         '</div>';
                     $Content.html(iCard);
-                    adri.ui.addManagerForm();
+                    dashboard.ui.addManagerForm();
                     var $options = $('#scheduled-interviews-container');
                     var control = '<div class="spacer"></div><div class="spacer"></div>' +
-                        '<button onclick="adri.ui.addManagerForm();" class="button thin hlBG negTxt"><span>ADD MANAGER</span></button>' +
-                        '<button class="bigButton mainBG negTxt ckable" onclick="adri.ui.submitPosition(adri.ui.dashboard.refreshPool)">SUBMIT</button>';
+                        '<button onclick="dashboard.ui.addManagerForm();" class="button thin hlBG negTxt"><span>ADD MANAGER</span></button>' +
+                        '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitPosition(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
 
                     $options.append(control);
                 },
                 addRecruiters: function () {
-                    adri.ui.selected('dashboard-sub-icon2', 'control-sub-label-act');
-                    var db = adri.ui.dashboard;
+                    dashboard.ui.selected('dashboard-sub-icon2', 'control-sub-label-act');
+                    var db = dashboard.ui.dashboard;
                     var $Content = $('.ui-content-body');
 
                     var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
@@ -302,11 +302,11 @@ window.adri = (function () {
                         '</div>' +
                         '</div>';
                     $Content.html(iCard);
-                    adri.ui.addRecruiterForm();
+                    dashboard.ui.addRecruiterForm();
                     var $options = $('#scheduled-interviews-container');
                     var control = '<div class="spacer"></div><div class="spacer"></div>' +
-                        '<button onclick="adri.ui.addRecruiterForm();" class="button thin hlBG negTxt"><span>ADD RECRUITER</span></button>' +
-                        '<button class="bigButton mainBG negTxt ckable" onclick="adri.ui.submitRecruiters(adri.ui.dashboard.refreshPool)">SUBMIT</button>';
+                        '<button onclick="dashboard.ui.addRecruiterForm();" class="button thin hlBG negTxt"><span>ADD RECRUITER</span></button>' +
+                        '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.ui.submitRecruiters(dashboard.ui.dashboard.refreshPool)">SUBMIT</button>';
 
                     $options.append(control);
                 },
@@ -328,7 +328,7 @@ window.adri = (function () {
                     var canName = '';
                     var phone = '';
                     var fullName = '';
-                    var rowColors = adri.colors;
+                    var rowColors = dashboard.colors;
                     console.log('email data', data);
                     for (var i = 0; i < lim; i++) {
 
@@ -337,7 +337,7 @@ window.adri = (function () {
                         // random_number template
                         dtlBar = '<li title="Select the message you wish to send." class="block email-subject-text">' + data[i].subject + '</li>' +
                             '<li title="Select the message you wish to send." class="block email-body-text">' + data[i].clean_msg + '</li>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><ul onclick="adri.ui.settings.checkMsgType(\'' + data[i].clean_msg + '\',\'' + data[i].subject + '\',' + data[i].templateid + ', ' + dInfo.random_number + ');" id="' + rowID + '" class="email-row-wrap">' + dtlBar + '</ul>');
+                        $tab.append('<div class="ui-row-spacer-main"></div><ul onclick="dashboard.ui.settings.checkMsgType(\'' + data[i].clean_msg + '\',\'' + data[i].subject + '\',' + data[i].templateid + ', ' + dInfo.random_number + ');" id="' + rowID + '" class="email-row-wrap">' + dtlBar + '</ul>');
                         console.log($('#' + rowID));
                         $('#' + rowID).css('border-left', '3px solid ' + getRandomColor);
                         $('#' + rowID).hover(function () {
@@ -351,7 +351,7 @@ window.adri = (function () {
                         $(this).select();
                     });
 
-                    adri.ui.loader(false, "dynamic-content-loader");
+                    dashboard.ui.loader(false, "dynamic-content-loader");
                 },
                 checkMsgType: function (msg, subject, tempid, batchid) {
 
@@ -374,7 +374,7 @@ window.adri = (function () {
                         '<div style="width:100%; text-align: center;"><div style="float:none; margin-top: 8px; margin-right: 15px;" class="modal-controls"><div id="cancel" class="cancelButton"></div></div>' +
                         '<div style="margin-top: 8px; float:none;" class="modal-controls"><div id="confirm" class="submitButton"></div></div></div>';
 
-                    adri.ui.modal.large.open(chkbox);
+                    dashboard.ui.modal.large.open(chkbox);
 
                     $('input[id=chkEmail]').change(
                         function () {
@@ -395,14 +395,14 @@ window.adri = (function () {
                             }
                         });
 
-                    adri.util.btns.confirmationBtns('confirm', 'cancel', adri.ui.settings.sendEmail, choices, adri.util.uploaderNew.open);
+                    dashboard.util.btns.confirmationBtns('confirm', 'cancel', dashboard.ui.settings.sendEmail, choices, dashboard.util.uploaderNew.open);
                 },
                 sendEmail: function (args) {
                     var message = args.msg;
                     var subject = args.subject;
                     console.log('args', args);
                     $('.ui-content-body').html('');
-                    adri.ui.modal.error.open('Message Sent!');
+                    dashboard.ui.modal.error.open('Message Sent!');
 
                     if (args.email === true) {
                         console.log('firing email');
@@ -420,13 +420,13 @@ window.adri = (function () {
                         };
 
                     }
-                    adri.ui.settings.setupCandidates();
+                    dashboard.ui.settings.setupCandidates();
                 },
             },
             zone: function () {
-                //Mark: Removed splash class/id and added the control-ribbon element. Also changed it to update the adri-ras-content id instead of the core-content id.
+                //Mark: Removed splash class/id and added the control-ribbon element. Also changed it to update the dashboard-ras-content id instead of the core-content id.
                 var elid = "dynamic-content-loader";
-                var zones = '<div id="adri-ras-content" class="content-area mainScroller">' +
+                var zones = '<div id="dashboard-ras-content" class="content-area mainScroller">' +
                     '<div class="ui-zone-tabular">' +
                     '<div class="ui-zone-row">' +
                     '<div id="left-nav" class="control-ribbon"></div>' +
@@ -447,7 +447,7 @@ window.adri = (function () {
             },
             nav: {
                 reset: function () {
-                    adri.ui.nav.template.idcount = {
+                    dashboard.ui.nav.template.idcount = {
                         main: 0,
                         sub: 0
                     };
@@ -456,81 +456,81 @@ window.adri = (function () {
                     var nav = '';
                     var menu = [ //<i class="material-icons">&#xE8B6;</i>
                         { adr: '', txt: '', type: 'lLogo', icon: '' },
-                        { adr: 'adri.init();', txt: 'Dashboard', type: 'dashBtn', icon: '&#xE7FB;' },
-                        { adr: 'adri.ui.nav.actionsSetup();', txt: 'Actions', type: 'dashBtn', icon: '&#xE3C9;' },
-                        { adr: 'adri.ui.modal.open();', txt: 'Edit Availability', type: 'dashBtn', icon: '&#xE8F9;' },
-                        { adr: 'adri.ui.nav.reportsSetup();', txt: 'Reports', type: 'dashBtn', icon: '&#xE8F9;' },
-                        { adr: 'adri.ui.nav.searchSetup();', txt: 'Search', type: 'dashBtn', icon: '&#xE8B6;' }
+                        { adr: 'dashboard.init();', txt: 'Dashboard', type: 'dashBtn', icon: '&#xE7FB;' },
+                        { adr: 'dashboard.ui.nav.actionsSetup();', txt: 'Actions', type: 'dashBtn', icon: '&#xE3C9;' },
+                        { adr: 'dashboard.ui.modal.open();', txt: 'Edit Availability', type: 'dashBtn', icon: '&#xE8F9;' },
+                        { adr: 'dashboard.ui.nav.reportsSetup();', txt: 'Reports', type: 'dashBtn', icon: '&#xE8F9;' },
+                        { adr: 'dashboard.ui.nav.searchSetup();', txt: 'Search', type: 'dashBtn', icon: '&#xE8B6;' }
                     ];
 
                     var lim = menu.length;
                     for (var i = 0; i < lim; i++) {
-                        nav = nav + adri.ui.nav.template[menu[i].type](menu[i].txt, menu[i].adr, menu[i].icon);
+                        nav = nav + dashboard.ui.nav.template[menu[i].type](menu[i].txt, menu[i].adr, menu[i].icon);
                     }
-                    $('#rpts-widget').attr('onclick', 'adri.ui.nav.open(\'' + atob(constants.interview.ui) + 'reports.html?cliid=' + constants.interview.client + '\');');
+                    $('#rpts-widget').attr('onclick', 'dashboard.ui.nav.open(\'' + atob(constants.interview.ui) + 'reports.html?cliid=' + constants.interview.client + '\');');
                     $('#left-nav').html(nav);
-                    adri.ui.labels.data.height = document.documentElement.clientHeight;
-                    adri.ui.labels.data.width = document.documentElement.clientWidth;
+                    dashboard.ui.labels.data.height = document.documentElement.clientHeight;
+                    dashboard.ui.labels.data.width = document.documentElement.clientWidth;
                     $('#dashboard-icon1').toggleClass('control-wrap-act');
-                    adri.ui.nav.template.idcount.main = 0;
-                    adri.ui.nav.template.idcount.sub = 0;
+                    dashboard.ui.nav.template.idcount.main = 0;
+                    dashboard.ui.nav.template.idcount.sub = 0;
                 },
                 actionsSetup: function () {
-                    adri.ui.nav.reset();
+                    dashboard.ui.nav.reset();
                     var nav = '';
                     var menu = [
                         { txt: 'Recruiters', type: 'subHeader' },
-                        { adr: 'adri.ui.actions.positions.getAssociatedRecruiters();', txt: 'Overview', type: 'dashSubBtn' },
-                        { adr: 'adri.ui.settings.addRecruiters();', txt: 'Add Recruiters', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.actions.positions.getAssociatedRecruiters();', txt: 'Overview', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.settings.addRecruiters();', txt: 'Add Recruiters', type: 'dashSubBtn' },
                         { type: 'subSpacer' },
                         { txt: 'Hiring Managers', type: 'subHeader' },
-                        { adr: 'adri.ui.nav.searchSetup();', txt: 'Add Hiring Managers', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.nav.searchSetup();', txt: 'Add Hiring Managers', type: 'dashSubBtn' },
                         { type: 'subSpacer' },
                         { txt: 'Positions', type: 'subHeader' },
-                        { adr: 'adri.ui.settings.openReqs();', txt: 'Overview', type: 'dashSubBtn' },
-                        { adr: 'adri.ui.settings.addPositions();', txt: 'Add Positions', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.settings.openReqs();', txt: 'Overview', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.settings.addPositions();', txt: 'Add Positions', type: 'dashSubBtn' },
                         { type: 'subSpacer' },
                         { txt: 'Candidates', type: 'subHeader' },
-                        { adr: 'adri.ui.settings.setupCandidates();', txt: 'Overview', type: 'dashSubBtn' },
-                        { adr: 'adri.ui.settings.addCandidates();', txt: 'Add Candidates', type: 'dashSubBtn' },
-                        { adr: 'adri.util.uploaderNew.open();', txt: 'Upload Candidates', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.settings.setupCandidates();', txt: 'Overview', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.settings.addCandidates();', txt: 'Add Candidates', type: 'dashSubBtn' },
+                        { adr: 'dashboard.util.uploaderNew.open();', txt: 'Upload Candidates', type: 'dashSubBtn' },
                         { type: 'subSpacer' },
                         { txt: 'Template Library', type: 'subHeader' },
-                        { adr: 'adri.ui.nav.searchSetup();', txt: 'Add New Messages', type: 'dashSubBtn' },
-                        { adr: 'adri.ui.actions.messages.getCandidateMsgs();', txt: 'Candidate Messages', type: 'dashSubBtn' },
-                        { adr: 'adri.ui.actions.messages.getRecruiterMsgs();', txt: 'Recruiter Messages', type: 'dashSubBtn' },
-                        { adr: 'adri.ui.actions.messages.getManagerMsgs();', txt: 'Manager Messages', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.nav.searchSetup();', txt: 'Add New Messages', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.actions.messages.getCandidateMsgs();', txt: 'Candidate Messages', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.actions.messages.getRecruiterMsgs();', txt: 'Recruiter Messages', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.actions.messages.getManagerMsgs();', txt: 'Manager Messages', type: 'dashSubBtn' },
                         { type: 'subSpacer' },
                         { txt: 'Settings', type: 'subHeader' },
-                        { adr: 'adri.ui.nav.searchSetup();', txt: 'Roles and Access', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.nav.searchSetup();', txt: 'Roles and Access', type: 'dashSubBtn' },
                     ];
 
                     var lim = menu.length;
                     for (var i = 0; i < lim; i++) {
-                        nav = nav + adri.ui.nav.template[menu[i].type](menu[i].txt, menu[i].adr, menu[i].icon);
+                        nav = nav + dashboard.ui.nav.template[menu[i].type](menu[i].txt, menu[i].adr, menu[i].icon);
                     }
                     $('#contentRibbon').html(nav);
-                    adri.ui.actions.positions.getAssociatedRecruiters();
-                    adri.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
+                    dashboard.ui.actions.positions.getAssociatedRecruiters();
+                    dashboard.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
                 },
                 reportsSetup: function () {
-                    adri.ui.nav.reset();
+                    dashboard.ui.nav.reset();
                     var nav = '';
                     var menu = [
                         { txt: 'Reports', type: 'subHeader' },
-                        { adr: 'adri.ui.dashboard.reports.open();', txt: 'Interactions', type: 'dashSubBtn' },
-                        { adr: 'adri.ui.nav.open(\'' + atob(constants.interview.ui) + 'reports.html?cliid=' + constants.interview.client + '\');', txt: 'My Reports', type: 'dashSubBtn' }
+                        { adr: 'dashboard.ui.dashboard.reports.open();', txt: 'Interactions', type: 'dashSubBtn' },
+                        { adr: 'dashboard.ui.nav.open(\'' + atob(constants.interview.ui) + 'reports.html?cliid=' + constants.interview.client + '\');', txt: 'My Reports', type: 'dashSubBtn' }
                     ];
 
                     var lim = menu.length;
                     for (var i = 0; i < lim; i++) {
-                        nav = nav + adri.ui.nav.template[menu[i].type](menu[i].txt, menu[i].adr, menu[i].icon);
+                        nav = nav + dashboard.ui.nav.template[menu[i].type](menu[i].txt, menu[i].adr, menu[i].icon);
                     }
                     $('#contentRibbon').html(nav);
-                    adri.ui.dashboard.reports.open();
+                    dashboard.ui.dashboard.reports.open();
                 },
                 searchSetup: function () {
-                    adri.ui.modal.error.open('Coming Soon!');
+                    dashboard.ui.modal.error.open('Coming Soon!');
                 },
                 template: {
                     idcount: {
@@ -538,11 +538,11 @@ window.adri = (function () {
                         sub: 0
                     },
                     dashBtn: function (txt, adr, icon) {
-                        adri.ui.nav.template.idcount.main++;
-                        var count = adri.ui.nav.template.idcount.main;
+                        dashboard.ui.nav.template.idcount.main++;
+                        var count = dashboard.ui.nav.template.idcount.main;
                         var theid = 'dashboard-icon' + count;
                         var cl = 'control-wrap-act';
-                        var clk = 'adri.ui.selected(\'' + theid + '\', \'' + cl + '\');';
+                        var clk = 'dashboard.ui.selected(\'' + theid + '\', \'' + cl + '\');';
                         return '<div onclick="' + adr + clk + '" id="' + theid + '" class="control-wrap">' +
                             '<div class="control-button">' +
                             '<i class="material-icons">' + icon + '</i>' +
@@ -551,11 +551,11 @@ window.adri = (function () {
                             '</div>';
                     },
                     dashSubBtn: function (txt, adr, icon) {
-                        adri.ui.nav.template.idcount.sub++;
-                        var count = adri.ui.nav.template.idcount.sub;
+                        dashboard.ui.nav.template.idcount.sub++;
+                        var count = dashboard.ui.nav.template.idcount.sub;
                         var theid = 'dashboard-sub-icon' + count;
                         var cl = 'control-sub-label-act';
-                        var clk = 'adri.ui.selected(\'' + theid + '\', \'' + cl + '\');';
+                        var clk = 'dashboard.ui.selected(\'' + theid + '\', \'' + cl + '\');';
                         return '<div onclick="' + adr + clk + '" class="control-sub-wrap">' +
                             '<div id="' + theid + '" class="control-sub-label"><span>' + txt + '</span></div>' +
                             '</div>';
@@ -585,13 +585,13 @@ window.adri = (function () {
                 }
             },
             initialize: function () {
-                adri.user.validate(adri.ui.checkUser);
+                dashboard.user.validate(dashboard.ui.checkUser);
                 /*
-                adri.interview.getUsers(function (data) {
-                    adri.interview.loadToUI(data);
-                    adri.interview.addUserNodes(data);
-                    adri.ui.availability.get(function (data) {
-                        adri.ui.availability.drawUserTimes(data);
+                dashboard.interview.getUsers(function (data) {
+                    dashboard.interview.loadToUI(data);
+                    dashboard.interview.addUserNodes(data);
+                    dashboard.ui.availability.get(function (data) {
+                        dashboard.ui.availability.drawUserTimes(data);
                     });
                 });
                 */
@@ -603,15 +603,15 @@ window.adri = (function () {
                 };
                 var welcome = 'Welcome, ' + user.firstName + ' ' + user.lastName + '!';
                 $('#welcome-box').html(welcome);
-                adri.ui.route[user.role](user);
+                dashboard.ui.route[user.role](user);
             },
             route: {
                 'Recruiter': function (user) {
-                    adri.interview.getUsers(function (data) {
-                        adri.interview.loadToUI(data);
-                        adri.interview.addUserNodes(data);
-                        adri.ui.availability.get(function (data) {
-                            adri.ui.availability.drawUserTimes(data);
+                    dashboard.interview.getUsers(function (data) {
+                        dashboard.interview.loadToUI(data);
+                        dashboard.interview.addUserNodes(data);
+                        dashboard.ui.availability.get(function (data) {
+                            dashboard.ui.availability.drawUserTimes(data);
                         });
                     });
                 },
@@ -619,13 +619,13 @@ window.adri = (function () {
 
                 },
                 'Interviewer': function (user) {
-                    adri.interview.get(function (data) {
+                    dashboard.interview.get(function (data) {
 
-                        adri.interview.loadToUI(data);
-                        adri.interview.getUsers(function (data) {
-                            adri.interview.addUserNodes(data);
-                            adri.ui.availability.get(function (data) {
-                                adri.ui.availability.drawUserTimes(data);
+                        dashboard.interview.loadToUI(data);
+                        dashboard.interview.getUsers(function (data) {
+                            dashboard.interview.addUserNodes(data);
+                            dashboard.ui.availability.get(function (data) {
+                                dashboard.ui.availability.drawUserTimes(data);
                             });
                         });
                     });
@@ -640,7 +640,7 @@ window.adri = (function () {
                     end: 0
                 },
                 open: function () {
-                    adri.user.validate(adri.ui.dashboard.checkUser);
+                    dashboard.user.validate(dashboard.ui.dashboard.checkUser);
                 },
                 checkUser: function (user) {
                     //Mark: Manually entering the user. Need to remove when beginning to test. 
@@ -650,12 +650,12 @@ window.adri = (function () {
                     };
                     var welcome = 'Welcome, ' + user.firstName + ' ' + user.lastName + '!';
                     $('#welcome-box').html(welcome);
-                    adri.ui.dashboard.route[user.role](user);
+                    dashboard.ui.dashboard.route[user.role](user);
                 },
                 route: {
                     'Recruiter': function (user) {
 
-                        var db = adri.ui.dashboard;
+                        var db = dashboard.ui.dashboard;
 
                         db.setup();
                         $('.dynamicContent').fadeIn('fast');
@@ -676,7 +676,7 @@ window.adri = (function () {
                                 POSITION_ID: "R5534",
                                 POSITION_NAME: "Customer Service - Personal Banker - Penicuik - 9 Month Fixed Term Contract - Part Time",
                                 ROW_ID: 37,
-                                USER_EMAIL: "support@adri-sys.com",
+                                USER_EMAIL: "support@dashboard-sys.com",
                                 USER_FNAME: "Adri-sys",
                                 USER_ID: "10020802",
                                 USER_LNAME: "Support",
@@ -695,7 +695,7 @@ window.adri = (function () {
                                 POSITION_ID: "R5534",
                                 POSITION_NAME: "Customer Service - Personal Banker - Penicuik - 9 Month Fixed Term Contract - Part Time",
                                 ROW_ID: 590,
-                                USER_EMAIL: "support@adri-sys.com",
+                                USER_EMAIL: "support@dashboard-sys.com",
                                 USER_FNAME: "Adri-sys",
                                 USER_ID: "10020802",
                                 USER_LNAME: "Support",
@@ -706,13 +706,13 @@ window.adri = (function () {
                             db.drawInterviews(data);
                         });
                         var elid = "dynamic-content-loader";
-                        adri.ui.loader(false, elid);
+                        dashboard.ui.loader(false, elid);
                     },
                     'Candidate': function (user) {
 
                     },
                     'Interviewer': function (user) {
-                        var db = adri.ui.dashboard;
+                        var db = dashboard.ui.dashboard;
 
                         db.setup();
                         //$('.dynamicContent').fadeIn('fast');
@@ -730,7 +730,7 @@ window.adri = (function () {
                     }
                 },
                 deleteUser: function (id, interviewID) {
-                    var db = adri.ui.dashboard;
+                    var db = dashboard.ui.dashboard;
 
                     $('#loader-' + id).html('<div class="centered vCenter">Removing...</div>');
                     $('#loader-' + id).stop();
@@ -769,7 +769,7 @@ window.adri = (function () {
                     var $el = $('#dynamic-content-area');
                     var wkDate = new Date();
                     var getUnscheduled = function (data) {
-                        adri.ui.dashboard.drawUnscheduledInterviews(data);
+                        dashboard.ui.dashboard.drawUnscheduledInterviews(data);
                     };
 
                     var dash = '<div id="contentRibbon" class="ui-content-ribbon subScroller">' +
@@ -778,19 +778,19 @@ window.adri = (function () {
                         '<div id="modal-form" class="modal-form"></div>' +
                         '<div id="smallModal" class="modal-small"></div>' +
                         '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                        '<div id="modal-bg-overlay" class="modal-overlay" onclick="adri.timeslot.removeControls();"></div>' +
-                        '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="adri.ui.modal.small.close();"></div>' +
+                        '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
+                        '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
                         '<div id="error-modal" class="modal">' +
                         '<div id="availError" class="modal-content">' +
-                        '<button id="closeModal" class="close-modal" onclick="adri.ui.modal.error.close();">&times;</button>' +
+                        '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
                         '</div>' +
                         '</div>' +
                         '<div class="ui-content-body">' +
                         '<div id="db-weekly-view" class="dashMain-title">' +
-                        '<button id="toggleScheduled" class="mediumClear" title="Check your unscheduled prospects" onclick="adri.ui.dashboard.getUnscheduledInterviews(' + getUnscheduled + ');"></button>' +
+                        '<button id="toggleScheduled" class="mediumClear" title="Check your unscheduled prospects" onclick="dashboard.ui.dashboard.getUnscheduledInterviews(' + getUnscheduled + ');"></button>' +
                         '<div class="lineSpacer"></div>' +
-                        adri.util.controls.calendarSmall.drawWeeklyView(wkDate) +
-                        '<button onclick="adri.util.getURLParams();" title="Refresh" class="refresh-button">&#xE5D5;</button>' +
+                        dashboard.util.controls.calendarSmall.drawWeeklyView(wkDate) +
+                        '<button onclick="dashboard.util.getURLParams();" title="Refresh" class="refresh-button">&#xE5D5;</button>' +
                         '</div>' +
                         '<div id="db-scheduling" class="dashboard-scheduling">' +
                         '<div id="scheduled-interviews-container" class="fullWidth-container ">' +
@@ -799,11 +799,11 @@ window.adri = (function () {
                         '</div>' +
                         '</div>';
                     $el.html(dash);
-                    adri.ui.time.loadNew('contentRibbon');
+                    dashboard.ui.time.loadNew('contentRibbon');
                 },
                 dateReset: {
                     scheduled: function () {
-                        var db = adri.ui.dashboard;
+                        var db = dashboard.ui.dashboard;
                         db.getInterviews(function (data) {
                             $('#sch-selected-date').html('Next 7 Days');
                             db.drawInterviews(data);
@@ -813,31 +813,31 @@ window.adri = (function () {
                 },
                 filter: {
                     scheduled: function () {
-                        var db = adri.ui.dashboard;
+                        var db = dashboard.ui.dashboard;
 
-                        if (!adri.ui.selectedDate || adri.ui.selectedDate === '') {
+                        if (!dashboard.ui.selectedDate || dashboard.ui.selectedDate === '') {
                             db.getInterviews(function (data) {
                                 db.drawInterviews(data);
                                 //db.drawInterviewsForDate(data);
                             });
                         }
                         else {
-                            db.getInterviewsDate(adri.ui.selectedDate, function (data) {
+                            db.getInterviewsDate(dashboard.ui.selectedDate, function (data) {
                                 db.drawInterviewsForDate(data);
                             });
                         }
 
                     },
                     unscheduled: function () {
-                        var db = adri.ui.dashboard;
+                        var db = dashboard.ui.dashboard;
                         db.getUnscheduledInterviews(function (data) {
                             db.drawUnscheduledInterviews(data);
                         });
                     }
                 },
                 getInterviewsForDate: function (date, id) {
-                    var db = adri.ui.dashboard;
-                    adri.ui.selectedDate = date;
+                    var db = dashboard.ui.dashboard;
+                    dashboard.ui.selectedDate = date;
                     $('#sch-selected-date').html(dis);
                     db.getInterviewsDate(date, function (data) {
                         db.drawInterviewsForDate(data);
@@ -891,7 +891,7 @@ window.adri = (function () {
                 },
                 getUnscheduledInterviews: function () {
                     var elid = "dynamic-content-loader";
-                    adri.ui.loader(true, elid);
+                    dashboard.ui.loader(true, elid);
                     var posFilter = $('#unsch-position-filter').val() || 'All';
                     $.ajax({
                         type: "GET",
@@ -899,7 +899,7 @@ window.adri = (function () {
                         dataType: "json",
                         url: constants.urls.getUnscheduledInterviews + '?uid=' + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client + '&pfl=' + btoa(posFilter),
                         success: function (data) {
-                            adri.ui.dashboard.drawUnscheduledInterviews(data[0]);
+                            dashboard.ui.dashboard.drawUnscheduledInterviews(data[0]);
                         },
                         error: function (xhr, ajaxOptions, error) {
                             console.log(xhr);
@@ -946,7 +946,7 @@ window.adri = (function () {
                     var canName = '';
                     var tslot = '';
                     var phone = '';
-                    var rowColors = adri.colors;
+                    var rowColors = dashboard.colors;
 
                     for (var i = 0; i < lim; i++) {
                         var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
@@ -981,7 +981,7 @@ window.adri = (function () {
                             '<div class="ui-cell-sm ui-cell-pad roboto small"> ' + data[i]['POSITION_ID'] + '</div>' +
                             '<div class="ui-cell-sm roboto small"> ' + phone.toPhone() + '</div>' +
                             '<div class="ui-cell-med roboto small"> ' + data[i]['CANDIDATE_EMAIL'] + '</div>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><div onclick="adri.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
+                        $tab.append('<div class="ui-row-spacer-main"></div><div onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
 
                         $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
                     }
@@ -990,14 +990,14 @@ window.adri = (function () {
                         $(this).select();
                     });
                     var elid = "dynamic-content-loader";
-                    adri.ui.loader(false, elid);
+                    dashboard.ui.loader(false, elid);
                 },
                 drawUnscheduledInterviews: function (data) {
 
                     //$('#toggleScheduled').text('Unscheduled Prospects');
                     $('#toggleScheduled').html('<div title="Check your unscheduled prospects">Unscheduled Prospects</div>');
                     $('#toggleScheduled').removeAttr('onclick');
-                    $('#toggleScheduled').attr('onclick', 'adri.ui.dashboard.getUnscheduledInterviews()');
+                    $('#toggleScheduled').attr('onclick', 'dashboard.ui.dashboard.getUnscheduledInterviews()');
                     $('.dashboard-header-text').html('Candidate Overview');
                     var lim = data.length;
                     var $schArea = $('#interviews');
@@ -1022,7 +1022,7 @@ window.adri = (function () {
                     var phone = '';
                     var fullName = '';
                     var sdate = '';
-                    var rowColors = adri.colors;
+                    var rowColors = dashboard.colors;
                     var month;
                     var hrs;
                     var day;
@@ -1061,7 +1061,7 @@ window.adri = (function () {
                             '<div title="Click to view Call Details" class="ui-cell-sm ui-cell-pad roboto small">' + data[i]['POSITION_ID'] + '</div>' +
                             '<div title="Click to view Call Details" class="ui-cell-sm roboto small">' + phone + '</div>' +
                             '<div title="Click to view Call Details" class="ui-cell-med roboto small">' + data[i]['CANDIDATE_EMAIL'] + '</div>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><div onclick="adri.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
+                        $tab.append('<div class="ui-row-spacer-main"></div><div onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
 
                         $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
                     }
@@ -1070,14 +1070,14 @@ window.adri = (function () {
                         $(this).select();
                     });
 
-                    adri.ui.loader(false, "dynamic-content-loader");
+                    dashboard.ui.loader(false, "dynamic-content-loader");
                 },
                 drawInterviews: function (data, btn) {
                     btn = btn || '';
 
                     $('#toggleScheduled').html('<div title="Check your unscheduled prospects">Unscheduled Prospects</div>');
                     $('#toggleScheduled').removeAttr('onclick');
-                    $('#toggleScheduled').attr('onclick', 'adri.ui.dashboard.getUnscheduledInterviews()');
+                    $('#toggleScheduled').attr('onclick', 'dashboard.ui.dashboard.getUnscheduledInterviews()');
                     $('#sch-selected-date').html('Upcoming Scheduled Calls');
                     var lim = data.length;
                     var $schArea = $('#interviews');
@@ -1103,7 +1103,7 @@ window.adri = (function () {
                     var phone = '';
                     var fullName = '';
                     var sdate = '';
-                    var rowColors = adri.colors;
+                    var rowColors = dashboard.colors;
                     var month;
                     var hrs;
                     var day;
@@ -1146,7 +1146,7 @@ window.adri = (function () {
                             '<div title="Click to view Call Details" class="ui-cell-sm ui-cell-pad roboto small">' + data[i]['POSITION_ID'] + '</div>' +
                             '<div title="Click to view Call Details" class="ui-cell-sm roboto small">' + phone.toPhone() + '</div>' +
                             '<div title="Click to view Call Details" class="ui-cell-med roboto small">' + data[i]['CANDIDATE_PHONE'] + '</div>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><div onclick="adri.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
+                        $tab.append('<div class="ui-row-spacer-main"></div><div onclick="dashboard.ui.dashboard.getInterview(\'' + data[i]['INTERVIEW_REFERENCE_ID'] + '\');" id="' + rowID + '" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
 
                         $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
                     }
@@ -1155,11 +1155,11 @@ window.adri = (function () {
                         $(this).select();
                     });
 
-                    adri.ui.loader(false, "dynamic-content-loader");
+                    dashboard.ui.loader(false, "dynamic-content-loader");
                 },
                 drawPositionPool: function (data) {
                     console.log('drawPositionPool ', data);
-                    adri.ui.form.data.positionids = [];
+                    dashboard.ui.form.data.positionids = [];
                     var lim = data.length;
                     var $schArea = $('#scheduled-interviews-container');
 
@@ -1178,18 +1178,18 @@ window.adri = (function () {
                     var canName = '';
                     var tslot = '';
                     var phone = '';
-                    var rowColors = adri.colors;
+                    var rowColors = dashboard.colors;
 
                     for (var i = 0; i < lim; i++) {
-                        adri.ui.form.data.positionids.push(data[i]['POSITION_ID']);
+                        dashboard.ui.form.data.positionids.push(data[i]['POSITION_ID']);
                         var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
                         var rowID = 'positionRow' + i;
-                        dtlBar = //'<div class="ui-cell-btn left" onclick="adri.ui.dashboard.confirmRemoveReq(\'' + data[i]['role_code'] + '\');">&#xE5CD;</div>' +
+                        dtlBar = //'<div class="ui-cell-btn left" onclick="dashboard.ui.dashboard.confirmRemoveReq(\'' + data[i]['role_code'] + '\');">&#xE5CD;</div>' +
                             '<div class="ui-cell-sm ui-cell-pad roboto small">' + data[i]['POSITION_ID'] + '</div>' +
                             '<div class="ui-cell-med roboto small">' + data[i]['POSITION_TYPE'] + '</div>' +
                             '<div class="ui-cell-med roboto small">' + data[i]['POSITION_NAME'] + '</div>' +
                             '</div>';
-                        $tab.append('<div class="ui-row-spacer-main"></div><div title="Click to add users to ' + data[i]['POSITION_ID'] + '" id="' + rowID + '" onclick="adri.ui.actions.positions.getUsersByPosition(\'' + data[i]['POSITION_ID'] + '\');" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
+                        $tab.append('<div class="ui-row-spacer-main"></div><div title="Click to add users to ' + data[i]['POSITION_ID'] + '" id="' + rowID + '" onclick="dashboard.ui.actions.positions.getUsersByPosition(\'' + data[i]['POSITION_ID'] + '\');" class="ui-main-row-inert tableBG">' + dtlBar + '</div>');
                         $('#' + rowID).css('border-left', '5px solid ' + getRandomColor);
                     }
 
@@ -1198,7 +1198,7 @@ window.adri = (function () {
                     });
 
                     var elid = "dynamic-content-loader";
-                    adri.ui.loader(false, elid);
+                    dashboard.ui.loader(false, elid);
                 },
                 getReqLink: function (reqnum) {
                     var link = window.location.href.split('rctrinfsys')[0] + 'candidate.html?rec=' + reqnum + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client;
@@ -1207,12 +1207,12 @@ window.adri = (function () {
                     $('#req-input').on('click', function () {
                         $(this).select();
                     });
-                    adri.ui.modal.small.open();
+                    dashboard.ui.modal.small.open();
                 },
                 confirmRemoveReq: function (reqnum) {
                     var conf = confirm('Are you sure you want to remove yourself from requisition ' + reqnum + '?');
                     if (conf) {
-                        adri.ui.dashboard.removeReq(reqnum);
+                        dashboard.ui.dashboard.removeReq(reqnum);
                     }
                 },
                 removeReq: function (reqnum) {
@@ -1231,7 +1231,7 @@ window.adri = (function () {
                         url: constants.urls.removeReq,
                         data: JSON.stringify(jsData),
                         success: function (data) {
-                            adri.ui.settings.open();
+                            dashboard.ui.settings.open();
                         },
                         error: function (xhr, ajaxOptions, error) {
                             console.log(xhr);
@@ -1239,37 +1239,37 @@ window.adri = (function () {
                     });
                 },
                 getInterview: function (id) {
-                    adri.ui.loader(true, "dynamic-content-loader");
+                    dashboard.ui.loader(true, "dynamic-content-loader");
                     constants.interview.id = btoa(id);
-                    adri.ui.initialize();
+                    dashboard.ui.initialize();
                 },
                 addPosition: function () {
-                    adri.ui.addPositionForm();
+                    dashboard.ui.addPositionForm();
                 },
                 scheduleInterview: function (positionID) {
-                    adri.ui.scheduleInterviewForm(positionID);
+                    dashboard.ui.scheduleInterviewForm(positionID);
                 },
                 addParty: function () {
-                    adri.interview.addUserForm();
+                    dashboard.interview.addUserForm();
                 },
                 notifyParties: function () {
 
                 },
                 refreshPool: function () {
-                    var db = adri.ui.dashboard;
-                    adri.ui.modal.close();
-                    adri.ui.settings.addPositions();
+                    var db = dashboard.ui.dashboard;
+                    dashboard.ui.modal.close();
+                    dashboard.ui.settings.addPositions();
                 },
                 refreshInterviews: function () {
-                    adri.ui.selectedDate = adri.ui.selectedDate || '';
-                    adri.ui.modal.close();
-                    if (adri.ui.selectedDate !== '') {
-                        adri.ui.dashboard.getInterviewsForDate(adri.ui.selectedDate);
+                    dashboard.ui.selectedDate = dashboard.ui.selectedDate || '';
+                    dashboard.ui.modal.close();
+                    if (dashboard.ui.selectedDate !== '') {
+                        dashboard.ui.dashboard.getInterviewsForDate(dashboard.ui.selectedDate);
                     }
                 },
                 reports: {
                     open: function () {
-                        //adri.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
+                        //dashboard.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
                         var $Content = $('.ui-content-body')
                         var iCard = '<div id="db-weekly-view" class="centered dashMain-title">' +
                             '<div style="margin-left:0;" class="dashboard-header-block"><div class="dashboard-header-text">Interactions</div></div>' +
@@ -1288,7 +1288,7 @@ window.adri = (function () {
                 },
                 messages: {
                     getCandidateMsgs: function (onComplete) {
-                        adri.ui.loader(true, "dynamic-content-loader");
+                        dashboard.ui.loader(true, "dynamic-content-loader");
                         //var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
                         var intInfo = [1, 'candidate'];
                         console.log(intInfo);
@@ -1299,11 +1299,11 @@ window.adri = (function () {
                         socket.on('receiveMessages', function (data) {
                             socket.disconnect();
                             console.log('messages ', data[0]);
-                            adri.ui.actions.messages.drawMsgs(data[0], intInfo[1]);
+                            dashboard.ui.actions.messages.drawMsgs(data[0], intInfo[1]);
                         });
                     },
                     getRecruiterMsgs: function (onComplete) {
-                        adri.ui.loader(true, "dynamic-content-loader");
+                        dashboard.ui.loader(true, "dynamic-content-loader");
                         //var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
                         var intInfo = [1, 'manager'];
                         console.log(intInfo);
@@ -1314,11 +1314,11 @@ window.adri = (function () {
                         socket.on('receiveMessages', function (data) {
                             socket.disconnect();
                             console.log('messages ', data[0]);
-                            adri.ui.actions.messages.drawMsgs(data[0], 'recruiter');
+                            dashboard.ui.actions.messages.drawMsgs(data[0], 'recruiter');
                         });
                     },
                     getManagerMsgs: function (onComplete) {
-                        adri.ui.loader(true, "dynamic-content-loader");
+                        dashboard.ui.loader(true, "dynamic-content-loader");
                         //var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
                         var intInfo = [1, 'manager'];
                         console.log(intInfo);
@@ -1329,7 +1329,7 @@ window.adri = (function () {
                         socket.on('receiveMessages', function (data) {
                             socket.disconnect();
                             console.log('messages ', data[0]);
-                            adri.ui.actions.messages.drawMsgs(data[0], intInfo[1]);
+                            dashboard.ui.actions.messages.drawMsgs(data[0], intInfo[1]);
                         });
                     },
                     drawMsgs: function (data, msgType) {
@@ -1349,7 +1349,7 @@ window.adri = (function () {
                         var canName = '';
                         var phone = '';
                         var fullName = '';
-                        var rowColors = adri.colors;
+                        var rowColors = dashboard.colors;
                         console.log(constants.interview);
                         for (var i = 0; i < lim; i++) {
 
@@ -1368,21 +1368,21 @@ window.adri = (function () {
                             $(this).select();
                         });
 
-                        adri.ui.loader(false, "dynamic-content-loader");
+                        dashboard.ui.loader(false, "dynamic-content-loader");
                     }
                 },
                 positions: {
                     getUsersByPosition: function (pid) {
-                        adri.ui.loader(true, "dynamic-content-loader");
+                        dashboard.ui.loader(true, "dynamic-content-loader");
                         var txt = 'Select Users to add or remove for ' + pid + '';
                         var buttons = '<div style="margin-top: 8px; margin-right: 15px;" class="modal-controls"><div id="cancel" class="cancelButton"></div></div>' +
                             '<div style="margin-top: 8px;" class="modal-controls"><div id="confirm" class="submitButton"></div></div>';
 
-                        adri.ui.actions.positions.drawUsers('', pid, txt, buttons);
+                        dashboard.ui.actions.positions.drawUsers('', pid, txt, buttons);
 
                     },
                     getAssociatedRecruiters: function () {
-                        adri.ui.loader(true, "dynamic-content-loader");
+                        dashboard.ui.loader(true, "dynamic-content-loader");
                         var txt = 'Recruiter Overview';
                         //var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
                         //var intInfo = [constants.interview.user];
@@ -1393,8 +1393,8 @@ window.adri = (function () {
 
                         socket.on('receivePositionAssociations', function (data) {
                             socket.disconnect();
-                            adri.ui.actions.positions.setupAssociations(txt);
-                            adri.ui.actions.positions.drawAssociations();
+                            dashboard.ui.actions.positions.setupAssociations(txt);
+                            dashboard.ui.actions.positions.drawAssociations();
                         });
                     },
                     getAssociatedManagers: {
@@ -1420,18 +1420,18 @@ window.adri = (function () {
                             '<div id="modal-form" class="modal-form"></div>' +
                             '<div id="smallModal" class="modal-small"></div>' +
                             '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                            '<div id="modal-bg-overlay" class="modal-overlay" onclick="adri.timeslot.removeControls();"></div>' +
-                            '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="adri.ui.modal.small.close();"></div>' +
+                            '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
+                            '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
                             '<div id="error-modal" class="modal">' +
                             '<div id="availError" class="modal-content">' +
-                            '<button id="closeModal" class="close-modal" onclick="adri.ui.modal.error.close();">&times;</button>' +
+                            '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
                             '</div>' +
                             '</div>';
                         $Content.html(iCard);
-                        adri.util.btns.confirmationBtns('confirm', 'cancel', adri.ui.actions.positions.updatePositions, '', adri.ui.settings.openReqs);
+                        dashboard.util.btns.confirmationBtns('confirm', 'cancel', dashboard.ui.actions.positions.updatePositions, '', dashboard.ui.settings.openReqs);
                     },
                     drawAssociations: function (data) {
-                        data = adri.ui.form.data.users.recruiters;
+                        data = dashboard.ui.form.data.users.recruiters;
 
                         var lim = data.length;
                         var $schArea = $('#position-pool');
@@ -1454,7 +1454,7 @@ window.adri = (function () {
                         var fullName = '';
                         var otherName = '';
                         var sdate = '';
-                        var rowColors = adri.colors;
+                        var rowColors = dashboard.colors;
                         var month;
                         var hrs;
                         var day;
@@ -1494,7 +1494,7 @@ window.adri = (function () {
                             }
                         });
                         console.log('drawAssociations', output);
-                        adri.ui.actions.data.recruiters = output;
+                        dashboard.ui.actions.data.recruiters = output;
                         data = output;
                         var dLen = data.length;
                         for (var i = 0; i < dLen; i++) {
@@ -1539,7 +1539,7 @@ window.adri = (function () {
                             $(this).select();
                         });
 
-                        adri.ui.loader(false, "dynamic-content-loader");
+                        dashboard.ui.loader(false, "dynamic-content-loader");
                     },
                     setupPositionAssociations: function (txt, btns) {
                         btns = btns || '';
@@ -1558,19 +1558,19 @@ window.adri = (function () {
                             '<div id="modal-form" class="modal-form"></div>' +
                             '<div id="smallModal" class="modal-small"></div>' +
                             '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                            '<div id="modal-bg-overlay" class="modal-overlay" onclick="adri.timeslot.removeControls();"></div>' +
-                            '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="adri.ui.modal.small.close();"></div>' +
+                            '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
+                            '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>' +
                             '<div id="error-modal" class="modal">' +
                             '<div id="availError" class="modal-content">' +
-                            '<button id="closeModal" class="close-modal" onclick="adri.ui.modal.error.close();">&times;</button>' +
+                            '<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>' +
                             '</div>' +
                             '</div>';
                         $Content.html(iCard);
-                        adri.util.btns.confirmationBtns('confirm', 'cancel', adri.ui.actions.positions.updatePositions, '', adri.ui.settings.openReqs);
+                        dashboard.util.btns.confirmationBtns('confirm', 'cancel', dashboard.ui.actions.positions.updatePositions, '', dashboard.ui.settings.openReqs);
                     },
                     drawUsers: function (data, pid, txt, buttons) {
-                        adri.ui.actions.positions.setupPositionAssociations(txt, buttons);
-                        data = adri.ui.actions.data.recruiters;
+                        dashboard.ui.actions.positions.setupPositionAssociations(txt, buttons);
+                        data = dashboard.ui.actions.data.recruiters;
                         console.log(data);
                         var lim = data.length;
                         var $schArea = $('#position-pool');
@@ -1594,7 +1594,7 @@ window.adri = (function () {
                         var phone = '';
                         var fullName = '';
                         var sdate = '';
-                        var rowColors = adri.colors;
+                        var rowColors = dashboard.colors;
                         var month;
                         var hrs;
                         var day;
@@ -1625,21 +1625,21 @@ window.adri = (function () {
                             for (var e in data[i]['pid']) {
                                 if (pid === data[i]['pid'][e]) {
                                     chkbox = '<p class="ui-cell-pad">' +
-                                        '<input checked onclick="adri.ui.actions.positions.setData(' + pid + ', ' + data[i]['userid'] + ');" type="checkbox" id="chkBox' + rowID + '" ></>' +
+                                        '<input checked onclick="dashboard.ui.actions.positions.setData(' + pid + ', ' + data[i]['userid'] + ');" type="checkbox" id="chkBox' + rowID + '" ></>' +
                                         '<label for="chkBox' + rowID + '"></label>' +
                                         '</p>';
                                     break;
                                 }
                                 else {
                                     chkbox = '<p class="ui-cell-pad">' +
-                                        '<input onclick="adri.ui.actions.positions.setData(\'' + pid + '\',' + data[i]['userid'] + ');" type="checkbox" id="chkBox' + rowID + '" ></>' +
+                                        '<input onclick="dashboard.ui.actions.positions.setData(\'' + pid + '\',' + data[i]['userid'] + ');" type="checkbox" id="chkBox' + rowID + '" ></>' +
                                         '<label for="chkBox' + rowID + '"></label>' +
                                         '</p>';
                                 }
                             }
                             /*
                             chkbox = '<p class="ui-cell-pad">' +
-                                '<input onclick="adri.ui.actions.positions.setData(' + pid + ', ' + data[i]['userid'] + ');" type="checkbox" id="chkBox' + rowID + '" ></>' +
+                                '<input onclick="dashboard.ui.actions.positions.setData(' + pid + ', ' + data[i]['userid'] + ');" type="checkbox" id="chkBox' + rowID + '" ></>' +
                                 '<label for="chkBox' + rowID + '"></label>' +
                                 '</p>';
                             */
@@ -1656,30 +1656,30 @@ window.adri = (function () {
                         });
 
 
-                        adri.ui.loader(false, "dynamic-content-loader");
+                        dashboard.ui.loader(false, "dynamic-content-loader");
                     },
                     setData: function (posid, userid) {
-                        var rec = adri.ui.actions.data.recruiters;
+                        var rec = dashboard.ui.actions.data.recruiters;
 
                         for (var e = 0; e < rec.length; e++) {
                             if (rec[e].userid === userid) {
                                 console.log('true0', rec[e].userid, userid);
-                                var iLen = adri.ui.actions.data.recruiters[e].pid.length;
+                                var iLen = dashboard.ui.actions.data.recruiters[e].pid.length;
                                 for (var i = 0; i < iLen; i++) {
-                                    if (adri.ui.actions.data.recruiters[e].pid[i] === posid) {
-                                        console.log(adri.ui.actions.data.recruiters[e].pid[i]);
-                                        //adri.ui.actions.data.recruiters[e].pid[i] = '';
+                                    if (dashboard.ui.actions.data.recruiters[e].pid[i] === posid) {
+                                        console.log(dashboard.ui.actions.data.recruiters[e].pid[i]);
+                                        //dashboard.ui.actions.data.recruiters[e].pid[i] = '';
                                     }
                                     else {
-                                        console.log('false', adri.ui.actions.data.recruiters[e]);
-                                        adri.ui.actions.data.recruiters[e].pid.push(posid);
+                                        console.log('false', dashboard.ui.actions.data.recruiters[e]);
+                                        dashboard.ui.actions.data.recruiters[e].pid.push(posid);
                                     }
                                 }
                             }
                         }
                     },
                     updatePositions: function (user) {
-                        adri.ui.settings.openReqs();
+                        dashboard.ui.settings.openReqs();
                     }
                 },
             },
@@ -1742,7 +1742,7 @@ window.adri = (function () {
                             $('#error-modal').fadeIn(400);
                         });
                         $('#availError').html(t);
-                        $('#availError').append('<button id="closeModal" class="close-modal" onclick="adri.ui.modal.error.close();">&times;</button>');
+                        $('#availError').append('<button id="closeModal" class="close-modal" onclick="dashboard.ui.modal.error.close();">&times;</button>');
                     },
                     close: function () {
                         $('#small-modal-bg-overlay').stop();
@@ -1754,12 +1754,12 @@ window.adri = (function () {
                 }
             },
             addPositionForm: function () {
-                var currentLength = adri.ui.form.data.positions.length;
+                var currentLength = dashboard.ui.form.data.positions.length;
 
                 var nodes = currentLength + $('.smallFormFields').length;
                 var $schArea = $('#position-pool');
-                var field = adri.ui.template.field;
-                adri.ui.form.data.positions[nodes] = {
+                var field = dashboard.ui.template.field;
+                dashboard.ui.form.data.positions[nodes] = {
                     rolename: "",
                     role_code: "",
                     role_type: "",
@@ -1773,12 +1773,12 @@ window.adri = (function () {
                 $schArea.append(posFields);
             },
             addRecruiterForm: function () {
-                var currentLength = adri.ui.form.data.users.recruiters.length;
+                var currentLength = dashboard.ui.form.data.users.recruiters.length;
 
                 var nodes = currentLength + $('.largeFormFields').length;
                 var $schArea = $('#position-pool');
-                var field = adri.ui.template.field;
-                adri.ui.form.data.users.recruiters[nodes] = {
+                var field = dashboard.ui.template.field;
+                dashboard.ui.form.data.users.recruiters[nodes] = {
                     userid: nodes + 1000,
                     fname: '',
                     lname: '',
@@ -1798,8 +1798,8 @@ window.adri = (function () {
                 var nodes = $('.largeFormFields').length;
                 console.log(nodes);
                 var $schArea = $('#position-pool');
-                var field = adri.ui.template.field;
-                adri.ui.form.data.users.managers[nodes] = {};
+                var field = dashboard.ui.template.field;
+                dashboard.ui.form.data.users.managers[nodes] = {};
                 var posFields = field.input('Email Address', 'managers', 'email', 'User', '', nodes) +
                     field.inputSmall('First Name', 'managers', 'fname', 'User', '', nodes) +
                     field.inputSmall('Last Name', 'managers', 'lname', 'User', '', nodes) +
@@ -1809,12 +1809,12 @@ window.adri = (function () {
                 $schArea.append(posFields);
             },
             addCandidateForm: function () {
-                var currentLength = adri.ui.form.data.users.candidates.length;
+                var currentLength = dashboard.ui.form.data.users.candidates.length;
 
                 var nodes = currentLength + $('.largeFormFields').length;
                 var $schArea = $('#position-pool');
-                var field = adri.ui.template.field;
-                adri.ui.form.data.users.candidates[nodes] = {
+                var field = dashboard.ui.template.field;
+                dashboard.ui.form.data.users.candidates[nodes] = {
                     c_email: '',
                     c_fname: '',
                     c_lname: '',
@@ -1827,27 +1827,27 @@ window.adri = (function () {
                     field.inputSmall('Last Name', 'candidates', 'c_lname', 'User', '', nodes) +
                     field.inputSmall('Phone Number', 'candidates', 'c_phone', 'User', '', nodes) +
                     field.input('Role Name', 'candidates', 'rolename', 'User', '', nodes) +
-                    field.selectNew('Position ID', 'candidates', 'role_code', adri.ui.form.data.positionids, 'User', nodes);
+                    field.selectNew('Position ID', 'candidates', 'role_code', dashboard.ui.form.data.positionids, 'User', nodes);
 
                 posFields = '<div class="smallForm"><div class="largeFormFields"><div class="formHeader">New Candidate</div>' + posFields + '</div></div>';
                 $schArea.append(posFields);
             },
             submitCandidates: function (onComplete) {
-                var jData = adri.ui.form.data.users.candidates;
+                var jData = dashboard.ui.form.data.users.candidates;
                 console.log(jData);
-                adri.ui.settings.setupCandidates();
-                adri.ui.selected('dashboard-sub-icon6', 'control-sub-label-act');
+                dashboard.ui.settings.setupCandidates();
+                dashboard.ui.selected('dashboard-sub-icon6', 'control-sub-label-act');
             },
             submitRecruiters: function (onComplete) {
-                var jData = adri.ui.form.data.users.recruiters;
+                var jData = dashboard.ui.form.data.users.recruiters;
                 console.log(jData);
-                adri.ui.actions.positions.getAssociatedRecruiters();
-                adri.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
+                dashboard.ui.actions.positions.getAssociatedRecruiters();
+                dashboard.ui.selected('dashboard-sub-icon1', 'control-sub-label-act');
 
             },
             submitPosition: function (onComplete) {
 
-                var jData = adri.ui.form.data.positions;
+                var jData = dashboard.ui.form.data.positions;
                 jData.clientID = constants.interview.client;
                 jData.userID = constants.interview.user;
                 jData.uiID = constants.interview.ui;
@@ -1859,7 +1859,7 @@ window.adri = (function () {
                     url: constants.urls.addPosition,
                     data: JSON.stringify(jData),
                     success: function (data) {
-                        adri.ui.form.resetData();
+                        dashboard.ui.form.resetData();
                         onComplete();
                     },
                     error: function (xhr, ajaxOptions, error) {
@@ -1868,7 +1868,7 @@ window.adri = (function () {
                 });
             },
             submitInterview: function () {
-                adri.ui.form.submit();
+                dashboard.ui.form.submit();
             },
             accordion: function (id) {
                 var accItem = document.getElementsByClassName();
@@ -1887,11 +1887,11 @@ window.adri = (function () {
                 }
             },
             debug: function () {
-                var $Content = $('#adri-ras-content');
-                var b1 = '<button type="button" onclick="adri.interview.get()">Get ' + appconfig.alias.interview + ' Info</button>';
-                var b2 = '<button type="button" onclick="adri.ui.time.load(\'adri-ras-content\')">Load Time Controls</button>';
-                var b3 = '<button type="button" onclick="adri.ui.availability.load()">Get Availability</button>';
-                var b4 = '<button type="button" onclick="adri.ui.form.newEvent()">Create Event</button>';
+                var $Content = $('#dashboard-ras-content');
+                var b1 = '<button type="button" onclick="dashboard.interview.get()">Get ' + appconfig.alias.interview + ' Info</button>';
+                var b2 = '<button type="button" onclick="dashboard.ui.time.load(\'dashboard-ras-content\')">Load Time Controls</button>';
+                var b3 = '<button type="button" onclick="dashboard.ui.availability.load()">Get Availability</button>';
+                var b4 = '<button type="button" onclick="dashboard.ui.form.newEvent()">Create Event</button>';
                 var markup = '<div style="text-align:center;">' +
                     b1 +
                     b2 +
@@ -1901,11 +1901,11 @@ window.adri = (function () {
                 $Content.html(markup);
             },
             setData: function (id, field, value) {
-                adri.data[id][field] = value;
+                dashboard.data[id][field] = value;
             },
             time: {
                 load: function (elmt) {
-                    adri.ui.form.data = {
+                    dashboard.ui.form.data = {
                         userID: constants.interview.user,
                         interviewID: constants.interview.id,
                         clientID: constants.interview.client,
@@ -1913,13 +1913,13 @@ window.adri = (function () {
                         availability: []
                     };
                     var today = new Date();
-                    var cctr = '<div id="adri-ras-calendar-control" style="height:45%;width:90%;margin:0 auto;"></div>'; //maybe add to css
+                    var cctr = '<div id="dashboard-ras-calendar-control" style="height:45%;width:90%;margin:0 auto;"></div>'; //maybe add to css
                     $('#' + elmt).html(cctr);
-                    adri.util.controls.calendar.draw('adri-ras-calendar-control', today.getMonth(), today.getFullYear());
+                    dashboard.util.controls.calendar.draw('dashboard-ras-calendar-control', today.getMonth(), today.getFullYear());
                 },
                 loadNew: function (elmt) { //Mark: loadNew added instead of load. The calendar function needed to be modified. Changed style as well. Chain needs to be modified so that availabilityView id doesn't have to be here.
                     $('#' + elmt).html('');
-                    adri.ui.form.data = {
+                    dashboard.ui.form.data = {
                         userID: constants.interview.user,
                         interviewID: constants.interview.id,
                         clientID: constants.interview.client,
@@ -1927,27 +1927,27 @@ window.adri = (function () {
                         availability: []
                     };
                     var today = new Date();
-                    var cctr = '<div id="ribbon-header" class="dashHeader centered roboto">ADRI</div><div id="adri-ras-calendar-control"></div>' +
+                    var cctr = '<div id="ribbon-header" class="dashHeader centered roboto">ADRI</div><div id="dashboard-ras-calendar-control"></div>' +
                         '<div id="availabilityView" class="timeContainerSmall"></div>';
                     $('#' + elmt).html(cctr);
-                    adri.util.controls.calendarSmall.draw('adri-ras-calendar-control', today.getMonth(), today.getFullYear());
-                    adri.user.info.launchEditForm();
+                    dashboard.util.controls.calendarSmall.draw('dashboard-ras-calendar-control', today.getMonth(), today.getFullYear());
+                    dashboard.user.info.launchEditForm();
                 },
                 submit: function () {
-                    var jData = adri.timeslot.wrap();
-                    adri.timeslot.add(jData);
+                    var jData = dashboard.timeslot.wrap();
+                    dashboard.timeslot.add(jData);
                 },
                 dateNode: {
                     add: function (date, element) {
-                        var dtNode = adri.ui.template.dateNode(adri.ui.time.dateNode.count, date);
+                        var dtNode = dashboard.ui.template.dateNode(dashboard.ui.time.dateNode.count, date);
                         var schdate = new BlockDate(date);
                         schdate.userID = atob(constants.interview.user);
                         schdate.status = 'Proposed';
                         schdate.interviewID = constants.interview.id;
-                        adri.ui.form.data.availability.push([schdate]);
+                        dashboard.ui.form.data.availability.push([schdate]);
                         $('#' + element).append(dtNode);
-                        adri.data[adri.ui.time.dateNode.count] = new ADRITime(date, '12', '00', 'AM', 'Accepted');
-                        adri.ui.time.dateNode.count++;
+                        dashboard.data[dashboard.ui.time.dateNode.count] = new ADRITime(date, '12', '00', 'AM', 'Accepted');
+                        dashboard.ui.time.dateNode.count++;
                     },
                     remove: function (id) {
                         var $nodeID = $('#datetime-node-' + id);
@@ -1958,7 +1958,7 @@ window.adri = (function () {
             },
             availability: {
                 load: function () {
-                    adri.ui.availability.get();
+                    dashboard.ui.availability.get();
                 },
                 get: function (onComplete) {
                     var svc = '';
@@ -1966,7 +1966,7 @@ window.adri = (function () {
                 },
                 drawNodes: function (data) {
                     var lim = data.length;
-                    var $Content = $('#adri-ras-timeNodes');
+                    var $Content = $('#dashboard-ras-timeNodes');
                     $Content.html('');
                     var map = {};
                     for (var i = 0; i < lim; i++) {
@@ -1979,7 +1979,7 @@ window.adri = (function () {
                     }
 
                     for (var time in map) {
-                        $Content.append(adri.ui.template.availabilityNode(map[time]));
+                        $Content.append(dashboard.ui.template.availabilityNode(map[time]));
                     }
                 },
                 drawUserTimes: function (data) {
@@ -1999,9 +1999,9 @@ window.adri = (function () {
                                 map[data[i]['USER_ID']] = data[i];
                                 $user.html('');
                             }
-                            $user.append(adri.ui.template.availabilityNodeSingle(data[i]));
+                            $user.append(dashboard.ui.template.availabilityNodeSingle(data[i]));
                             if (data[i]['CANDIDATE_ID'] !== null) {
-                                $('#user-availability-' + data[i]['CANDIDATE_ID']).append(adri.ui.template.availabilityNodeSingle(data[i]));
+                                $('#user-availability-' + data[i]['CANDIDATE_ID']).append(dashboard.ui.template.availabilityNodeSingle(data[i]));
                             }
                         }
                     }
@@ -2045,20 +2045,20 @@ window.adri = (function () {
                     toggler: function (label, icon, updates, field, value) {
                         var markup = '<div class="field-wrapper">' +
                             '<span class="secHTxt">' + label + '</span>' +
-                            '<div class="field-toggler ckable" data-state="off" data-value="' + value + '" onclick="adri.ui.form.setToggler($(this)); adri.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).attr(\'data-value\'));"><div>' + icon + '</div></div>' +
+                            '<div class="field-toggler ckable" data-state="off" data-value="' + value + '" onclick="dashboard.ui.form.setToggler($(this)); dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).attr(\'data-value\'));"><div>' + icon + '</div></div>' +
                             '</div>';
                         return markup;
                     },
                     groupToggle: function (icon, updates, field) {
-                        var markup = '<div class="field-toggler ckable" data-state="off" data-value="no" onclick="adri.ui.form.setToggler($(this)); adri.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).attr(\'data-value\'));"><div>' + icon + '</div></div>';
+                        var markup = '<div class="field-toggler ckable" data-state="off" data-value="no" onclick="dashboard.ui.form.setToggler($(this)); dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).attr(\'data-value\'));"><div>' + icon + '</div></div>';
                         return markup;
                     },
                     dayToggleOld: function (icon, updates, index) {
-                        var markup = '<div class="field-toggler ckable" id="day-toggle-' + index + '-' + updates + '" data-state="off" data-value="no" onclick="adri.ui.form.setToggler($(this)); adri.ui.form.instantiateDay(\'' + updates + '\',\'' + index + '\');"><div>' + icon + '</div></div>';
+                        var markup = '<div class="field-toggler ckable" id="day-toggle-' + index + '-' + updates + '" data-state="off" data-value="no" onclick="dashboard.ui.form.setToggler($(this)); dashboard.ui.form.instantiateDay(\'' + updates + '\',\'' + index + '\');"><div>' + icon + '</div></div>';
                         return markup;
                     },
                     dayToggle: function (icon, updates, index) {//MARK: altered dayToggle to work with new markup. 
-                        var markup = '<div title="Choose the days you are available!" class="day-toggler" id="day-toggle-' + index + '-' + updates + '" data-state="off" data-value="no" onclick="adri.ui.form.setToggler($(this)); adri.ui.form.instantiateDay(\'' + updates + '\',\'' + index + '\');"><div>' + icon + '</div></div>';
+                        var markup = '<div title="Choose the days you are available!" class="day-toggler" id="day-toggle-' + index + '-' + updates + '" data-state="off" data-value="no" onclick="dashboard.ui.form.setToggler($(this)); dashboard.ui.form.instantiateDay(\'' + updates + '\',\'' + index + '\');"><div>' + icon + '</div></div>';
                         return markup;
                     },
                     dayToggleSmall: function (icon, updates, index) { //MARK: added smaller dayToggle
@@ -2072,11 +2072,11 @@ window.adri = (function () {
                             opts = opts + '<option value="' + choices[i] + '">' + choices[i] + '</option>';
                         }
 
-                        adri.ui.form.setData(updates, field, choices[0]);
-                        //'<select onchange="adri.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select>' +
+                        dashboard.ui.form.setData(updates, field, choices[0]);
+                        //'<select onchange="dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select>' +
                         var markup = '<div class="field-wrapper">' +
                             '<span>' + label + '</span>' +
-                            '<div class="containerFull"><select class="" onchange="adri.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select></div>'
+                            '<div class="containerFull"><select class="" onchange="dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select></div>'
                         '</div>';
                         return markup;
                     },
@@ -2087,11 +2087,11 @@ window.adri = (function () {
                             opts = opts + '<option value="' + choices[i] + '">' + choices[i] + '</option>';
                         }
 
-                        adri.ui.form.setData(updates, field, choices[0]);
+                        dashboard.ui.form.setData(updates, field, choices[0]);
 
                         var markup = '<div class="field-wrapper">' +
                             '<span>' + label + '</span>' +
-                            '<select onchange="adri.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select>' +
+                            '<select onchange="dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());">' + opts + '</select>' +
                             '</div>';
                         return markup;
                     },
@@ -2101,7 +2101,7 @@ window.adri = (function () {
                         setType = setType || '';
                         var markup = '<div class="field-wrapper">' +
                             '<span>' + label + '</span>' +                  //updates, index, field, val
-                            '<input id="field-' + field + '" onchange="adri.ui.form.set' + setType + 'Data(\'' + updates + '\',\'' + index + '\',\'' + field + '\',$(this).val());">' + value + '</input>' +
+                            '<input id="field-' + field + '" onchange="dashboard.ui.form.set' + setType + 'Data(\'' + updates + '\',\'' + index + '\',\'' + field + '\',$(this).val());">' + value + '</input>' +
                             '</div>';
 
                         return markup;
@@ -2111,7 +2111,7 @@ window.adri = (function () {
                         setType = setType || '';
                         var markup = '<div class="field-wrapper-small">' +
                             '<span>' + label + '</span>' +
-                            '<input id="field-' + field + '" onchange="adri.ui.form.set' + setType + 'Data(\'' + updates + '\',\'' + index + '\',\'' + field + '\',$(this).val());">' + value + '</input>' +
+                            '<input id="field-' + field + '" onchange="dashboard.ui.form.set' + setType + 'Data(\'' + updates + '\',\'' + index + '\',\'' + field + '\',$(this).val());">' + value + '</input>' +
                             '</div>';
                         return markup;
                     },
@@ -2121,26 +2121,26 @@ window.adri = (function () {
                         step = step || '1';
                         var markup = '<div class="field-wrapper">' +
                             '<span>' + label + '</span>' +
-                            '<input type="number" min="' + min + '" id="field-' + field + '" step="' + step + '" value="' + value + '" onchange="adri.util.checkNumValue($(this),' + min + ',' + step + ');adri.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());"></input>' +
+                            '<input type="number" min="' + min + '" id="field-' + field + '" step="' + step + '" value="' + value + '" onchange="dashboard.util.checkNumValue($(this),' + min + ',' + step + ');dashboard.ui.form.setData(\'' + updates + '\',\'' + field + '\',$(this).val());"></input>' +
                             '</div>';
                         return markup;
                     },
                     userInput: function (label, role, index, field) {
                         var markup = '<div class="field-wrapper">' +
                             '<span>' + label + '</span>' +
-                            '<input onchange="adri.ui.form.setUserData(\'' + role + '\',\'' + index + '\',\'' + field + '\',$(this).val());"></input>' +
+                            '<input onchange="dashboard.ui.form.setUserData(\'' + role + '\',\'' + index + '\',\'' + field + '\',$(this).val());"></input>' +
                             '</div>';
                         return markup;
                     },
                     userRepeater: function (label, updates, field) {
                         var rid = label.split(/[^A-Za-z0-9]/).join('');
-                        var markup = '<div title="Add a range of time. You can use this for more control of your schedule." id="user-repeater-' + rid + '"></div><button class="button thin hlBG negTxt ckable" onclick="adri.ui.form.addUser(\'user-repeater-' + rid + '\',\'' + label + '\',\'' + updates + '\',\'' + field + '\')"><span>Add ' + label + '</span></button>';
+                        var markup = '<div title="Add a range of time. You can use this for more control of your schedule." id="user-repeater-' + rid + '"></div><button class="button thin hlBG negTxt ckable" onclick="dashboard.ui.form.addUser(\'user-repeater-' + rid + '\',\'' + label + '\',\'' + updates + '\',\'' + field + '\')"><span>Add ' + label + '</span></button>';
                         return markup;
                     },
                     user: function (role, updates, fld) {
                         var nodes = $('.form-user-node-struct').length;
-                        adri.ui.form.data.users[fld][nodes] = {};
-                        var field = adri.ui.template.field;
+                        dashboard.ui.form.data.users[fld][nodes] = {};
+                        var field = dashboard.ui.template.field;
                         var markup = '<div id="user-' + nodes + '" class="form-user-node">' +
                             '<div id="user-' + nodes + '" class="formHeader">Enter ' + role + ' Information</div>' +
                             field.userInput(role + ' ID', fld, nodes, 'id') +
@@ -2155,7 +2155,7 @@ window.adri = (function () {
                         var zone;
                         var markup = '';
                         var mkup = '';
-                        var timeData = adri.util.time.propagateWorkhoursArray();
+                        var timeData = dashboard.util.time.propagateWorkhoursArray();
                         var hours = timeData.hours;
                         var minutes = timeData.minutes;
                         var period = timeData.period;
@@ -2168,14 +2168,14 @@ window.adri = (function () {
                         }
 
                         var id = 'selector-hours' + index + '-' + category;
-                        adri.id = id;                                                                                                                                             ////onclick="adri.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'hour\',\'' + value[0] + '\'); adri.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'period\',\'' + value[1] + '\');"          
-                        markup = '<div title="Use these fields to choose a time range for your availability" id="selector-hours-' + index + '-' + category + '" class="container"><select onchange="adri.ui.form.setBlockHour(\'' + category + '\',\'' + index + '\',$(this).val());" class="dropdown" name="radio-hours-' + index + '-' + category + '" id="radio-hours-' + index + '-' + category + '" >' + hmkup + '</select></div>';
+                        dashboard.id = id;                                                                                                                                             ////onclick="dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'hour\',\'' + value[0] + '\'); dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'period\',\'' + value[1] + '\');"          
+                        markup = '<div title="Use these fields to choose a time range for your availability" id="selector-hours-' + index + '-' + category + '" class="container"><select onchange="dashboard.ui.form.setBlockHour(\'' + category + '\',\'' + index + '\',$(this).val());" class="dropdown" name="radio-hours-' + index + '-' + category + '" id="radio-hours-' + index + '-' + category + '" >' + hmkup + '</select></div>';
 
                         for (var e = 0; e < mins; e++) {
                             mkup = mkup + '<option value="' + minutes[e] + '">' + minutes[e] + '</option>';
                         }
 
-                        markup = markup + '<div title="Use these fields to choose a time range for your availability" class="container"><select onchange="adri.ui.form.setBlockMinute(\'' + category + '\',\'' + index + '\',\'minutes\',$(this).val());" class="dropdown" name="radio-minutes-' + index + '-' + category + '" id="radio-minutes-' + index + '-' + category + '" >' + mkup + '</select></div>';
+                        markup = markup + '<div title="Use these fields to choose a time range for your availability" class="container"><select onchange="dashboard.ui.form.setBlockMinute(\'' + category + '\',\'' + index + '\',\'minutes\',$(this).val());" class="dropdown" name="radio-minutes-' + index + '-' + category + '" id="radio-minutes-' + index + '-' + category + '" >' + mkup + '</select></div>';
 
                         return markup;
                     },
@@ -2184,7 +2184,7 @@ window.adri = (function () {
                         return markup;
                     },
                     timeNode: function (category, index, zone, value, icon) {
-                        var markup = '<option id="' + zone + '-' + index + '-' + value + '" onclick="adri.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'minutes\',\'' + value + '\');">' + icon + '</option>';
+                        var markup = '<option id="' + zone + '-' + index + '-' + value + '" onclick="dashboard.ui.form.setBlockTime(\'' + category + '\',\'' + index + '\',\'minutes\',\'' + value + '\');">' + icon + '</option>';
                         return markup;
                     },
                     timeNodeSmall: function (category, index, zone, value, args) {//Mark: added "small" function as the timeNode function is still needed for the editing form.           
@@ -2209,7 +2209,7 @@ window.adri = (function () {
 
                     var nodeID = data['TIME_SLOT'].split(/[^0-9]/).join('-');
                     var markup = '<div id="availability-node-' + nodeID + '" class="date-node">' +
-                        adri.ui.template.date(data['TIME_SLOT'].split('T')[0]) +
+                        dashboard.ui.template.date(data['TIME_SLOT'].split('T')[0]) +
                         '<div>' + data['TIME_SLOT'].split('T')[1].split('Z')[0] + '</div>' +
                         '<div>' + data.users.join('\<br\/\>') + '</div>' +
                         '</div>';
@@ -2219,9 +2219,9 @@ window.adri = (function () {
                 availabilityNodeSingle: function (data) {
                     var nodeID = data['TIME_SLOT'].split(/[^0-9]/).join('-');
                     var markup = '<div id="availability-node-' + nodeID + '" class="date-node-single">' +
-                        adri.ui.template.date(data['TIME_SLOT'].split('T')[0]) +
+                        dashboard.ui.template.date(data['TIME_SLOT'].split('T')[0]) +
                         '<div>' + data['TIME_SLOT'].split('T')[1].split('Z')[0] + '</div>' + //<i class="material-icons">&#xE5CD;</i>
-                        '<div class="remove-widget" onclick="adri.timeslot.deleteSlot(\'' + data['TSID'] + '\');">&#xE5CD;</div>' +
+                        '<div class="remove-widget" onclick="dashboard.timeslot.deleteSlot(\'' + data['TSID'] + '\');">&#xE5CD;</div>' +
                         '</div>';
                     return markup;
                 },
@@ -2246,7 +2246,7 @@ window.adri = (function () {
                         data['USER_PHONE'] = '';
                     }
 
-                    var uid = constants.interview.user; //<i class="material-icons">&#xE5CD;</i> onclick="adri.interview.deleteUser(\'' + data['ROW_ID'] + '\');"
+                    var uid = constants.interview.user; //<i class="material-icons">&#xE5CD;</i> onclick="dashboard.interview.deleteUser(\'' + data['ROW_ID'] + '\');"
                     var delUser = '';//'<div title="Delete this user from this call." class="remove-widget">&#xE5CD;</div>';
                     if (uid === data.personcode || appconfig.page.interviewdetail.controls.deleteuser === false) {
                         delUser = '';
@@ -2262,9 +2262,9 @@ window.adri = (function () {
                     role = role.split('Recruiter').join(appconfig.alias.recruiter);
                     var etxt = '<p>Email sent!</p>';
                     var mtxt = '<p>Text sent!</p>';
-                    var calwidget = '<div title="Offer a specific time." class="add-widget" onclick="adri.timeslot.addControls(\'modal-form\',\'' + data['USER_ID'] + '\',\'' + fullName + '\',\'' + data['USER_ROLE'] + '\');">&#xE878;</div>';
-                    var emlwidget = '<div title="Email this user a new link." class="add-widget" onclick="adri.util.emailUser(\'' + 6 + '\', \'' + data['USER_ID'] + '\');adri.ui.modal.error.open(\'' + etxt + '\');">&#xE0BE;</div>';
-                    var smswidget = '<div title="Send a mobile text to this user." class="add-widget" onclick="adri.util.smsUser(\'' + data['USER_ID'] + '\');adri.ui.modal.error.open(\'' + mtxt + '\');">&#xE0D8;</div>';
+                    var calwidget = '<div title="Offer a specific time." class="add-widget" onclick="dashboard.timeslot.addControls(\'modal-form\',\'' + data['USER_ID'] + '\',\'' + fullName + '\',\'' + data['USER_ROLE'] + '\');">&#xE878;</div>';
+                    var emlwidget = '<div title="Email this user a new link." class="add-widget" onclick="dashboard.util.emailUser(\'' + 6 + '\', \'' + data['USER_ID'] + '\');dashboard.ui.modal.error.open(\'' + etxt + '\');">&#xE0BE;</div>';
+                    var smswidget = '<div title="Send a mobile text to this user." class="add-widget" onclick="dashboard.util.smsUser(\'' + data['USER_ID'] + '\');dashboard.ui.modal.error.open(\'' + mtxt + '\');">&#xE0D8;</div>';
 
                     if (appconfig.page.interviewdetail.controls.calendar !== true) {
                         calwidget = '';
@@ -2297,20 +2297,20 @@ window.adri = (function () {
                     return markup;
                 },
                 addUserNode: function () {
-                    return '<div onclick="adri.interview.addUserForm();" class="add-user-container"><div class="add-user-widget">&#xf234;</div></div>';
+                    return '<div onclick="dashboard.interview.addUserForm();" class="add-user-container"><div class="add-user-widget">&#xf234;</div></div>';
                 },
                 dateNode: function (nodeID, date) {
-                    var field = adri.ui.template.field;
+                    var field = dashboard.ui.template.field;
                     var index = $('.ti-schedule-node').length;
                     var startSelector = field.timeNodes('startTime', index);
                     var markup = '<div id="datetime-node-' + nodeID + '" class="ti-schedule-node pBG">' +
-                        adri.ui.template.date(date) +
+                        dashboard.ui.template.date(date) +
                         field.wrap('Start Time', startSelector) + '<br />' +
                         '</div>';
                     return markup;
                 },
                 timeSelect: function (id, opts, field) {
-                    return '<select id="' + id + '" class="time-select" onchange="adri.ui.setData(\'' + id + '\',\'' + field + '\',$(this).val())">' + opts + '</select>';
+                    return '<select id="' + id + '" class="time-select" onchange="dashboard.ui.setData(\'' + id + '\',\'' + field + '\',$(this).val())">' + opts + '</select>';
                 },
                 date: function (date) {
                     var da = date.split('-');
@@ -2373,7 +2373,7 @@ window.adri = (function () {
                     users: {
                         candidates: [
                             {
-                                c_email: 'support@adri-sys.com',
+                                c_email: 'support@dashboard-sys.com',
                                 c_fname: 'Jordan',
                                 c_lname: 'Marshall',
                                 c_phone: '12059151006',
@@ -2382,7 +2382,7 @@ window.adri = (function () {
                                 role_code: "R7540"
                             },
                             {
-                                c_email: 'support@adri-sys.com',
+                                c_email: 'support@dashboard-sys.com',
                                 c_fname: 'Peter',
                                 c_lname: 'Parker',
                                 c_phone: '12059151006',
@@ -2391,7 +2391,7 @@ window.adri = (function () {
                                 role_code: "R7540"
                             },
                             {
-                                c_email: 'support@adri-sys.com',
+                                c_email: 'support@dashboard-sys.com',
                                 c_fname: 'Will',
                                 c_lname: 'Smith',
                                 c_phone: '12059151006',
@@ -2405,7 +2405,7 @@ window.adri = (function () {
                                 userid: 1319,
                                 fname: "Billie",
                                 lname: "Hook",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7150"
                             },
@@ -2413,7 +2413,7 @@ window.adri = (function () {
                                 userid: 1319,
                                 fname: "Billie",
                                 lname: "Hook",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7160"
                             },
@@ -2421,7 +2421,7 @@ window.adri = (function () {
                                 userid: 1319,
                                 fname: "Billie",
                                 lname: "Hook",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7540"
                             },
@@ -2429,7 +2429,7 @@ window.adri = (function () {
                                 userid: 92990,
                                 fname: "Mikesha",
                                 lname: "Charles",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7146"
                             },
@@ -2437,7 +2437,7 @@ window.adri = (function () {
                                 userid: 92990,
                                 fname: "Mikesha",
                                 lname: "Charles",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7150"
                             },
@@ -2445,7 +2445,7 @@ window.adri = (function () {
                                 userid: 92990,
                                 fname: "Mikesha",
                                 lname: "Charles",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7156"
                             },
@@ -2453,7 +2453,7 @@ window.adri = (function () {
                                 userid: 92990,
                                 fname: "Mikesha",
                                 lname: "Charles",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7540"
                             },
@@ -2461,7 +2461,7 @@ window.adri = (function () {
                                 userid: 92990,
                                 fname: "Mikesha",
                                 lname: "Charles",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7543"
                             },
@@ -2469,7 +2469,7 @@ window.adri = (function () {
                                 userid: 92990,
                                 fname: "Mikesha",
                                 lname: "Charles",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R8477"
                             },
@@ -2477,7 +2477,7 @@ window.adri = (function () {
                                 userid: 92990,
                                 fname: "Mikesha",
                                 lname: "Charles",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R8632"
                             },
@@ -2485,7 +2485,7 @@ window.adri = (function () {
                                 userid: 77767,
                                 fname: "Emily",
                                 lname: "LAROCHE",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7150"
                             },
@@ -2493,7 +2493,7 @@ window.adri = (function () {
                                 userid: 12345,
                                 fname: "Clinton",
                                 lname: "White",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7150"
                             },
@@ -2501,7 +2501,7 @@ window.adri = (function () {
                                 userid: 12345,
                                 fname: "Clinton",
                                 lname: "White",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R7156"
                             },
@@ -2509,7 +2509,7 @@ window.adri = (function () {
                                 userid: 93452,
                                 fname: "Amber",
                                 lname: "Jones",
-                                emailaddress: "support@adri-sys.com",
+                                emailaddress: "support@dashboard-sys.com",
                                 mobilenumber: "12059151006",
                                 role_code: "R8464"
                             },
@@ -2518,7 +2518,7 @@ window.adri = (function () {
                     }
                 },
                 resetData: function () {
-                    adri.ui.form.data = {
+                    dashboard.ui.form.data = {
                         clientID: constants.interview.client,
                         userID: constants.interview.user,
                         uiID: constants.interview.ui,
@@ -2571,7 +2571,7 @@ window.adri = (function () {
                         users: {
                             candidates: [
                                 {
-                                    c_email: 'support@adri-sys.com',
+                                    c_email: 'support@dashboard-sys.com',
                                     c_fname: 'Jordan',
                                     c_lname: 'Marshall',
                                     c_phone: '12059151006',
@@ -2580,7 +2580,7 @@ window.adri = (function () {
                                     role_code: "R7540"
                                 },
                                 {
-                                    c_email: 'support@adri-sys.com',
+                                    c_email: 'support@dashboard-sys.com',
                                     c_fname: 'Peter',
                                     c_lname: 'Parker',
                                     c_phone: '12059151006',
@@ -2589,7 +2589,7 @@ window.adri = (function () {
                                     role_code: "R7540"
                                 },
                                 {
-                                    c_email: 'support@adri-sys.com',
+                                    c_email: 'support@dashboard-sys.com',
                                     c_fname: 'Will',
                                     c_lname: 'Smith',
                                     c_phone: '12059151006',
@@ -2603,7 +2603,7 @@ window.adri = (function () {
                                     userid: 1319,
                                     fname: "Billie",
                                     lname: "Hook",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7150"
                                 },
@@ -2611,7 +2611,7 @@ window.adri = (function () {
                                     userid: 1319,
                                     fname: "Billie",
                                     lname: "Hook",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7160"
                                 },
@@ -2619,7 +2619,7 @@ window.adri = (function () {
                                     userid: 1319,
                                     fname: "Billie",
                                     lname: "Hook",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7540"
                                 },
@@ -2627,7 +2627,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7146"
                                 },
@@ -2635,7 +2635,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7150"
                                 },
@@ -2643,7 +2643,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7156"
                                 },
@@ -2651,7 +2651,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7540"
                                 },
@@ -2659,7 +2659,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7543"
                                 },
@@ -2667,7 +2667,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R8477"
                                 },
@@ -2675,7 +2675,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R8632"
                                 },
@@ -2683,7 +2683,7 @@ window.adri = (function () {
                                     userid: 77767,
                                     fname: "Emily",
                                     lname: "LAROCHE",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7150"
                                 },
@@ -2691,7 +2691,7 @@ window.adri = (function () {
                                     userid: 12345,
                                     fname: "Clinton",
                                     lname: "White",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7150"
                                 },
@@ -2699,7 +2699,7 @@ window.adri = (function () {
                                     userid: 12345,
                                     fname: "Clinton",
                                     lname: "White",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7156"
                                 },
@@ -2707,7 +2707,7 @@ window.adri = (function () {
                                     userid: 93452,
                                     fname: "Amber",
                                     lname: "Jones",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R8464"
                                 },
@@ -2717,19 +2717,19 @@ window.adri = (function () {
                     };
                 },
                 setData: function (updates, index, field, val) {
-                    adri.ui.form.dtemp[updates][field] = val;
+                    dashboard.ui.form.dtemp[updates][field] = val;
                 },
                 setUserData: function (updates, index, field, val) {
-                    adri.ui.form.dtemp.users[updates][index][field] = val;
+                    dashboard.ui.form.dtemp.users[updates][index][field] = val;
                 },
                 setSubData: function (updates, field, subField, val) {
-                    adri.ui.form.data[updates][field][subField] = val;
+                    dashboard.ui.form.data[updates][field][subField] = val;
                 },
                 setBlockTime: function (category, index, field, value) {
 
-                    var lim = adri.ui.form.data.availability[index].length;
+                    var lim = dashboard.ui.form.data.availability[index].length;
                     for (var i = 0; i < lim; i++) {
-                        adri.ui.form.data.availability[index][i].schedule[category][field] = value;
+                        dashboard.ui.form.data.availability[index][i].schedule[category][field] = value;
                     }
                 },
                 setBlockHour: function (category, index, value) {
@@ -2738,21 +2738,21 @@ window.adri = (function () {
                     var time = val[0];
                     var period = val[1];
 
-                    var lim = adri.ui.form.data.availability[index].length;
+                    var lim = dashboard.ui.form.data.availability[index].length;
                     for (var i = 0; i < lim; i++) {
-                        adri.ui.form.data.availability[index][i].schedule[category]['period'] = period;
+                        dashboard.ui.form.data.availability[index][i].schedule[category]['period'] = period;
                     }
 
                     for (var i = 0; i < lim; i++) {
-                        adri.ui.form.data.availability[index][i].schedule[category]['hour'] = time;
+                        dashboard.ui.form.data.availability[index][i].schedule[category]['hour'] = time;
                     }
                     //console.log(category, index, value);
-                    //console.log(adri.ui.form.data.availability[index]);
+                    //console.log(dashboard.ui.form.data.availability[index]);
                 },
                 setBlockMinute: function (category, index, field, value) {
-                    var lim = adri.ui.form.data.availability[index].length;
+                    var lim = dashboard.ui.form.data.availability[index].length;
                     for (var i = 0; i < lim; i++) {
-                        adri.ui.form.data.availability[index][i].schedule[category][field] = value;
+                        dashboard.ui.form.data.availability[index][i].schedule[category][field] = value;
                     }
                 },
                 instantiateDay: function (day, index) {
@@ -2761,42 +2761,42 @@ window.adri = (function () {
                     var state = $node.attr('data-state');
 
                     if (state === 'off') {
-                        var lim = adri.ui.form.data.availability[index].length;
+                        var lim = dashboard.ui.form.data.availability[index].length;
                         var ids = [];
                         for (var i = 0; i < lim; i++) {
-                            if (adri.ui.form.data.availability[index][i].day === day) {
+                            if (dashboard.ui.form.data.availability[index][i].day === day) {
                                 ids.push(i);
                             }
                         }
 
                         for (var n = ids.length - 1; n > -1; n--) {
-                            adri.ui.form.data.availability[index].splice(ids[n], 1);
+                            dashboard.ui.form.data.availability[index].splice(ids[n], 1);
                         }
                     }
                     else {
                         var block = new BlockDay(day);
-                        if (!adri.ui.form.data.availability[index]) {
-                            adri.ui.form.data.availability.push([block]);
+                        if (!dashboard.ui.form.data.availability[index]) {
+                            dashboard.ui.form.data.availability.push([block]);
                         }
                         else {
-                            block.schedule = adri.ui.form.data.availability[index][0].schedule;
-                            adri.ui.form.data.availability[index].push(block);
+                            block.schedule = dashboard.ui.form.data.availability[index][0].schedule;
+                            dashboard.ui.form.data.availability[index].push(block);
                         }
                     }
                 },
                 addUser: function (el, role, updates, field) {
-                    var markup = adri.ui.template.field.user(role, updates, field);
+                    var markup = dashboard.ui.template.field.user(role, updates, field);
                     $('#' + el).append(markup);
                 },
                 removeUser: function (id, updates) {
 
                 },
                 newEvent: function () {
-                    var $content = $('#adri-ras-content');
-                    var field = adri.ui.template.field;
-                    var interview = adri.ui.form.data.interview;
-                    var position = adri.ui.form.data.positions;
-                    var users = adri.ui.form.data.users;
+                    var $content = $('#dashboard-ras-content');
+                    var field = dashboard.ui.template.field;
+                    var interview = dashboard.ui.form.data.interview;
+                    var position = dashboard.ui.form.data.positions;
+                    var users = dashboard.ui.form.data.users;
                     var form = '<div id="new-event-form" class="form-event">' +
                         '<div class="formHeader">Enter ' + appconfig.alias.interview + ' Information</div>' +        //hard-coded
                         field.input(appconfig.alias.interview + ' Title', 'interview', 'title') +                       //hard-coded
@@ -2818,7 +2818,7 @@ window.adri = (function () {
                         '<hr/>' +
                         field.userRepeater(appconfig.alias.interviewer, 'users', 'interviewers') +      //hard-coded
                         '</div>' +
-                        '<div style="width:100%;text-align:center;"><button type="button" onclick="adri.ui.form.submit()">Create Event!</button></div>';
+                        '<div style="width:100%;text-align:center;"><button type="button" onclick="dashboard.ui.form.submit()">Create Event!</button></div>';
                     $content.html(form);
 
                     var dNow = new Date();
@@ -2834,9 +2834,9 @@ window.adri = (function () {
                         contentType: 'application/json',
                         dataType: "json",
                         url: constants.urls.addInterview,
-                        data: JSON.stringify(adri.ui.form.data),
+                        data: JSON.stringify(dashboard.ui.form.data),
                         success: function (data) {
-                            adri.ui.form.resetData();
+                            dashboard.ui.form.resetData();
 
                             if (typeof onComplete === "function") {
                                 onComplete();
@@ -2881,7 +2881,7 @@ window.adri = (function () {
                 }
 
                 else {
-                    adri.ui.labels.initLabels();
+                    dashboard.ui.labels.initLabels();
                     theEl.css('display', 'none');
                 }
             },
@@ -2901,7 +2901,7 @@ window.adri = (function () {
                 }
 
                 else {
-                    adri.ui.labels.initLabels();
+                    dashboard.ui.labels.initLabels();
                     theEl.css('display', 'none');
                 }
             }
@@ -2961,13 +2961,13 @@ window.adri = (function () {
                     '</div>' +
                     '<div class="interviewNodeArea ">' +
                     //'<div class="formHeader secHTxt">Users Associated with ' + appconfig.alias.interview + '</div>' +    //hard-coded
-                    '<div id="adri-ras-timeNodes"></div>' +
+                    '<div id="dashboard-ras-timeNodes"></div>' +
                     '</div>' +
                     '<div id="modal-form" class="modal-form"></div>' +
                     '<div id="smallModal" class="modal-small"></div>' +
                     '<div id="largeModal" class="modal-large"><div class="modal-header-wrap" id="modalLargeHeader"></div><div style="display:table" id="modalLargeBody"></div></div>' +
-                    '<div id="modal-bg-overlay" class="modal-overlay" onclick="adri.timeslot.removeControls();"></div>' +
-                    '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="adri.ui.modal.small.close();"></div>';
+                    '<div id="modal-bg-overlay" class="modal-overlay" onclick="dashboard.timeslot.removeControls();"></div>' +
+                    '<div id="small-modal-bg-overlay" class="modal-overlay" onclick="dashboard.ui.modal.small.close();"></div>';
 
                 $el.html(iCard);
                 var tMarkup = '';
@@ -3023,48 +3023,48 @@ window.adri = (function () {
                 }
 
                 for (var user in map) {
-                    $Content.append(adri.ui.template.userNode(map[user]));
+                    $Content.append(dashboard.ui.template.userNode(map[user]));
                 }
 
-                var rowColors = adri.tcolors;
+                var rowColors = dashboard.tcolors;
                 var getRandomColor = rowColors[Math.floor(Math.random() * rowColors.length)];
                 $('.user-date-node').css('background', getRandomColor);
 
                 if (appconfig.page.interviewdetail.controls.adduser === true) {
-                    $Content.append(adri.ui.template.addUserNode());
+                    $Content.append(dashboard.ui.template.addUserNode());
                 }
-                adri.ui.loader(false, "dynamic-content-loader");
+                dashboard.ui.loader(false, "dynamic-content-loader");
             },
             addUserForm: function () {
-                adri.ui.form.resetData();
+                dashboard.ui.form.resetData();
                 var $modal = $('#modal-form');
-                var field = adri.ui.template.field;
+                var field = dashboard.ui.template.field;
                 var userFields = field.userRepeater(appconfig.alias.candidate, 'users', 'candidates') +
                     field.userRepeater(appconfig.alias.recruiter, 'users', 'recruiters') +
                     field.userRepeater(appconfig.alias.interviewer, 'users', 'interviewers') +    //hard-coded
                     '<hr \>' +
-                    '<button class="bigButton mainBG negTxt ckable" onclick="adri.interview.submitUsers()">SUBMIT</button>';
+                    '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.interview.submitUsers()">SUBMIT</button>';
                 $modal.html(userFields);
-                adri.ui.modal.open();
+                dashboard.ui.modal.open();
             },
             submitUsers: function () {
-                adri.ui.form.data.interview.id = constants.interview.id;
+                dashboard.ui.form.data.interview.id = constants.interview.id;
 
                 $.ajax({
                     type: "POST",
                     contentType: 'application/json',
                     dataType: "json",
                     url: constants.urls.addUsers,
-                    data: JSON.stringify(adri.ui.form.data),
+                    data: JSON.stringify(dashboard.ui.form.data),
                     success: function (data) {
-                        adri.ui.form.resetData();
-                        adri.interview.getUsers(function (data) {
-                            adri.interview.addUserNodes(data);
-                            adri.ui.availability.get(function (data) {
-                                adri.ui.availability.drawUserTimes(data);
+                        dashboard.ui.form.resetData();
+                        dashboard.interview.getUsers(function (data) {
+                            dashboard.interview.addUserNodes(data);
+                            dashboard.ui.availability.get(function (data) {
+                                dashboard.ui.availability.drawUserTimes(data);
                             });
                         });
-                        adri.ui.modal.close();
+                        dashboard.ui.modal.close();
                     },
                     error: function (xhr, ajaxOptions, error) {
                         console.log(xhr);
@@ -3088,10 +3088,10 @@ window.adri = (function () {
                     url: constants.urls.deleteUser,
                     data: JSON.stringify(jsData),
                     success: function (data) {
-                        adri.interview.getUsers(function (data) {
-                            adri.interview.addUserNodes(data);
-                            adri.ui.availability.get(function (data) {
-                                adri.ui.availability.drawUserTimes(data);
+                        dashboard.interview.getUsers(function (data) {
+                            dashboard.interview.addUserNodes(data);
+                            dashboard.ui.availability.get(function (data) {
+                                dashboard.ui.availability.drawUserTimes(data);
                             });
                         });
                     },
@@ -3114,10 +3114,10 @@ window.adri = (function () {
                 var index = 0;
                 var timeslot;
 
-                var lim = adri.ui.form.data.availability.length;
+                var lim = dashboard.ui.form.data.availability.length;
 
                 for (var i = 0; i < lim; i++) {
-                    timeslot = adri.ui.form.data.availability[i][0];
+                    timeslot = dashboard.ui.form.data.availability[i][0];
                     jsData.data[index] = new APITimeInstance(timeslot);
                     index++;
                 }
@@ -3132,10 +3132,10 @@ window.adri = (function () {
                     url: constants.urls.addTimeSlot,
                     data: JSON.stringify(jsData),
                     success: function (data) {
-                        adri.data = {};
-                        adri.timeslot.removeControls();
-                        adri.ui.availability.get(function (data) {
-                            adri.ui.availability.drawUserTimes(data);
+                        dashboard.data = {};
+                        dashboard.timeslot.removeControls();
+                        dashboard.ui.availability.get(function (data) {
+                            dashboard.ui.availability.drawUserTimes(data);
                         });
                     },
                     error: function (xhr, ajaxOptions, error) {
@@ -3144,21 +3144,21 @@ window.adri = (function () {
                 });
             },
             addControls: function (elmt, userID, userName, userRole) {
-                adri.interview.scheduling = {
+                dashboard.interview.scheduling = {
                     userID: userID,
                     userName: userName,
                     userRole: userRole
                 };
-                adri.ui.time.load(elmt);
-                adri.ui.modal.open();
+                dashboard.ui.time.load(elmt);
+                dashboard.ui.modal.open();
             },
             removeControls: function () {
-                adri.interview.scheduling = {
+                dashboard.interview.scheduling = {
                     userID: '',
                     userName: '',
                     userRole: ''
                 };
-                adri.ui.modal.close();
+                dashboard.ui.modal.close();
             },
             deleteSlot: function (id) {
                 var jsData = {
@@ -3176,8 +3176,8 @@ window.adri = (function () {
                     url: constants.urls.deleteTimeSlot,
                     data: JSON.stringify(jsData),
                     success: function (data) {
-                        adri.ui.availability.get(function (data) {
-                            adri.ui.availability.drawUserTimes(data);
+                        dashboard.ui.availability.get(function (data) {
+                            dashboard.ui.availability.drawUserTimes(data);
                         });
                     },
                     error: function (xhr, ajaxOptions, error) {
@@ -3206,19 +3206,19 @@ window.adri = (function () {
             },
             info: {
                 launchEditForm: function () {
-                    adri.user.info.edit(constants.interview.user);
+                    dashboard.user.info.edit(constants.interview.user);
                 },
                 edit: function (userID, check) {
                     var $vc = $('#availabilityView');
                     var $modal = $('#modal-form');
-                    var form = adri.user.info.form(userID);
-                    var view = adri.user.info.view();
+                    var form = dashboard.user.info.form(userID);
+                    var view = dashboard.user.info.view();
                     $vc.html(view);
                     $modal.html(form);
-                    adri.user.info.load(userID);
+                    dashboard.user.info.load(userID);
                 },
                 form: function (userID) {
-                    var field = adri.ui.template.field;
+                    var field = dashboard.ui.template.field;
                     var wdGroup = field.dayToggle('Su', 'sunday', 0) +
                         field.dayToggle('Mo', 'monday', 0) +
                         field.dayToggle('Tu', 'tuesday', 0) +
@@ -3248,11 +3248,11 @@ window.adri = (function () {
                         '</div>' +
                         '</div>' +
                         '<div class="block-repeater-add">' +
-                        '<div title="Add an additional range of time to your schedule." class="block-text fheader">&nbsp;Add Another Schedule</div><div class="stdWidget" onclick="adri.user.info.addBlockRepeater();">&#xE146;</div>' +
+                        '<div title="Add an additional range of time to your schedule." class="block-text fheader">&nbsp;Add Another Schedule</div><div class="stdWidget" onclick="dashboard.user.info.addBlockRepeater();">&#xE146;</div>' +
                         '</div>' +
                         field.number('Default ' + appconfig.alias.interview + ' Length (Minutes)', 'info', 'defaultInterviewMinutes', 5, 20, 10) +           //hard-coded
                         field.number(appconfig.alias.interviewer + ' Rank', 'info', 'ranking', 1, 1, 0) +
-                        '<div class="centered spanned"><button type="button" class="bigButton mainBG negTxt ckable" onclick="adri.user.info.update(\'' + userID + '\',adri.user.info.updated)">Submit</button></div><div class="spacer"></div>' +
+                        '<div class="centered spanned"><button type="button" class="bigButton mainBG negTxt ckable" onclick="dashboard.user.info.update(\'' + userID + '\',dashboard.user.info.updated)">Submit</button></div><div class="spacer"></div>' +
                         '</div>';
                     return form;
                 },
@@ -3263,14 +3263,14 @@ window.adri = (function () {
                         field.input('Email Address', 'info', 'email') +
                         field.input('Phone Number', 'info', 'phone') +
                         field.input('Location', 'info', 'location') +
-                        '<button class="bigButton mainBG negTxt ckable" onclick="adri.user.info.update(\'' + userID + '\',adri.user.info.updated)">Submit</button>';
+                        '<button class="bigButton mainBG negTxt ckable" onclick="dashboard.user.info.update(\'' + userID + '\',dashboard.user.info.updated)">Submit</button>';
                     return info;
                 },
                 view: function () {//Mark: view created for display under mini calendar. Most markup not needed as it is mostly drawn depending on the data pulled. 
-                    var field = adri.ui.template.field;
+                    var field = dashboard.ui.template.field;
                     var form = '<div class="formContent">' +
                         '<div class="dashHeader">Current Availability</div>' +
-                        '<div title="Edit Availability" id="block-schedule-view" class="block-container" onclick="adri.ui.modal.open();">' +
+                        '<div title="Edit Availability" id="block-schedule-view" class="block-container" onclick="dashboard.ui.modal.open();">' +
                         '</div>' +
                         '</div>' +
                         '</div>';
@@ -3278,7 +3278,7 @@ window.adri = (function () {
                 },
                 addBlockRepeater: function () { // MARK: Might need to create view version of block repeater
                     var index = $('.block-repeater').length;
-                    var field = adri.ui.template.field;
+                    var field = dashboard.ui.template.field;
                     var wdGroup = field.dayToggle('Su', 'sunday', index) +
                         field.dayToggle('Mo', 'monday', index) +
                         field.dayToggle('Tu', 'tuesday', index) +
@@ -3305,11 +3305,11 @@ window.adri = (function () {
                     $('#block-schedule-view').html('');
                     var index = $('.block-repeater').length;
 
-                    var field = adri.ui.template.field;
+                    var field = dashboard.ui.template.field;
                     var fWrap;
-                    var avail = adri.ui.form.data.availability;
+                    var avail = dashboard.ui.form.data.availability;
                     var aLen = avail.length;
-                    var rowColors = adri.colors;
+                    var rowColors = dashboard.colors;
 
                     if (avail[0]) {
                         var wkDays = {
@@ -3329,7 +3329,7 @@ window.adri = (function () {
 
 
                         function setTimeNode(t, tInstance, field, id) {
-                            var temp = adri.ui.template.field;
+                            var temp = dashboard.ui.template.field;
                             var h = tInstance.hour;
                             var m = tInstance.minutes;
                             var p = '';
@@ -3406,12 +3406,12 @@ window.adri = (function () {
                         var block = '<div id="' + id + '" style="text-align:left; color:white; padding:4px; font-size:14pt;" class="repeater-section">Your availability is not set up.</div>';
 
                         $('#block-schedule-view').append(block);
-                        adri.ui.modal.error.open(txt);
+                        dashboard.ui.modal.error.open(txt);
                     }
                 },
                 load: function (userID) {
-                    adri.user.info.get(userID, function (data) {
-                        adri.user.info.set(data);
+                    dashboard.user.info.get(userID, function (data) {
+                        dashboard.user.info.set(data);
                     });
                 },
                 get: function (userID, onComplete) {
@@ -3432,7 +3432,7 @@ window.adri = (function () {
                 set: function (data) {
                     var pa = data.persistentAvailability[0];
                     var uInfo = data.userInfo[0][0];
-                    adri.ui.form.data = {
+                    dashboard.ui.form.data = {
                         userID: btoa(pa.personid),
                         interviewID: constants.interview.id,
                         clientID: constants.interview.client,
@@ -3485,7 +3485,7 @@ window.adri = (function () {
                         users: {
                             candidates: [
                                 {
-                                    c_email: 'support@adri-sys.com',
+                                    c_email: 'support@dashboard-sys.com',
                                     c_fname: 'Jordan',
                                     c_lname: 'Marshall',
                                     c_phone: '12059151006',
@@ -3494,7 +3494,7 @@ window.adri = (function () {
                                     role_code: "R7540"
                                 },
                                 {
-                                    c_email: 'support@adri-sys.com',
+                                    c_email: 'support@dashboard-sys.com',
                                     c_fname: 'Peter',
                                     c_lname: 'Parker',
                                     c_phone: '12059151006',
@@ -3503,7 +3503,7 @@ window.adri = (function () {
                                     role_code: "R7540"
                                 },
                                 {
-                                    c_email: 'support@adri-sys.com',
+                                    c_email: 'support@dashboard-sys.com',
                                     c_fname: 'Will',
                                     c_lname: 'Smith',
                                     c_phone: '12059151006',
@@ -3517,7 +3517,7 @@ window.adri = (function () {
                                     userid: 1319,
                                     fname: "Billie",
                                     lname: "Hook",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7150"
                                 },
@@ -3525,7 +3525,7 @@ window.adri = (function () {
                                     userid: 1319,
                                     fname: "Billie",
                                     lname: "Hook",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7160"
                                 },
@@ -3533,7 +3533,7 @@ window.adri = (function () {
                                     userid: 1319,
                                     fname: "Billie",
                                     lname: "Hook",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7540"
                                 },
@@ -3541,7 +3541,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7146"
                                 },
@@ -3549,7 +3549,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7150"
                                 },
@@ -3557,7 +3557,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7156"
                                 },
@@ -3565,7 +3565,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7540"
                                 },
@@ -3573,7 +3573,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7543"
                                 },
@@ -3581,7 +3581,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R8477"
                                 },
@@ -3589,7 +3589,7 @@ window.adri = (function () {
                                     userid: 92990,
                                     fname: "Mikesha",
                                     lname: "Charles",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R8632"
                                 },
@@ -3597,7 +3597,7 @@ window.adri = (function () {
                                     userid: 77767,
                                     fname: "Emily",
                                     lname: "LAROCHE",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7150"
                                 },
@@ -3605,7 +3605,7 @@ window.adri = (function () {
                                     userid: 12345,
                                     fname: "Clinton",
                                     lname: "White",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7150"
                                 },
@@ -3613,7 +3613,7 @@ window.adri = (function () {
                                     userid: 12345,
                                     fname: "Clinton",
                                     lname: "White",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R7156"
                                 },
@@ -3621,7 +3621,7 @@ window.adri = (function () {
                                     userid: 93452,
                                     fname: "Amber",
                                     lname: "Jones",
-                                    emailaddress: "support@adri-sys.com",
+                                    emailaddress: "support@dashboard-sys.com",
                                     mobilenumber: "12059151006",
                                     role_code: "R8464"
                                 },
@@ -3656,13 +3656,13 @@ window.adri = (function () {
                     /*
                     for (var i = 0; i < lim; i++) {
                         $('#field-' + flds[i][0]).val(uInfo[flds[i][1]]);
-                        adri.ui.form.data.info[flds[i][0]] = uInfo[flds[i][1]];
+                        dashboard.ui.form.data.info[flds[i][0]] = uInfo[flds[i][1]];
                     }
                     */
-                    var dlm = adri.ui.form.data.info.defaultInterviewMinutes;
+                    var dlm = dashboard.ui.form.data.info.defaultInterviewMinutes;
 
                     if (dlm === '' || dlm === null) {
-                        adri.ui.form.data.info.defaultInterviewMinutes = 20;
+                        dashboard.ui.form.data.info.defaultInterviewMinutes = 20;
                         $('#field-defaultInterviewMinutes').val(20);
                     }
 
@@ -3706,16 +3706,16 @@ window.adri = (function () {
 
                         if (theHour[0] > 11) {
                             //MARK
-                            adri.ui.form.setBlockHour(field, t, h + ',PM');
-                            adri.ui.form.setBlockMinute(field, t, 'minutes', m);
+                            dashboard.ui.form.setBlockHour(field, t, h + ',PM');
+                            dashboard.ui.form.setBlockMinute(field, t, 'minutes', m);
 
                             $('[name=' + $hr + ']').val(h + ',PM');
                             $('[name=' + $min + ']').val(m);
                         }
                         else {
                             //MARK
-                            adri.ui.form.setBlockHour(field, t, h + ',AM');
-                            adri.ui.form.setBlockMinute(field, t, 'minutes', m);
+                            dashboard.ui.form.setBlockHour(field, t, h + ',AM');
+                            dashboard.ui.form.setBlockMinute(field, t, 'minutes', m);
                             $('[name=' + $hr + ']').val(h + ',AM');
                             $('[name=' + $min + ']').val(m);
                         }
@@ -3731,9 +3731,9 @@ window.adri = (function () {
                         if (typeof tMap[dateKey] === 'undefined') {
 
                             if (n !== 0) {
-                                adri.user.info.addBlockRepeater();
+                                dashboard.user.info.addBlockRepeater();
                             }
-                            cIndex = adri.ui.form.data.availability.length;
+                            cIndex = dashboard.ui.form.data.availability.length;
                             tMap[dateKey] = cIndex;
                             $('#day-toggle-' + cIndex + '-' + pa[n].AVAILABLE_DAY.toLowerCase()).click();
 
@@ -3746,10 +3746,10 @@ window.adri = (function () {
                             $('#day-toggle-' + cIndex + '-' + pa[n].AVAILABLE_DAY.toLowerCase()).click();
                         }
                     }
-                    adri.user.info.addBlockView();
+                    dashboard.user.info.addBlockView();
                 },
                 update: function (userID, onComplete) {
-                    var jData = adri.user.info.setJson();
+                    var jData = dashboard.user.info.setJson();
                     console.log(jData);
                     $.ajax({
                         type: "POST",
@@ -3768,13 +3768,13 @@ window.adri = (function () {
                 updated: function () { //Mark: added loadNew to refresh dash availability view along with loading animation close. 
                     var elid = "dynamic-content-loader";
 
-                    adri.ui.form.resetData();
-                    adri.ui.time.loadNew('contentRibbon');
-                    adri.ui.loader(false, elid);
-                    adri.ui.modal.close();
+                    dashboard.ui.form.resetData();
+                    dashboard.ui.time.loadNew('contentRibbon');
+                    dashboard.ui.loader(false, elid);
+                    dashboard.ui.modal.close();
                 },
                 setJson: function () {
-                    var jData = adri.ui.form.data;
+                    var jData = dashboard.ui.form.data;
                     return JSON.stringify(jData);
                 }
             }
@@ -3838,7 +3838,7 @@ window.adri = (function () {
                 });
             },
             getURLParams: function () {
-                //var testurl = 'https://s3-us-west-2.amazonaws.com/www.recruiting.adri-sys.com/candidate.html?iref=QURSSTAwMTktNTIyNzY1LVI1NTM0&uid=QURSSTAwMTk=&cliid=UkJTREVNTzIwMTcwODE4&uiid=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS93d3cucmVjcnVpdGluZy5hZHJpLXN5cy5jb20v';
+                //var testurl = 'https://s3-us-west-2.amazonaws.com/www.recruiting.dashboard-sys.com/candidate.html?iref=QURSSTAwMTktNTIyNzY1LVI1NTM0&uid=QURSSTAwMTk=&cliid=UkJTREVNTzIwMTcwODE4&uiid=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS93d3cucmVjcnVpdGluZy5hZHJpLXN5cy5jb20v';
                 //var uParts = testurl.split('?');
                 var uParts = window.location.href.split('?');
                 var pObj = {};
@@ -3866,7 +3866,7 @@ window.adri = (function () {
             testFormat: function () {
                 var frmt = $('#test-format').val();
                 var args = { format: frmt }
-                var rtv = adri.util.date.fmt(args);
+                var rtv = dashboard.util.date.fmt(args);
                 $('#test-format-out').html(rtv);
             },
             str: {
@@ -3905,7 +3905,7 @@ window.adri = (function () {
                     var lim = data.length;
                     var cells = '';
                     for (var i = 0; i < lim; i++) {
-                        cells = cells + adri.util.table.headerCell(data[i]);
+                        cells = cells + dashboard.util.table.headerCell(data[i]);
                     }
                     return '<div class="ui-header-row">' + cells + '</div>';
                 },
@@ -3921,18 +3921,18 @@ window.adri = (function () {
                     var cells = '';
                     for (var i = 0; i < flds; i++) {
                         if (fields[i][1] == 'value') {
-                            cells = cells + adri.util.table.dataCell(data[fields[i][0]]);
+                            cells = cells + dashboard.util.table.dataCell(data[fields[i][0]]);
                         }
                         else {
-                            cells = cells + adri.util.table.indicatorCell(data[fields[i][0]]);
+                            cells = cells + dashboard.util.table.indicatorCell(data[fields[i][0]]);
                         }
                     }
-                    return '<div class="ui-row" onclick="adri.ui.dashboard.getInterview(\'' + id + '\')">' + cells + '</div>';
+                    return '<div class="ui-row" onclick="dashboard.ui.dashboard.getInterview(\'' + id + '\')">' + cells + '</div>';
                 },
                 dataRows: function (data, fields) {
                     var rows = '';
                     for (var row in data) {
-                        rows = rows + adri.util.table.dataRow(data[row], fields, data[row][fields[0][0]]);
+                        rows = rows + dashboard.util.table.dataRow(data[row], fields, data[row][fields[0][0]]);
                     }
                     return rows;
                 },
@@ -3968,7 +3968,7 @@ window.adri = (function () {
                     var min = '' + dt.getMinutes();
                     var sec = '' + dt.getSeconds();
                     var wkdy = '' + dt.getDay();
-                    var util = adri.util;
+                    var util = dashboard.util;
 
                     var patterns = [
                         { pattern: 'dd', out: util.str.pad(day, '0', 2) },
@@ -4129,9 +4129,9 @@ window.adri = (function () {
                             return '<div class="cal-header-row">' + cells + '</div>';
                         },
                         cell: function (date) {
-                            var cellid = adri.util.date.fmt({ date: date, format: 'MM-dd-yyyy' });
-                            var sDate = adri.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
-                            return '<div id="cal-cell-' + cellid + '" class="cal-cell" onclick="adri.ui.time.dateNode.add(\'' + sDate + '\',\'ui-datenodes\')">' +
+                            var cellid = dashboard.util.date.fmt({ date: date, format: 'MM-dd-yyyy' });
+                            var sDate = dashboard.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
+                            return '<div id="cal-cell-' + cellid + '" class="cal-cell" onclick="dashboard.ui.time.dateNode.add(\'' + sDate + '\',\'ui-datenodes\')">' +
                                 '<div nohighlight class="cal-cell-date">' + date.getDate() + '</div>' +
                                 '</div>';
                         },
@@ -4142,10 +4142,10 @@ window.adri = (function () {
                                 '</div>';
                         },
                         title: function (date) {
-                            return '<div nohighlight class="cal-title">' + adri.util.date.fmt({ date: date, format: 'MMMM yyyy' }) + '</div>';
+                            return '<div nohighlight class="cal-title">' + dashboard.util.date.fmt({ date: date, format: 'MMMM yyyy' }) + '</div>';
                         },
                         wkviewTitle: function (date) {
-                            return '<div nohighlight class="title-weekly-calendar vCenter centered">Week of ' + adri.util.date.fmt({ date: date, format: 'MMMM dd, yyyy' }) + '</div>';
+                            return '<div nohighlight class="title-weekly-calendar vCenter centered">Week of ' + dashboard.util.date.fmt({ date: date, format: 'MMMM dd, yyyy' }) + '</div>';
                         },
                         header: function (wkdy) {
                             return '<div class="cal-header secHTxt">' + wkdy + '</div>';
@@ -4168,31 +4168,31 @@ window.adri = (function () {
                             dir = cMap[dir];
 
                             var d = new Date(date.getFullYear(), date.getMonth() + dir.i, 1);
-                            var mthYr = adri.util.date.fmt({ date: d, format: 'MMMM yyyy' });
-                            var clk = 'adri.util.controls.calendar.draw(\'' + elmt + '\',\'' + d.getMonth() + '\',\'' + d.getFullYear() + '\')';
+                            var mthYr = dashboard.util.date.fmt({ date: d, format: 'MMMM yyyy' });
+                            var clk = 'dashboard.util.controls.calendar.draw(\'' + elmt + '\',\'' + d.getMonth() + '\',\'' + d.getFullYear() + '\')';
 
                             return '<div nohighlight class="cal-button" onclick="' + clk + ';">' + dir.icon + '</div>';
                         },
                         controls: function (date, elmt) {
-                            var tmp = adri.util.controls.calendar.template;
+                            var tmp = dashboard.util.controls.calendar.template;
                             return tmp.button(date, 'down', elmt) + tmp.title(date) + tmp.button(date, 'up', elmt);
                         },
                         wvCell: function (date) {
-                            var cellid = adri.util.date.fmt({ date: date, format: 'MM-dd-yyyy' });
-                            var sDate = adri.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
-                            var cellDate = adri.util.date.fmt({ date: date, format: 'MMM d' });
+                            var cellid = dashboard.util.date.fmt({ date: date, format: 'MM-dd-yyyy' });
+                            var sDate = dashboard.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
+                            var cellDate = dashboard.util.date.fmt({ date: date, format: 'MMM d' });
 
-                            return '<div id="cal-cell-' + cellid + '" class="wvCell pBG ckable" onclick="adri.ui.dashboard.getInterviewsForDate(\'' + sDate + '\')">' +
+                            return '<div id="cal-cell-' + cellid + '" class="wvCell pBG ckable" onclick="dashboard.ui.dashboard.getInterviewsForDate(\'' + sDate + '\')">' +
                                 '<div nohighlight class="wv-cell-date">' + cellDate + '</div>' +
                                 '<div id="cal-cell-nodes-' + cellid + '"></div>' +
                                 '</div>';
                         }
                     },
                     frame: function (minDate, maxDate, elmt) {
-                        var tmp = adri.util.controls.calendar.template;
+                        var tmp = dashboard.util.controls.calendar.template;
                         var header = '';
                         for (var d = 0; d < 7; d++) {
-                            header = header + tmp.header(adri.util.date.days[d].abbreviation);
+                            header = header + tmp.header(dashboard.util.date.days[d].abbreviation);
                         }
 
                         var row = '';
@@ -4226,26 +4226,26 @@ window.adri = (function () {
                         header = tmp.headerRow(header, elmt);
                         body = '<div class="cal-monthHeader">' + tmp.controls(minDate, elmt) + '</div><div class="cal-body">' + header + body + '</div>';
                         body = body + '<div id="ui-datenodes" class="ti-schedule-nodes">' + exNodes + '</div>';
-                        body = body + '<div class="cal-footer-row"><button class="bigButton mainBG negTxt ckable" type="button" onclick="adri.ui.time.submit()">Add Times</button></div>';
+                        body = body + '<div class="cal-footer-row"><button class="bigButton mainBG negTxt ckable" type="button" onclick="dashboard.ui.time.submit()">Add Times</button></div>';
                         return body;
                     },
                     draw: function (elmt, mth, yr) {
-                        var cal = adri.util.controls.calendar;
+                        var cal = dashboard.util.controls.calendar;
                         var minDate = new Date(yr, mth, 1);
                         var maxDate = new Date(yr, (+mth + 1), 0);
 
-                        var dates = adri.util.date.propagate(minDate, maxDate);
-                        var times = adri.util.time.propagate();
+                        var dates = dashboard.util.date.propagate(minDate, maxDate);
+                        var times = dashboard.util.time.propagate();
 
                         var $el = $('#' + elmt);
                         $el.html(cal.frame(minDate, maxDate, elmt));
                     },
                     frameWeeklyView: function (wkDate) {
-                        var fDate = adri.util.date.getFirstDayOfWeek(wkDate);
-                        var tmp = adri.util.controls.calendar.template;
+                        var fDate = dashboard.util.date.getFirstDayOfWeek(wkDate);
+                        var tmp = dashboard.util.controls.calendar.template;
                         var header = '';
                         for (var d = 0; d < 7; d++) {
-                            header = header + tmp.wvheader(adri.util.date.days[d].abbreviation);
+                            header = header + tmp.wvheader(dashboard.util.date.days[d].abbreviation);
                         }
 
                         var row = '';
@@ -4265,24 +4265,24 @@ window.adri = (function () {
                         body = '<div class="mobile-hscroll"><div class="wvCalBody">' + header + body + '</div></div>';
                         body = body + '<div id="ui-datenodes" class="date-nodes"></div>';
                         body = body + '<div class="cal-footer-row"></div>';
-                        body = '<div class="cycle-weekly-calendar"><div class="stdWidget vCenter right ckablef" onclick="adri.util.controls.calendar.cycleWeeklyView(-1,\'' + wkDate + '\');">&#xf137;</div></div>' +
+                        body = '<div class="cycle-weekly-calendar"><div class="stdWidget vCenter right ckablef" onclick="dashboard.util.controls.calendar.cycleWeeklyView(-1,\'' + wkDate + '\');">&#xf137;</div></div>' +
                             '<div class="weekly-cal-title-cntr">' + tmp.wkviewTitle(wkDate) + '</div>' +
-                            '<div class="cycle-weekly-calendar"><div class="stdWidget vCenter left ckablef" onclick="adri.util.controls.calendar.cycleWeeklyView(1,\'' + wkDate + '\');">&#xf138;</div></div>' +
+                            '<div class="cycle-weekly-calendar"><div class="stdWidget vCenter left ckablef" onclick="dashboard.util.controls.calendar.cycleWeeklyView(1,\'' + wkDate + '\');">&#xf138;</div></div>' +
                             '<hr class="titleHR" />' +
                             body;
                         return body;
                     },
                     drawWeeklyView: function (wkDate) {
-                        var wkvw = adri.util.controls.calendar.frameWeeklyView(wkDate);
+                        var wkvw = dashboard.util.controls.calendar.frameWeeklyView(wkDate);
                         return wkvw;
                     },
                     cycleWeeklyView: function (m, wkDate) {
                         m = m * 7;
-                        var db = adri.ui.dashboard;
+                        var db = dashboard.ui.dashboard;
                         var d = new Date(wkDate);
                         d.setDate(d.getDate() + m);
 
-                        $('#db-weekly-view').html(adri.util.controls.calendar.drawWeeklyView(d));
+                        $('#db-weekly-view').html(dashboard.util.controls.calendar.drawWeeklyView(d));
                         db.getInterviews(function (data) {
                             db.drawInterviews(data);
                         });
@@ -4302,11 +4302,11 @@ window.adri = (function () {
                         headerRow: function (cells) { //Mark: Spacer added
                             return '<div class="cal-header-row">' + cells + '</div><div class="cal-header-row spacer"></div>';
                         },
-                        cell: function (date) { //Mark: Removed onclick="adri.ui.time.dateNode.add(\'' + sDate + '\',\'ui-datenodes\')"
-                            var cellid = adri.util.date.fmt({ date: date, format: 'MM-dd-yyyy' });
-                            var sDate = adri.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
-                            //adri.ui.time.dateNode.add(sDate, 'ui-datenodes');
-                            return '<div id="cal-cell-' + cellid + '" class="cal-cell hover-underline" onclick="adri.ui.dashboard.getInterviewsForDate(\'' + sDate + '\', \'cal-cell-' + cellid + '\')">' +
+                        cell: function (date) { //Mark: Removed onclick="dashboard.ui.time.dateNode.add(\'' + sDate + '\',\'ui-datenodes\')"
+                            var cellid = dashboard.util.date.fmt({ date: date, format: 'MM-dd-yyyy' });
+                            var sDate = dashboard.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
+                            //dashboard.ui.time.dateNode.add(sDate, 'ui-datenodes');
+                            return '<div id="cal-cell-' + cellid + '" class="cal-cell hover-underline" onclick="dashboard.ui.dashboard.getInterviewsForDate(\'' + sDate + '\', \'cal-cell-' + cellid + '\')">' +
                                 '<div nohighlight class="cal-cell-date">' + date.getDate() + '</div>' +
                                 '</div>';
                         },
@@ -4317,10 +4317,10 @@ window.adri = (function () {
                                 '</div>';
                         },
                         title: function (date) {
-                            return '<div nohighlight class="cal-title">' + adri.util.date.fmt({ date: date, format: 'MMMM yyyy' }) + '</div>';
+                            return '<div nohighlight class="cal-title">' + dashboard.util.date.fmt({ date: date, format: 'MMMM yyyy' }) + '</div>';
                         },
                         wkviewTitle: function (date) { //Mark: Changing date format to be returned
-                            return '<div nohighlight class="title-weekly-calendar right">' + adri.util.date.fmt({ date: date, format: 'MMM dd' }) + '</div>';
+                            return '<div nohighlight class="title-weekly-calendar right">' + dashboard.util.date.fmt({ date: date, format: 'MMM dd' }) + '</div>';
                         },
                         header: function (wkdy) {
                             return '<div class="cal-header secHTxt">' + wkdy + '</div>';
@@ -4343,31 +4343,31 @@ window.adri = (function () {
                             dir = cMap[dir];
 
                             var d = new Date(date.getFullYear(), date.getMonth() + dir.i, 1);
-                            var mthYr = adri.util.date.fmt({ date: d, format: 'MMMM yyyy' });
-                            var clk = 'adri.util.controls.calendarSmall.draw(\'' + elmt + '\',\'' + d.getMonth() + '\',\'' + d.getFullYear() + '\')';
+                            var mthYr = dashboard.util.date.fmt({ date: d, format: 'MMMM yyyy' });
+                            var clk = 'dashboard.util.controls.calendarSmall.draw(\'' + elmt + '\',\'' + d.getMonth() + '\',\'' + d.getFullYear() + '\')';
 
                             return '<div nohighlight class="cal-button" onclick="' + clk + ';">' + dir.icon + '</div>';
                         },
                         controls: function (date, elmt) {
-                            var tmp = adri.util.controls.calendarSmall.template;
+                            var tmp = dashboard.util.controls.calendarSmall.template;
                             return tmp.button(date, 'down', elmt) + tmp.title(date) + tmp.button(date, 'up', elmt);
                         },
                         wvCell: function (date) {
-                            var cellid = adri.util.date.fmt({ date: date, format: 'MM-dd-yyyy' });
-                            var sDate = adri.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
-                            var cellDate = adri.util.date.fmt({ date: date, format: 'MMM d' });
+                            var cellid = dashboard.util.date.fmt({ date: date, format: 'MM-dd-yyyy' });
+                            var sDate = dashboard.util.date.fmt({ date: date, format: 'yyyy-MM-dd' });
+                            var cellDate = dashboard.util.date.fmt({ date: date, format: 'MMM d' });
 
-                            return '<div id="cal-cell-' + cellid + '" class="wvCell pBG ckable" onclick="adri.ui.dashboard.getInterviewsForDate(\'' + sDate + '\', \'cal-cell-' + cellid + '\')">' +
+                            return '<div id="cal-cell-' + cellid + '" class="wvCell pBG ckable" onclick="dashboard.ui.dashboard.getInterviewsForDate(\'' + sDate + '\', \'cal-cell-' + cellid + '\')">' +
                                 '<div nohighlight class="wv-cell-date">' + cellDate + '</div>' +
                                 '<div id="cal-cell-nodes-' + cellid + '"></div>' +
                                 '</div>';
                         }
                     },
                     frame: function (minDate, maxDate, elmt) { //Mark: added modified frame function for opening dashboard. Changes include the removal of the Add Times button.
-                        var tmp = adri.util.controls.calendarSmall.template;
+                        var tmp = dashboard.util.controls.calendarSmall.template;
                         var header = '';
                         for (var d = 0; d < 7; d++) {
-                            header = header + tmp.header(adri.util.date.daysSmall[d].abbreviation);
+                            header = header + tmp.header(dashboard.util.date.daysSmall[d].abbreviation);
                         }
 
                         var row = '';
@@ -4405,12 +4405,12 @@ window.adri = (function () {
                         return body;
                     },
                     draw: function (elmt, mth, yr) {
-                        var cal = adri.util.controls.calendarSmall;
+                        var cal = dashboard.util.controls.calendarSmall;
                         var minDate = new Date(yr, mth, 1);
                         var maxDate = new Date(yr, (+mth + 1), 0);
 
-                        var dates = adri.util.date.propagate(minDate, maxDate);
-                        var times = adri.util.time.propagate();
+                        var dates = dashboard.util.date.propagate(minDate, maxDate);
+                        var times = dashboard.util.time.propagate();
 
                         var $el = $('#' + elmt);
                         $el.html(cal.frame(minDate, maxDate, elmt));
@@ -4427,10 +4427,10 @@ window.adri = (function () {
                             cDay = 'Today\'s Calls';
                         }
 
-                        var tmp = adri.util.controls.calendarSmall.template;
+                        var tmp = dashboard.util.controls.calendarSmall.template;
                         var header = '';
                         for (var d = 0; d < 7; d++) {
-                            header = header + tmp.wvheader(adri.util.date.days[d].abbreviation);
+                            header = header + tmp.wvheader(dashboard.util.date.days[d].abbreviation);
                         }
 
                         var row = '';
@@ -4447,16 +4447,16 @@ window.adri = (function () {
                         return body;
                     },
                     drawWeeklyView: function (wkDate) {
-                        var wkvw = adri.util.controls.calendarSmall.frameWeeklyView(wkDate);
+                        var wkvw = dashboard.util.controls.calendarSmall.frameWeeklyView(wkDate);
                         return wkvw;
                     },
                     cycleWeeklyView: function (m, wkDate) {
                         m = m * 7;
-                        var db = adri.ui.dashboard;
+                        var db = dashboard.ui.dashboard;
                         var d = new Date(wkDate);
                         d.setDate(d.getDate() + m);
 
-                        $('#db-weekly-view').html(adri.util.controls.calendarSmall.drawWeeklyView(d));
+                        $('#db-weekly-view').html(dashboard.util.controls.calendarSmall.drawWeeklyView(d));
                         db.getInterviews(function (data) {
                             db.drawInterviews(data);
                         });
@@ -4464,10 +4464,10 @@ window.adri = (function () {
                 },
                 switchCSS: function () {
                     $('#css-switch-trugreen').click(function () {
-                        $('link[href="adri/adri.ras.generic.css"]').attr('href', 'adri/adri.ras.css');
+                        $('link[href="dashboard/dashboard.ras.generic.css"]').attr('href', 'dashboard/dashboard.ras.css');
                     });
-                    $('#css-switch-adri').click(function () {
-                        $('link[href="adri/adri.ras.css"]').attr('href', 'adri/adri.ras.generic.css');
+                    $('#css-switch-dashboard').click(function () {
+                        $('link[href="dashboard/dashboard.ras.css"]').attr('href', 'dashboard/dashboard.ras.generic.css');
                     });
                 },
                 reloadLocation: function () {
@@ -4494,7 +4494,7 @@ window.adri = (function () {
                         function callbackSubmit() {
                             setTimeout(function () {
                                 $("#" + id).removeClass("submit-validate");
-                                adri.ui.modal.large.close();
+                                dashboard.ui.modal.large.close();
                                 confirm(cb);
                             }, 400);
                         }
@@ -4515,7 +4515,7 @@ window.adri = (function () {
                         function callbackCancel() {
                             setTimeout(function () {
                                 $("#" + id2).removeClass("cancel-validate");
-                                adri.ui.modal.large.close();
+                                dashboard.ui.modal.large.close();
                                 cancel();
                             }, 400);
                         }
@@ -4543,8 +4543,8 @@ window.adri = (function () {
                 open: function () {
                     var $Content = $('.ui-content-body');
                     $Content.html('');
-                    adri.util.uploaderNew.files = {};
-                    adri.util.uploaderNew.intInfo = {
+                    dashboard.util.uploaderNew.files = {};
+                    dashboard.util.uploaderNew.intInfo = {
                         userID: constants.interview.user,
                         filename: '',
                         filedata: ''
@@ -4552,7 +4552,7 @@ window.adri = (function () {
                     var dz = '<div class="file-drop" id="dz-input"><div style="margin-top:100px;" class="vCenter">Drop files here</div></div>' +
                         '<div id="progress-bars" class="file-progress"></div>' +
                         '<div id="upload-msg"></div>' +
-                        '<div><button type="button" class="bigButton mainBG negTxt ckable" onclick="adri.util.uploaderNew.upload();" id="upload-button">Upload!</button></div>';
+                        '<div><button type="button" class="bigButton mainBG negTxt ckable" onclick="dashboard.util.uploaderNew.upload();" id="upload-button">Upload!</button></div>';
                     $($Content).html(dz);
 
                     function handleFileSelect(evt) {
@@ -4565,7 +4565,7 @@ window.adri = (function () {
                             $('#progress-bars').append('<div id="progress-bar-' + i + '" class="file-progress"><div id="pct-' + i + '" class="percent">0%</div></div>');
                             $('#pct-' + i).css('max-width', '0%');
                             $('#pct-' + i).html('0%');
-                            adri.util.uploaderNew.read(files[i], i);
+                            dashboard.util.uploaderNew.read(files[i], i);
                         }
 
                     }
@@ -4601,7 +4601,7 @@ window.adri = (function () {
                         setTimeout(function () {
                             $('#progress-bar-' + i).removeClass('loading');
                         }, 2000);
-                        adri.util.uploaderNew.files[file.name] = {
+                        dashboard.util.uploaderNew.files[file.name] = {
                             name: file.name,
                             data: e.target.result,
                             //data: btoa(unescape(encodeURIComponent(e.target.result))), //btoa(e.target.result) MARK This was needed due to error "Failed to execute 'btoa' on 'Window': The string to be encoded contains characters outside of the Latin1 range."
@@ -4609,7 +4609,7 @@ window.adri = (function () {
                         };
                     }
                     $('#dz-cancel').click(function () {
-                        adri.util.uploaderNew.abort(reader);
+                        dashboard.util.uploaderNew.abort(reader);
                     });
 
                     // Read in as text
@@ -4646,20 +4646,20 @@ window.adri = (function () {
                     reader.abort();
                 },
                 upload: function () {
-                    var files = adri.util.uploaderNew.files;
+                    var files = dashboard.util.uploaderNew.files;
                     if ($.isEmptyObject(files) === true) {
-                        adri.ui.modal.error.open('There do not seem to be any files uploaded.');
+                        dashboard.ui.modal.error.open('There do not seem to be any files uploaded.');
                     }
                     else {
-                        adri.ui.loaderLong(true, "dynamic-content-loader");
-                        //iterate through each member of adri.util.uploader.files, call service to check file contents and upload or reject
+                        dashboard.ui.loaderLong(true, "dynamic-content-loader");
+                        //iterate through each member of dashboard.util.uploader.files, call service to check file contents and upload or reject
                         $('#upload-msg').html(''); // FIX THIS
-                        for (var f in adri.util.uploaderNew.files) {
-                            var file = adri.util.uploaderNew.files[f];
-                            var intInfo = adri.util.uploaderNew.intInfo;
+                        for (var f in dashboard.util.uploaderNew.files) {
+                            var file = dashboard.util.uploaderNew.files[f];
+                            var intInfo = dashboard.util.uploaderNew.intInfo;
                             intInfo.filename = file.name;
                             intInfo.filedata = file.data;
-                            adri.util.uploaderNew.process(file, adri.util.uploaderNew.complete, adri.util.uploaderNew.reject);
+                            dashboard.util.uploaderNew.process(file, dashboard.util.uploaderNew.complete, dashboard.util.uploaderNew.reject);
                         }
                     }
                 },
@@ -4695,9 +4695,9 @@ window.adri = (function () {
             }
         }
     };
-    return adri;
+    return dashboard;
 })();
 
 $(document).ready(function () {
-    adri.init();
+    dashboard.init();
 });

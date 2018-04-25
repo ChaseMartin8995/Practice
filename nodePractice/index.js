@@ -1,4 +1,5 @@
-var cors = require('cors');
+var whitelist = require('./whitelist.js')
+var cors = require('cors')
 var list = whitelist.Whitelist();
 var bodyParser = require('body-parser');
 var express = require('express');
@@ -7,6 +8,8 @@ var add_todb = require('./add.js');
 var loaddb = require('./loaddb.js');
 var datalayer = require('./datalayer.js');
 var emailer = require('./ema.js');
+var pydatalayer = require('./pydata.js');
+var getWebReports = require('./getwebreports.js');
 var path = require('path');
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
@@ -35,6 +38,16 @@ app.get('/', (req, res) => {
     res.sendFile('lp.html', { root: __dirname })
 })
 
+app.get('/newuser', (req, res) => {
+    console.log('inside the newUser endpoint');
+    res.sendFile('newUser.html', { root: __dirname })
+})
+
+app.get('/Audrey', (req, res) => {
+    console.log('inside the Audrey endpoint');
+    res.sendFile('lp.html', { root: __dirname })
+})
+
 app.get('/Dashboard', (req, res) => {
     console.log('inside the Dashboard endpoint');
     res.sendFile('dash.html', { root: __dirname })
@@ -48,6 +61,12 @@ app.get('/Main', (req, res) => {
 
 })
 
+app.get('/Candidate', (req, res) => {
+    console.log('inside the candidate endpoint');
+    //
+    //
+    res.sendFile('candidate.html', { root: __dirname });
+})
 
 app.post('/fileupload', function (req, res) {
     var form = new formidable.IncomingForm();
