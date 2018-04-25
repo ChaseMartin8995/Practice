@@ -1,9 +1,3 @@
-var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
-AWS.config.region = 'us-east-1'; // Region
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    // Provide your Pool Id here
-    IdentityPoolId: 'us-east-1:b049e1f9-7053-48ec-9b1c-431f2edb615c',
-});
 
 String.prototype.toPhone = function () {
     return this.replace(/(\d\d\d)(\d\d\d)(\d\d\d\d)/, '$1-$2-$3');
@@ -11,9 +5,8 @@ String.prototype.toPhone = function () {
 
 window.constants = {
     interview: {// Mark
-        id: '',
-        user: '92990',
-        personcode: '',
+        id: 'QURSSTAwMDItNTIyNzY1LVI1NTM0',
+        user: 'MTAwMjA4MDI=',
         client: 'UkJTREVNTzIwMTcwODE4',
         ui: 'aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS93d3cucmVjcnVpdGluZy5hZHJpLXN5cy5jb20v'
     },
@@ -594,21 +587,21 @@ window.dashboard = (function () {
                         db.drawInterviews(data);
                     }, start, diffDays);
                 },
-                getInterviews: function (onComplete, start, end) {
-                    start = start || 0;
-                    end = end || start;
-
-                    var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
-                    var today = new Date();
-                    var sDate = dashboard.util.date.fmt({ date: today, format: 'yyyy-MM-dd' });
-                    var intInfo = [constants.interview.user, start, end];
-                    socket.on('connect', function (data) {
-                        socket.emit('getInterviews', intInfo);
+                getInterviews: function (onComplete) {
+                    var posFilter = $('#sch-position-filter').val() || 'All';
+                    $.ajax({
+                        type: "GET",
+                        contentType: 'application/json',
+                        dataType: "json",
+                        url: constants.urls.getUserTimeSlots + "?uid=" + constants.interview.user + '&uiid=' + constants.interview.ui + '&cliid=' + constants.interview.client + '&pfl=' + btoa(posFilter),
+                        success: function (data) {
+                            onComplete(data[0]);
+                        },
+                        error: function (xhr, ajaxOptions, error) {
+                            console.log(xhr);
+                        }
                     });
 
-                    socket.on('recieveGet', function (data) {
-                        onComplete(data[0]);
-                    });
                 },
                 getScheduledInterviews: function (onComplete) {
 
@@ -2314,15 +2307,18 @@ window.dashboard = (function () {
                     });
                 }, 
                 get: function (userID, onComplete) {
-
-                    userID = constants.interview.user;
-                    var socket = io.connect('http://ec2-54-244-71-87.us-west-2.compute.amazonaws.com/');
-                    socket.on('connect', function (data) {
-                        socket.emit('getAvail', userID);
-                    });
-
-                    socket.on('recieveGet', function (data) {
-                        onComplete(data);
+                    var svc = constants.urls.persistentAvailability + '?uid=' + userID + '&cliid=' + constants.interview.client + '&uiid=' + constants.interview.ui;
+                    $.ajax({
+                        type: "GET",
+                        contentType: 'application/json',
+                        dataType: "json",
+                        url: svc,
+                        success: function (data) {
+                            onComplete(data);
+                        },
+                        error: function (xhr, ajaxOptions, error) {
+                            console.log(xhr);
+                        }
                     });
                 },
                 set: function (data) {
