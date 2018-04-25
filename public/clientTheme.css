@@ -1,0 +1,354 @@
+﻿
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+}
+
+.pBG {
+    background-color: #e5e5e5;
+}
+
+.mainBG {
+    background-color: rgb(35,132,212);
+}
+
+.secBG {
+    background-color: rgb(24,94,150);
+}
+
+.brightBG {
+    background-color: rgb(128,0,255);
+}
+
+.hlBG {
+    background-color: rgb(247,143,42);
+}
+
+.hltxt {
+    color: rgb(247,143,42);
+}
+
+.maintxt {
+    color: rgb(89,89,89);
+}
+
+.small {
+    font-size: 9pt;
+}
+
+.roboto {
+    font-family: 'Roboto Slab';
+}
+
+.fheader {
+    font-size: 12pt;
+    font-weight: 400;
+    color: #07589C;
+    margin-bottom: 15px;
+}
+
+.cellText {
+    font-size: 8pt;
+}
+
+.blue {
+
+}
+
+.negTxt {
+    color: white;
+}
+
+.negBg {
+    background-color: white;
+}
+
+.tableBG {
+    background-color: rgb(250,250,250);
+}
+
+.attn-text {
+    color: rgb(247,143,42);
+    font-weight: bold;
+}
+
+.mainHTxt {
+    color:rgb(89,89,89);
+    font-weight: bold;
+}
+
+.bold {
+    font-weight: 400;
+}
+
+.secHTxt {
+    color: white;
+    font-size: 10pt;
+}
+
+.brightTxt {
+    color: rgb(128,0,255);
+    font-weight: bold;
+}
+
+.lgTxt {
+    padding-top: 20px;
+    font-size: 24pt;
+}
+
+.loadTxt {
+    color: white;
+    font-weight: bold;
+    font-size: 20pt;
+}
+
+.infoTxt {
+    font-size: 12pt;
+    color: rgb(89,89,89);
+}
+
+.fixedHgt {
+    height: 25px;
+}
+
+.warningTxt {
+    color: red;
+}
+
+.titleHR {
+    width: 80%;
+    margin-bottom: 50px;
+    border-color: #e5e5e5;
+    color: #e5e5e5;
+    border: 1px solid;
+}
+
+.smallHR {
+    width: 80%;
+    border: 1px solid;
+    border-color: rgb(247,143,42);
+    color: rgb(247,143,42);
+}
+
+.interview-sch-node {
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: left;
+    display: inline-block;
+    border-bottom: 2px solid;
+    padding: 2px;
+    border-color: rgb(35,132,212);
+}
+
+.dashHeader {
+    margin-bottom: 1em;
+    text-align: left;
+    font-size: 1.3em;
+    padding-top: .5em;
+    width: 100%;
+    color:white;
+}
+
+.formHeader {
+    margin-bottom: 1em;
+    margin-left: 2%;
+    font-size: 1.5em;
+    padding-top: .5em;
+    width: 90%;
+}
+
+.chart-header {
+    text-align: center;
+    border-bottom: 2px solid rgb(247,143,42);
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.user-date-node {
+    width: 100%;
+    overflow: auto;
+    position: absolute;
+    height: 3em;
+    max-height: 150px;
+    bottom: 0;
+    left: 0;
+    opacity: .85;
+    transition: all 0.15s;
+}
+
+.time-node:hover {
+    background-color: rgb(35,132,212);
+}
+
+.add-user-widget:hover {
+    color: rgb(35,132,212);
+}
+
+.add-widget:hover {
+    color: rgb(35,132,212);
+}
+
+.cal-monthHeader {
+    width: 100%;
+}
+
+.field-wrapper {
+    color: rgb(89,89,89);
+    font-weight: 300;
+}
+
+
+.cal-cell {
+    cursor: pointer;
+    transition: all .1s linear;
+}
+
+
+.add-user-widget {
+    font-family: 'Material Icons';
+    font-size: 56pt;
+    color: rgb(89,89,89);
+    transition: all .2s linear;
+}
+
+
+.add-widget {
+    font-size: 2em;
+    font-family: 'Material Icons';
+    color: rgb(89,89,89);
+    transition: all .2s linear;
+}
+
+.fullWidth-container {
+    display: block;
+    width: 98%;
+    height: auto;
+    overflow: auto;
+    margin-right: 1%;
+}
+
+.halfWidth-container {
+    display: inline-block;
+    width: 48%;
+    margin-top: 10px;
+    height: 325px;
+    overflow: auto;
+    color: rgb(89,89,89);
+    margin-left: 1%;
+    margin-right: 1%;
+}
+
+.block-text {
+    color: #07589C;
+    display: block;
+}
+
+.inline-text {
+    color: rgb(89,89,89);
+    display: inline-block;
+}
+
+
+.field-toggler {
+    text-align: center;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    margin: 2px;
+    cursor: pointer;
+    position: relative;
+    background-color: white;
+    transition: all .2s;
+}
+
+.field-viewer {
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    color: rgb(255,255,255);
+}
+
+.wvHeader {
+    display: table-cell;
+    height: auto;
+    margin-bottom: 1em;
+    color: rgb(89,89,89);
+}
+
+.wvCalBody {
+    width: 100%;
+    table-layout: fixed;
+    display: table;
+    color: rgb(89,89,89);
+    border-spacing: 2px;
+}
+
+.title-weekly-calendar {
+    color: #B8B8B8;
+    font-size: 18pt;
+}
+
+.tightHR {
+    width: 100%;
+    border-color: rgb(89,89,89);
+    color: rgb(89,89,89);
+    border: 1px solid;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.bigWidget {
+    font-family: 'Material Icons';
+    font-size: 36pt;
+    color: rgb(89,89,89);
+}
+
+.medWidget {
+    font-family: 'Material Icons';
+    font-size: 24pt;
+    color: rgb(89,89,89);
+    display: inline-block;
+}
+
+.stdWidget {
+    font-family: 'Material Icons';
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    font-size: 55px;
+    vertical-align: middle;
+    color: #B8B8B8;
+}
+
+.closeWidget {
+    font-family: 'Material Icons';
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    font-size: 25px;
+    vertical-align: middle;
+    color: #F65262;
+}
+
+/* client pallette end */
