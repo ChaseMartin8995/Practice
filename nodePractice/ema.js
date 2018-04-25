@@ -50,8 +50,8 @@ function sendEmail(theemail, themessage, thetitle) {
     console.log('in sendEmail');
 
     var transporter = nodemailer.createTransport(ses({
-        accessKeyId: 'AKIAIGVJSH44VJLXCLOA',
-        secretAccessKey: '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'
+        accessKeyId: 'AKIAIGVJS',
+        secretAccessKey: '+XE+z8Tt1sig6aoj1xH4Dk+'
     }));
 
     var mailOptions = {
@@ -76,7 +76,7 @@ function setupemail1(err, rows) {
         lname = rows[0][i].lname;
         emailaddress = rows[0][i].emailaddress;
         encrypted = rows[0][i].encrypted;
-        thetitle = 'Audrey'
+        thetitle = ''
         var themessage = 'Hi ' + fname + ' ' + lname + '!  The manager paired with you is available to interview.  Please follow this link to setup a time.  <a class="ulink" href="http://stuff' + encrypted + '" target="_blank">Link to Audrey</a>';
         console.log(themessage);
         sendEmail(emailaddress, themessage, thetitle);
@@ -243,7 +243,7 @@ function setupemailbatch(err, rows) {
         lname = rows[0][i].lname;
         emailaddress = rows[0][i].emailaddress;
         encrypted = rows[0][i].encrypted;
-        thetitle = 'Audrey'
+        thetitle = ''
         var themessage = 'Hi ' + fname + ' ' + lname + '!  The manager paired with you is available to interview.  Please follow this link to setup a time.  <a class="ulink" href="http://stuff?id=' + encrypted + '" target="_blank">Link to Audrey</a>';
         console.log(themessage);
         sendEmail(emailaddress, themessage, thetitle);

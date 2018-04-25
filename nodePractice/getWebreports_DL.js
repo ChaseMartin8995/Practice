@@ -1,5 +1,4 @@
 ﻿var AWS = require('aws-sdk');
-//var mysql = require('node_modules/mysql');
 var mysql = require('mysql');
 var s3 = new AWS.S3();
 var fcsv = require('fast-csv');
@@ -49,8 +48,8 @@ function postValidation(cDetails, queries, onComplete){
         if(cDetails === 'INVALID USER'){
                 var msg = {
                         type: 'error',
-                        markup: '<div class="er-msg">We\'re sorry, but we were unable to locate your user ID. Please contact                                                  your company\'s recruiting administrator for assistance.</div>',
-                        text: 'We\'re sorry, but we were unable to locate your user ID. Please contact your company\'s recrui                                                 ting administrator for assistance.'
+                        markup: '<div class="er-msg">We\'re sorry, but we were unable to locate your user ID. Please contact your company\'s recruiting administrator for assistance.</div>',
+                        text: 'We\'re sorry, but we were unable to locate your user ID.'
                 };
                 onComplete(msg);
         }
