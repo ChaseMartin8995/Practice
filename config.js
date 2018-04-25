@@ -1,10 +1,10 @@
 ﻿window.appconfig = (function () {
     var appconfig = {
         api: {
-            base: 'https://4jja3nb0yf.execute-api.us-west-2.amazonaws.com',
+            base: '',
             stage: 'prod' 
         },
-        clientname: 'TruGreen',
+        clientname: '',
         alias: {
             interview: 'Call',
             interviewer: 'Hiring Manager',
