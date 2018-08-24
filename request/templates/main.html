@@ -4,12 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    <link rel="stylesheet" href="src/request.css">
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/request.css') }}">
+    <script src="{{ url_for('static',filename='js/knockout.js') }}" type='text/javascript'></script> 
+    <script src="{{ url_for('static',filename='js/jquery.min.js') }}" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-    <script src='src/knockout.js' type='text/javascript'></script>       
-    <script src="src/request.js" type="text/javascript"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>         
+    <script src="{{ url_for('static',filename='js/request.js') }}" type="text/javascript"></script>
 </head>
 <body class="bg-light">
     <div class="container" id="app">
@@ -18,21 +18,21 @@
             <div class="col-md-7 order-md-1">
                 <div class="form">
                     <h4>Request New Feature</h4>
-                    <form class="needs-validation" novalidate>
+                    <form data-bind="submit: submitData" class="needs-validation" novalidate>
                         <div class="mb-3">
                             <label for="title">Title</label>
-                            <input data-bind="text: title" class="form-control"></input>
+                            <input data-bind="value: title" class="form-control"></input>
                         </div>
                         <div class="mb-3">
                             <label for="desc">Description
                                 <span class="text-muted">(Briefly describe why this is needed)</span>
                             </label>
-                            <textarea data-bind="text: desc" class="form-control" rows="5"></textarea>
+                            <textarea data-bind="value: desc" class="form-control" rows="5"></textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="clientid">Client</label>
-                                <select data-bind="text: clientid" type="text" class="custom-select d-block w-100">
+                                <select data-bind="value: clientid" type="text" class="custom-select d-block w-100">
                                     <option value="Client A">Client A</option>
                                     <option value="Client B">Client B</option>
                                     <option value="Client C">Client C</option>
@@ -54,11 +54,11 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="tdate">Target Date</label>
-                                <input data-bind="text: tdate" type="text" class="form-control" placeholder="mm/dd/yyyy"></input>
+                                <input data-bind="value: tdate" type="text" class="form-control" placeholder="mm/dd/yyyy"></input>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="parea">Product Area</label>
-                                <select data-bind="text: parea" type="text" class="custom-select d-block w-100">
+                                <select data-bind="value: parea" type="text" class="custom-select d-block w-100">
                                     <option value="Policies">Policies</option>
                                     <option value="Billing">Billing</option>
                                     <option value="Claims">Claims</option>
